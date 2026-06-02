@@ -10,7 +10,7 @@ window.SMERP_CONFIG = {
   // Supabase self-hosted (SMERP) no EasyPanel
   SUPABASE_URL: 'https://supabase-supabase.h5xdag.easypanel.host',
   SUPABASE_ANON_KEY:
-    'eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJyb2xlIjogImFub24iLCAiaXNzIjogInN1cGFiYXNlIiwgImlhdCI6IDE2NDE3NjkyMDAsICJleHAiOiAxODkzNDU2MDAwfQ.ZopqoUt20nEV9cklpv9e3yw3PVyZLmKs5qLD6nGL1SI',
+    'eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJyb2xlIjogImFub24iLCAiaXNzIjogInN1cGFiYXNlIiwgImlhdCI6IDE2NDE3NjkyMDAsICJleHAiOiAxODkzNDU2MDAwfQ.n_Z8vVhAqNlxq3qRr0_JbyBcKilz_Tm4Xjc7LNjFH38',
 
   // chave do localStorage exclusiva do hub (não colide com os apps)
   STORAGE_KEY: 'smerp-hub-auth',
