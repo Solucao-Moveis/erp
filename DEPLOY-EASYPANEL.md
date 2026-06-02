@@ -30,8 +30,9 @@ erp/
    - **Build**: tipo **Dockerfile** (o EasyPanel detecta o `Dockerfile` na raiz).
 
 3. **Porta**
-   - Em **Domains/Proxy**, aponte a porta interna **80** (exposta no Dockerfile).
+   - O container escuta na porta **3000** (padrão do EasyPanel) — não precisa alterar nada.
    - O EasyPanel cuida do HTTPS (Let's Encrypt) automaticamente.
+   - Se ver **502 Bad Gateway**, confira em **Domains** se a porta está como **3000**.
 
 4. **Deploy**
    - Clique em **Deploy**. A cada `git push` no `main`, o EasyPanel rebuilda e republica (zero downtime).
@@ -39,7 +40,7 @@ erp/
 ## Testar localmente (opcional)
 ```bash
 docker build -t smerp-hub .
-docker run --rm -p 8080:80 smerp-hub
+docker run --rm -p 8080:3000 smerp-hub
 # abra http://localhost:8080
 ```
 

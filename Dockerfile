@@ -12,11 +12,11 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY index.html styles.css script.js /usr/share/nginx/html/
 COPY assets/ /usr/share/nginx/html/assets/
 
-# EasyPanel detecta a porta exposta automaticamente
-EXPOSE 80
+# EasyPanel faz o proxy para a porta 3000 por padrão
+EXPOSE 3000
 
 # Healthcheck simples
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget -q -O /dev/null http://localhost:80/ || exit 1
+  CMD wget -q -O /dev/null http://localhost:3000/ || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]
