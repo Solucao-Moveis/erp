@@ -74,7 +74,7 @@ body {
 .nav__link:hover { color: var(--ink); background: var(--orange-soft); }
 .nav__link--active { color: var(--orange); background: var(--orange-soft); }
 
-.header__right { display: flex; align-items: center; gap: 14px; }
+.header__right { display: flex; align-items: center; gap: 14px; margin-left: auto; }
 .badge-version {
   font-size: 11px; font-weight: 600; color: var(--orange);
   background: var(--orange-soft); padding: 4px 10px; border-radius: 20px;
@@ -97,7 +97,7 @@ body {
 .workspace {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 54px 28px calc(var(--footer-h) + 48px);
+  padding: 54px 28px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -223,14 +223,12 @@ body {
 
 /* ===================== FOOTER ===================== */
 .footer {
-  position: fixed; bottom: 0; left: 0; right: 0;
   height: var(--footer-h);
+  margin-top: 32px;
   background: rgba(255,255,255,0.9);
-  backdrop-filter: blur(8px);
   border-top: 1px solid var(--border);
   display: flex; align-items: center; justify-content: center; gap: 8px;
   font-size: 12px; font-weight: 600; color: var(--ink-soft);
-  z-index: 90;
 }
 .footer__dot { color: var(--orange); }
 
@@ -257,7 +255,7 @@ body {
   .header__inner { padding: 0 18px; gap: 12px; }
   .brand__sub { display: none; }
 
-  .workspace { padding: 36px 18px calc(var(--footer-h) + 36px); }
+  .workspace { padding: 36px 18px 20px; }
   .hub { width: 150px; height: 150px; }
   .hub__core { width: 124px; height: 124px; }
   .hub__logo { width: 50px; }

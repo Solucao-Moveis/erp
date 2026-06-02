@@ -4,22 +4,6 @@
 (function () {
   'use strict';
 
-  /* ---- Menu mobile (hamburguer) ---- */
-  var hamburger = document.querySelector('.hamburger');
-  var nav = document.querySelector('.nav');
-
-  if (hamburger && nav) {
-    hamburger.addEventListener('click', function () {
-      var isOpen = nav.classList.toggle('nav--open');
-      hamburger.setAttribute('aria-label', isOpen ? 'Fechar menu' : 'Abrir menu');
-    });
-    nav.addEventListener('click', function (e) {
-      if (e.target.classList.contains('nav__link')) {
-        nav.classList.remove('nav--open');
-      }
-    });
-  }
-
   /* ============================================================
      LOGIN ÚNICO (SMERP) + SSO para os 3 sistemas
      ============================================================ */
