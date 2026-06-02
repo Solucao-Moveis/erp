@@ -9,7 +9,7 @@ RUN rm -f /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copia os arquivos do site
-COPY index.html styles.css script.js /usr/share/nginx/html/
+COPY index.html styles.css script.js config.js /usr/share/nginx/html/
 COPY assets/ /usr/share/nginx/html/assets/
 
 # O proxy do EasyPanel deste app aponta para a porta 80 (solucaomoveis_erp:80)

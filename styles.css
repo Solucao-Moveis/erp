@@ -291,3 +291,85 @@ body {
   .hub__ring, .hub__core { animation: none; }
   * { transition-duration: .01ms !important; }
 }
+
+/* ===================== LOGIN ÚNICO (overlays) ===================== */
+/* enquanto carrega/logando, esconde o conteúdo do hub */
+body.smerp-booting .workspace,
+body.smerp-booting .footer { visibility: hidden; }
+
+.btn-logout {
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  color: var(--orange); background: var(--orange-soft);
+  border: 1px solid rgba(232,114,42,0.25);
+  padding: 7px 14px; border-radius: 9px;
+  transition: background .2s ease, color .2s ease;
+}
+.btn-logout:hover { background: var(--orange); color: #fff; }
+.user-email { font-size: 13px; font-weight: 600; color: var(--ink-soft); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.smerp-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background-color: var(--bg);
+  background-image: radial-gradient(circle, rgba(26,26,46,0.06) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.smerp-overlay[hidden] { display: none; }
+
+/* --- Loading --- */
+.smerp-loading__box { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; }
+.smerp-loading__logo { width: 84px; height: auto; animation: pulse 3s ease-in-out infinite; }
+.smerp-loading__name { font-size: 26px; font-weight: 900; color: var(--orange); letter-spacing: .5px; }
+.smerp-loading__txt { font-size: 13px; font-weight: 600; color: var(--ink-soft); }
+.smerp-spinner {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 3px solid var(--orange-soft); border-top-color: var(--orange);
+  animation: spin 0.9s linear infinite;
+}
+
+/* --- Login --- */
+.smerp-login__card {
+  width: 100%; max-width: 380px;
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 34px 30px;
+  box-shadow: var(--shadow-panel);
+  display: flex; flex-direction: column; align-items: stretch; gap: 14px;
+}
+.smerp-login__logo { width: 64px; height: auto; align-self: center; }
+.smerp-login__title { text-align: center; font-size: 24px; font-weight: 900; color: var(--orange); letter-spacing: .5px; }
+.smerp-login__sub { text-align: center; font-size: 13px; color: var(--ink-soft); margin-top: -8px; margin-bottom: 6px; }
+
+.smerp-field { display: flex; flex-direction: column; gap: 6px; }
+.smerp-field span { font-size: 12px; font-weight: 700; color: var(--ink); }
+.smerp-field input {
+  font: inherit; font-size: 15px; color: var(--ink);
+  padding: 11px 13px; border: 1px solid var(--border); border-radius: 10px;
+  background: #fff; outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.smerp-field input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-soft); }
+
+.smerp-login__error {
+  font-size: 13px; font-weight: 600; color: #C0392B;
+  background: rgba(192,57,43,0.08); border: 1px solid rgba(192,57,43,0.2);
+  padding: 9px 12px; border-radius: 9px; text-align: center;
+}
+.smerp-login__error[hidden] { display: none; }
+
+.smerp-login__btn {
+  margin-top: 4px; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
+  color: #fff; background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+  border: none; padding: 13px 18px; border-radius: 11px;
+  box-shadow: 0 8px 22px var(--orange-glow);
+  transition: box-shadow .25s ease, opacity .2s ease;
+}
+.smerp-login__btn:hover { box-shadow: 0 12px 30px rgba(232,114,42,0.45); }
+.smerp-login__btn:disabled { opacity: .65; cursor: default; }
+
+.smerp-login__forgot {
+  font: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+  background: none; border: none; color: var(--ink-soft);
+  text-decoration: underline; text-underline-offset: 3px; padding: 4px;
+}
+.smerp-login__forgot:hover { color: var(--ink); }

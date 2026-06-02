@@ -11,7 +11,40 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body class="smerp-booting">
+  <!-- ===================== TELA DE CARREGAMENTO ===================== -->
+  <div class="smerp-overlay smerp-loading" id="loadingOverlay">
+    <div class="smerp-loading__box">
+      <img class="smerp-loading__logo" src="assets/logo-solucao-moveis.png" alt="Solução Móveis" />
+      <span class="smerp-loading__name">SMERP</span>
+      <div class="smerp-spinner" aria-hidden="true"></div>
+      <span class="smerp-loading__txt">Carregando…</span>
+    </div>
+  </div>
+
+  <!-- ===================== TELA DE LOGIN ===================== -->
+  <div class="smerp-overlay smerp-login" id="loginOverlay" hidden>
+    <form class="smerp-login__card" id="loginForm" autocomplete="on">
+      <img class="smerp-login__logo" src="assets/logo-solucao-moveis.png" alt="Solução Móveis" />
+      <h1 class="smerp-login__title">SMERP</h1>
+      <p class="smerp-login__sub">Entre para acessar seus sistemas</p>
+
+      <label class="smerp-field">
+        <span>E-mail</span>
+        <input id="loginEmail" name="email" type="email" required autocomplete="username" />
+      </label>
+      <label class="smerp-field">
+        <span>Senha</span>
+        <input id="loginPassword" name="password" type="password" required autocomplete="current-password" />
+      </label>
+
+      <p class="smerp-login__error" id="loginError" hidden></p>
+
+      <button class="smerp-login__btn" id="loginSubmit" type="submit">Entrar</button>
+      <button class="smerp-login__forgot" id="btnForgot" type="button">Esqueci minha senha</button>
+    </form>
+  </div>
+
   <!-- ===================== HEADER ===================== -->
   <header class="header">
     <div class="header__inner">
@@ -32,6 +65,8 @@
 
       <div class="header__right">
         <span class="badge-version">v1.0</span>
+        <span class="user-email" id="userEmail" hidden></span>
+        <button class="btn-logout" id="btnLogout" type="button" hidden>Sair</button>
         <div class="avatar" title="Solução Móveis" aria-hidden="true">SM</div>
         <button class="hamburger" aria-label="Abrir menu" type="button">
           <span></span><span></span><span></span>
@@ -61,7 +96,7 @@
     <!-- Cards dos sistemas -->
     <section class="systems" id="sistemas" aria-label="Sistemas integrados">
       <!-- COMPRAS / SC MANAGER -->
-      <article class="card" data-accent="compras">
+      <article class="card" data-accent="compras" data-system="compras">
         <div class="card__body">
           <div class="card__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -85,7 +120,7 @@
       </article>
 
       <!-- HORA A HORA -->
-      <article class="card" data-accent="producao">
+      <article class="card" data-accent="producao" data-system="fabrill">
         <div class="card__body">
           <div class="card__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -108,7 +143,7 @@
       </article>
 
       <!-- BIP SOLUÇÃO -->
-      <article class="card" data-accent="logistica">
+      <article class="card" data-accent="logistica" data-system="bip">
         <div class="card__body">
           <div class="card__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -139,6 +174,8 @@
     <span>v1.0</span>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
