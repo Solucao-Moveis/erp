@@ -26,9 +26,23 @@ Valores do Lovable estão no **git de cada app** (`.env` versionado). Reverter =
 - `PGRST_DB_SCHEMAS = public,compras,fabrill,bip` no Supabase (EasyPanel) → restart.
 - Realtime: `ALTER PUBLICATION supabase_realtime ADD TABLE compras.notifications;`
 
-## Passo 2 — Trocar as chaves (cada app, 2 lugares)
+## Passo 2 — Trocar as chaves (cada app, 2 lugares) — ver `ENV-VIRADA.md`
 - **`.env` versionado** → `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY` = SMERP.
-- **EasyPanel → Environment** → `SUPABASE_URL` + `SUPABASE_PUBLISHABLE_KEY` = SMERP; **bip também** `SUPABASE_SERVICE_ROLE_KEY`.
+- **EasyPanel → Environment** → `SUPABASE_URL` + `SUPABASE_PUBLISHABLE_KEY` (+ `SUPABASE_SERVICE_ROLE_KEY`) + `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY` = SMERP.
+
+### ✅ Conferência do ENV (não passar batido nenhum dos 3)
+Para **cada** serviço no EasyPanel (compras, fabrill, bip) E o `.env` de cada repo, confirmar:
+- [ ] `SUPABASE_URL` e `VITE_SUPABASE_URL` = `https://supabase-supabase.h5xdag.easypanel.host` (NÃO mais `*.supabase.co`)
+- [ ] `SUPABASE_PUBLISHABLE_KEY` e `VITE_SUPABASE_PUBLISHABLE_KEY` = anon do SMERP (**termina em `...LNjFH38`**) — NÃO a anon antiga do Lovable
+- [ ] `SUPABASE_SERVICE_ROLE_KEY` presente (role `service_role`; secreta; só no EasyPanel)
+- [ ] não sobrou nenhuma URL/ref antiga (`wbxnaemipiqxtaledycl` / `oqghoelwiqnpcfmijhny` / `dbdoacdhflrxjlngpwif`)
+
+Checklist por app:
+- [ ] **bip** — EasyPanel + `.env` conferidos
+- [ ] **fabrill** — EasyPanel + `.env` conferidos
+- [ ] **compras** — EasyPanel + `.env` conferidos
+
+> Teste rápido pós-deploy: abrir o app, F12 → Network → uma chamada deve ir para `supabase-supabase.h5xdag.easypanel.host`. Se ainda for pra `*.supabase.co`, o `.env`/build não pegou.
 
 ## Passo 3 — Commit + deploy (ordem: bip → fabrill → compras)
 Mudanças locais já prontas em cada app (db.schema nos 3 clients, SSO no boot, `app:'<sistema>'` no cadastro, botão "Voltar ao ERP", fix realtime do compras) + `.env` editado → commit → push.
