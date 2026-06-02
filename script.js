@@ -74,30 +74,49 @@
     else { loginError.textContent = ''; loginError.hidden = true; }
   }
 
+  // --- transições suaves (fade) ---
+  var bootStart = Date.now();
+  var SPLASH_MIN_MS = 1000; // segura a splash pelo menos 1s pra não "piscar"
+
   function showLoadingState() {
     document.body.classList.add('smerp-booting');
-    show(loadingOverlay);
-    hide(loginOverlay);
+    if (loadingOverlay) { loadingOverlay.classList.remove('is-leaving'); loadingOverlay.hidden = false; }
+    if (loginOverlay) { loginOverlay.classList.remove('is-visible'); loginOverlay.hidden = true; }
+  }
+
+  // some com a splash em fade (respeitando o tempo mínimo) e então chama done()
+  function fadeOutLoading(done) {
+    if (!loadingOverlay || loadingOverlay.hidden) { if (done) done(); return; }
+    var wait = Math.max(0, SPLASH_MIN_MS - (Date.now() - bootStart));
+    setTimeout(function () {
+      loadingOverlay.classList.add('is-leaving');
+      var finished = false;
+      var finish = function () {
+        if (finished) return; finished = true;
+        loadingOverlay.hidden = true;
+        if (done) done();
+      };
+      loadingOverlay.addEventListener('transitionend', finish, { once: true });
+      setTimeout(finish, 700); // segurança caso o transitionend não dispare
+    }, wait);
+  }
+
+  function revealLogin() {
+    if (loginOverlay) { loginOverlay.hidden = false; loginOverlay.classList.remove('is-visible'); }
+    hide(btnLogout); hide(userEmail);
+    requestAnimationFrame(function () { if (loginOverlay) loginOverlay.classList.add('is-visible'); });
+    if (loginEmail) { try { loginEmail.focus(); } catch (e) {} }
+  }
+
+  function hideLogin(done) {
+    if (!loginOverlay || loginOverlay.hidden) { if (done) done(); return; }
+    loginOverlay.classList.remove('is-visible'); // fade-out
+    setTimeout(function () { loginOverlay.hidden = true; if (done) done(); }, 350);
   }
 
   function showLoginState() {
     document.body.classList.add('smerp-booting'); // mantém os cards cobertos
-    hide(loadingOverlay);
-    show(loginOverlay);
-    hide(btnLogout);
-    hide(userEmail);
-    if (loginEmail) { try { loginEmail.focus(); } catch (e) {} }
-  }
-
-  function showAppState(session) {
-    document.body.classList.remove('smerp-booting');
-    hide(loadingOverlay);
-    hide(loginOverlay);
-    if (userEmail && session && session.user) {
-      userEmail.textContent = session.user.email || '';
-      show(userEmail);
-    }
-    show(btnLogout);
+    fadeOutLoading(revealLogin);
   }
 
   // Mostra só os cards dos sistemas que o usuário tem acesso.
@@ -117,19 +136,24 @@
   }
 
   async function enterApp(session) {
-    showAppState(session);
+    if (userEmail && session && session.user) {
+      userEmail.textContent = session.user.email || '';
+      show(userEmail);
+    }
+    show(btnLogout);
+    // filtra os cards ANTES de revelar, pra não piscar os 3
     try {
       var res = await sb.rpc('my_systems');
-      if (res.error) {
-        console.error('[SMERP] my_systems:', res.error.message);
-        applySystems({}); // sem dados -> nenhum card
-        return;
-      }
-      applySystems(res.data || {});
+      if (res.error) { console.error('[SMERP] my_systems:', res.error.message); applySystems({}); }
+      else applySystems(res.data || {});
     } catch (e) {
       console.error('[SMERP] my_systems falhou:', e);
       applySystems({});
     }
+    // revela o hub: some a splash (se visível) e o login (se visível) em fade suave
+    fadeOutLoading(function () {
+      hideLogin(function () { document.body.classList.remove('smerp-booting'); });
+    });
   }
 
   // Abre o app levando a sessão atual no hash (SSO). Sem sessão, cai no link normal.
