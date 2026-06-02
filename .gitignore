@@ -6,6 +6,8 @@
 migracao/migrate-storage.js
 # senha do usuário master em texto puro
 migracao/master_user.sql
+# senha padrão dos usuários em texto puro
+migracao/set_default_password.sql
 # token do export + função temporária (será apagada do Lovable)
 migracao/edge-function-export/
 # dumps brutos: e-mails dos usuários + signed URLs (pesados, redundantes c/ import_*.sql)
