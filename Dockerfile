@@ -15,8 +15,9 @@ COPY assets/ /usr/share/nginx/html/assets/
 # O proxy do EasyPanel deste app aponta para a porta 80 (solucaomoveis_erp:80)
 EXPOSE 80
 
-# Healthcheck simples
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget -q -O /dev/null http://localhost:80/ || exit 1
+# OBS: sem HEALTHCHECK do Docker de propósito. Um healthcheck com "localhost"
+# falha porque localhost resolve para IPv6 (::1) e o Nginx só escuta em IPv4,
+# marcando o container como unhealthy e fazendo o EasyPanel devolver 502.
+# O EasyPanel já monitora a saúde do serviço por conta própria.
 
 CMD ["nginx", "-g", "daemon off;"]
