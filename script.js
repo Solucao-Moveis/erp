@@ -20,15 +20,6 @@
     });
   }
 
-  /* ---- Toque nos cards (mobile): destaca o card tocado ---- */
-  var cards = document.querySelectorAll('.card');
-  cards.forEach(function (card) {
-    card.addEventListener('touchstart', function () {
-      cards.forEach(function (c) { c.classList.remove('card--active'); });
-      card.classList.add('card--active');
-    }, { passive: true });
-  });
-
   /* ============================================================
      LOGIN ÚNICO (SMERP) + SSO para os 3 sistemas
      ============================================================ */
@@ -119,21 +110,91 @@
     fadeOutLoading(revealLogin);
   }
 
-  // Mostra só os cards dos sistemas que o usuário tem acesso.
-  function applySystems(systems) {
-    var keys = systems && typeof systems === 'object' ? Object.keys(systems) : [];
-    var visible = 0;
-    document.querySelectorAll('.card[data-system]').forEach(function (card) {
-      var sys = card.getAttribute('data-system');
-      var ok = keys.indexOf(sys) !== -1;
-      card.style.display = ok ? '' : 'none';
-      if (ok) visible++;
+  // Ícones por setor (SVG inline)
+  var ICONS = {
+    cart:  '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    bars:  '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5v14M7 5v14M11 5v14M14 5v14M18 5v14M21 5v14"/></svg>'
+  };
+  var CHEVRON = '<svg class="card__chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+  var ARROW = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
+  }
+
+  function closeAllMenus(except) {
+    document.querySelectorAll('.card.card--open').forEach(function (c) {
+      if (c === except) return;
+      c.classList.remove('card--open');
+      var b = c.querySelector('.card__btn');
+      if (b) b.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  // Renderiza um card por SETOR, só com os módulos liberados pra pessoa.
+  // Clicar no card abre um dropdown interno; clicar num módulo abre na MESMA aba.
+  function renderSetores(systems) {
+    var container = $('systems');
+    if (!container) return;
+    container.innerHTML = '';
+    var keys = systems && typeof systems === 'object' ? Object.keys(systems) : [];
+    var setores = CFG.SETORES || [];
+    var visible = 0;
+
+    setores.forEach(function (setor) {
+      var mods = (setor.modulos || []).filter(function (m) { return keys.indexOf(m.system) !== -1; });
+      if (!mods.length) return;
+      visible++;
+
+      var card = document.createElement('article');
+      card.className = 'card';
+      card.setAttribute('data-setor', setor.id);
+      card.innerHTML =
+        '<div class="card__icon" aria-hidden="true">' + (ICONS[setor.icon] || '') + '</div>' +
+        '<h2 class="card__title">' + escapeHtml(setor.nome) + '</h2>' +
+        '<button class="card__btn" type="button" aria-expanded="false">Acessar' + CHEVRON + '</button>' +
+        '<div class="card__menu" role="menu">' +
+          mods.map(function (m) {
+            return '<button class="card__menu-item" type="button" role="menuitem" data-system="' + escapeHtml(m.system) + '">' +
+              '<span class="card__menu-text"><span class="card__menu-name">' + escapeHtml(m.nome) + '</span>' +
+              (m.desc ? '<span class="card__menu-desc">' + escapeHtml(m.desc) + '</span>' : '') + '</span>' +
+              ARROW +
+            '</button>';
+          }).join('') +
+        '</div>';
+
+      var btn = card.querySelector('.card__btn');
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var willOpen = !card.classList.contains('card--open');
+        closeAllMenus(card);
+        card.classList.toggle('card--open', willOpen);
+        btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      });
+
+      card.querySelectorAll('.card__menu-item').forEach(function (item) {
+        item.addEventListener('click', function (e) {
+          e.stopPropagation();
+          openApp(item.getAttribute('data-system'));
+        });
+      });
+
+      container.appendChild(card);
+    });
+
     var intro = document.querySelector('.intro__desc');
-    if (visible === 0 && intro) {
-      intro.textContent = 'Nenhum sistema liberado para o seu usuário ainda. Fale com o administrador.';
+    if (intro) {
+      intro.textContent = visible === 0
+        ? 'Nenhum sistema liberado para o seu usuário ainda. Fale com o administrador.'
+        : 'Selecione um setor e o módulo que quer usar.';
     }
   }
+
+  // fecha qualquer dropdown ao clicar fora
+  document.addEventListener('click', function () { closeAllMenus(null); });
 
   async function enterApp(session) {
     if (userEmail && session && session.user) {
@@ -141,14 +202,14 @@
       show(userEmail);
     }
     show(btnLogout);
-    // filtra os cards ANTES de revelar, pra não piscar os 3
+    // monta os cards ANTES de revelar, pra não piscar
     try {
       var res = await sb.rpc('my_systems');
-      if (res.error) { console.error('[SMERP] my_systems:', res.error.message); applySystems({}); }
-      else applySystems(res.data || {});
+      if (res.error) { console.error('[SMERP] my_systems:', res.error.message); renderSetores({}); }
+      else renderSetores(res.data || {});
     } catch (e) {
       console.error('[SMERP] my_systems falhou:', e);
-      applySystems({});
+      renderSetores({});
     }
     // revela o hub: some a splash (se visível) e o login (se visível) em fade suave
     fadeOutLoading(function () {
@@ -156,9 +217,9 @@
     });
   }
 
-  // Abre o app levando a sessão atual no hash (SSO). Sem sessão, cai no link normal.
-  async function openApp(system, fallbackHref) {
-    var url = (CFG.APPS && CFG.APPS[system]) || fallbackHref;
+  // Abre o app na MESMA aba, levando a sessão atual no hash (SSO).
+  async function openApp(system) {
+    var url = CFG.APPS && CFG.APPS[system];
     if (!url) return;
     try {
       var s = (await sb.auth.getSession()).data.session;
@@ -171,18 +232,8 @@
     } catch (e) {
       console.warn('[SMERP] sem sessão para SSO, abrindo direto:', e);
     }
-    window.open(url, '_blank', 'noopener');
+    window.location.href = url; // mesma aba (o app tem botão "Voltar ao ERP")
   }
-
-  // Intercepta o clique no botão "Acessar Sistema" de cada card.
-  document.querySelectorAll('.card[data-system] .card__btn').forEach(function (btn) {
-    btn.addEventListener('click', function (e) {
-      e.preventDefault();
-      var card = btn.closest('.card');
-      var system = card && card.getAttribute('data-system');
-      openApp(system, btn.getAttribute('href'));
-    });
-  });
 
   // Login
   if (loginForm) {
@@ -231,7 +282,7 @@
   if (btnLogout) {
     btnLogout.addEventListener('click', async function () {
       try { await sb.auth.signOut(); } catch (e) {}
-      document.querySelectorAll('.card[data-system]').forEach(function (c) { c.style.display = ''; });
+      var sysc = $('systems'); if (sysc) sysc.innerHTML = '';
       if (loginPassword) loginPassword.value = '';
       showLoginState();
     });

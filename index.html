@@ -88,81 +88,11 @@
     <!-- Intro -->
     <div class="intro">
       <h1 class="intro__title">Bem-vindo ao seu painel de gestão</h1>
-      <p class="intro__desc">Selecione um sistema para começar. Cada módulo abre em uma nova aba.</p>
+      <p class="intro__desc">Selecione um setor e o módulo que quer usar.</p>
     </div>
 
-    <!-- Cards dos sistemas -->
-    <section class="systems" id="sistemas" aria-label="Sistemas integrados">
-      <!-- COMPRAS / SC MANAGER -->
-      <article class="card" data-accent="compras" data-system="compras">
-        <div class="card__body">
-          <div class="card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-            </svg>
-          </div>
-          <h2 class="card__title">SC Manager</h2>
-          <p class="card__desc">Gestão de suprimentos e compras</p>
-          <div class="card__sector">
-            <span class="card__sector-label">Setor</span>
-            <span class="card__sector-value">Administrativo</span>
-          </div>
-        </div>
-        <div class="card__overlay">
-          <a class="card__btn" href="https://solucaomoveis-compras.h5xdag.easypanel.host/" target="_blank" rel="noopener">
-            Acessar Sistema
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
-        </div>
-      </article>
-
-      <!-- HORA A HORA -->
-      <article class="card" data-accent="producao" data-system="fabrill">
-        <div class="card__body">
-          <div class="card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
-            </svg>
-          </div>
-          <h2 class="card__title">Hora a Hora</h2>
-          <p class="card__desc">Apontamento de produção por hora</p>
-          <div class="card__sector">
-            <span class="card__sector-label">Setor</span>
-            <span class="card__sector-value">Fábrica / Produção</span>
-          </div>
-        </div>
-        <div class="card__overlay">
-          <a class="card__btn" href="https://solucaomoveis-horaahora.h5xdag.easypanel.host/" target="_blank" rel="noopener">
-            Acessar Sistema
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
-        </div>
-      </article>
-
-      <!-- BIP SOLUÇÃO -->
-      <article class="card" data-accent="logistica" data-system="bip">
-        <div class="card__body">
-          <div class="card__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 5v14M7 5v14M11 5v14M14 5v14M18 5v14M21 5v14"/>
-            </svg>
-          </div>
-          <h2 class="card__title">BIP Solução</h2>
-          <p class="card__desc">Conferência de lotes por bipagem</p>
-          <div class="card__sector">
-            <span class="card__sector-label">Setor</span>
-            <span class="card__sector-value">Expedição / Logística</span>
-          </div>
-        </div>
-        <div class="card__overlay">
-          <a class="card__btn" href="https://solucaomoveis-bip.h5xdag.easypanel.host/" target="_blank" rel="noopener">
-            Acessar Sistema
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
-        </div>
-      </article>
-    </section>
+    <!-- Cards por setor (preenchidos pelo script.js conforme o acesso da pessoa) -->
+    <section class="systems" id="systems" aria-label="Setores"></section>
   </main>
 
   <!-- ===================== FOOTER ===================== -->
@@ -173,7 +103,7 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js?v=2"></script>
-  <script src="script.js?v=2"></script>
+  <script src="config.js?v=3"></script>
+  <script src="script.js?v=3"></script>
 </body>
 </html>
