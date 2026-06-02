@@ -25,6 +25,40 @@
   function show(el) { if (el) el.hidden = false; }
   function hide(el) { if (el) el.hidden = true; }
 
+  /* ---- Notas de Atualização (independe do login) ---- */
+  (function initNotas() {
+    var btnNotas = $('btnNotas');
+    var modal = $('notasModal');
+    var listEl = $('notasList');
+    if (!btnNotas || !modal) return;
+
+    function render() {
+      if (!listEl) return;
+      var notas = window.SMERP_NOTAS || [];
+      if (!notas.length) { listEl.innerHTML = '<p class="nota__vazio">Nenhuma nota ainda.</p>'; return; }
+      listEl.innerHTML = notas.map(function (n) {
+        var itens = (n.mudancas || []).map(function (m) {
+          return '<li class="nota__item">' +
+            '<span class="nota__oque">' + escapeHtml(m.o_que) + '</span>' +
+            (m.como ? '<span class="nota__como"><b>Como usar:</b> ' + escapeHtml(m.como) + '</span>' : '') +
+          '</li>';
+        }).join('');
+        return '<section class="nota">' +
+          '<div class="nota__head"><span class="nota__ver">v' + escapeHtml(n.versao) + '</span>' +
+          '<span class="nota__data">' + escapeHtml(n.data) + '</span></div>' +
+          '<h3 class="nota__titulo">' + escapeHtml(n.titulo) + '</h3>' +
+          '<ul class="nota__itens">' + itens + '</ul>' +
+        '</section>';
+      }).join('');
+    }
+    function open() { render(); modal.hidden = false; requestAnimationFrame(function () { modal.classList.add('is-open'); }); }
+    function close() { modal.classList.remove('is-open'); setTimeout(function () { modal.hidden = true; }, 200); }
+
+    btnNotas.addEventListener('click', open);
+    modal.querySelectorAll('[data-close]').forEach(function (el) { el.addEventListener('click', close); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.hidden) close(); });
+  })();
+
   // Degradação graciosa: se a lib/CDN ou o config falharem, libera o hub estático.
   if (!CFG || !lib || typeof lib.createClient !== 'function') {
     document.body.classList.remove('smerp-booting');

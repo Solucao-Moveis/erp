@@ -391,3 +391,73 @@ body.smerp-booting .footer { visibility: hidden; }
   text-decoration: underline; text-underline-offset: 3px; padding: 4px;
 }
 .smerp-login__forgot:hover { color: var(--ink); }
+
+/* ===================== BOTÃO NOVIDADES + MODAL DE NOTAS ===================== */
+.btn-notas {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+  color: var(--orange); background: var(--orange-soft);
+  border: 1px solid rgba(232,114,42,0.25);
+  padding: 7px 12px; border-radius: 9px;
+  transition: background .2s ease, color .2s ease;
+}
+.btn-notas:hover { background: var(--orange); color: #fff; }
+.btn-notas svg { flex-shrink: 0; }
+
+.smerp-modal {
+  position: fixed; inset: 0; z-index: 1100;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.smerp-modal[hidden] { display: none; }
+.smerp-modal__backdrop {
+  position: absolute; inset: 0; background: rgba(26,26,46,0.45);
+  opacity: 0; transition: opacity .2s ease;
+}
+.smerp-modal.is-open .smerp-modal__backdrop { opacity: 1; }
+.smerp-modal__card {
+  position: relative; z-index: 1; width: 100%; max-width: 560px;
+  max-height: 82vh; display: flex; flex-direction: column;
+  background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-panel);
+  transform: translateY(12px) scale(.98); opacity: 0;
+  transition: transform .22s ease, opacity .22s ease;
+}
+.smerp-modal.is-open .smerp-modal__card { transform: none; opacity: 1; }
+.smerp-modal__head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 18px 22px; border-bottom: 1px solid var(--border);
+}
+.smerp-modal__title { font-size: 18px; font-weight: 800; color: var(--ink); }
+.smerp-modal__close {
+  font-size: 26px; line-height: 1; cursor: pointer; border: none; background: none;
+  color: var(--ink-soft); width: 36px; height: 36px; border-radius: 9px;
+  transition: background .2s ease, color .2s ease;
+}
+.smerp-modal__close:hover { background: #F0F2F5; color: var(--ink); }
+.smerp-modal__body { padding: 6px 22px 22px; overflow-y: auto; }
+
+.nota { padding: 18px 0; border-bottom: 1px solid var(--border); }
+.nota:last-child { border-bottom: none; }
+.nota__head { display: flex; align-items: center; gap: 8px; }
+.nota__ver {
+  font-size: 11px; font-weight: 800; color: var(--orange);
+  background: var(--orange-soft); border: 1px solid rgba(232,114,42,0.25);
+  padding: 2px 8px; border-radius: 20px;
+}
+.nota__data { font-size: 12px; font-weight: 600; color: var(--ink-soft); }
+.nota__titulo { font-size: 16px; font-weight: 800; color: var(--ink); margin-top: 8px; }
+.nota__itens { list-style: none; margin-top: 10px; display: flex; flex-direction: column; gap: 12px; }
+.nota__item { display: flex; flex-direction: column; gap: 3px; padding-left: 16px; position: relative; }
+.nota__item::before {
+  content: ''; position: absolute; left: 0; top: 7px;
+  width: 7px; height: 7px; border-radius: 50%; background: var(--orange);
+}
+.nota__oque { font-size: 14px; font-weight: 700; color: var(--ink); }
+.nota__como { font-size: 13px; font-weight: 400; color: var(--ink-soft); }
+.nota__como b { color: var(--ink); font-weight: 700; }
+.nota__vazio { font-size: 14px; color: var(--ink-soft); padding: 16px 0; }
+
+/* mobile: deixa só o ícone do botão Novidades pra economizar espaço */
+@media (max-width: 768px) {
+  .btn-notas { font-size: 0; gap: 0; padding: 7px 9px; }
+  .btn-notas svg { width: 18px; height: 18px; }
+}
