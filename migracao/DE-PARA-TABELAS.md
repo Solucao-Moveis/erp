@@ -69,6 +69,21 @@ Pra dedup por e-mail ficar exata, estas colunas são reapontadas pro `id` canôn
 ## Coluna gerada (pulada no import, o banco recalcula)
 - `fabrill.production_deviations.total_weight` (GENERATED = quantity × piece_weight)
 
+## Relacionamentos e dependências (FKs) — preservados
+Os schemas do SMERP recriam **todas as chaves estrangeiras** do Lovable, com as **mesmas regras** (`on delete cascade` / `set null` / `restrict`).
+
+**Dentro de cada schema:**
+- **compras:** `purchase_requests` → `sectors`, `cost_centers`, `items`; `request_items` / `request_comments` / `request_history` / `request_attachments` → `purchase_requests` (**cascade**); `request_items` → `items` (set null).
+- **fabrill:** `user_areas` → `areas`; `production_goals` / `machine_operators` / `production_entries` → `machines`; `production_deviations` → `areas` (restrict) + `machines` (set null).
+- **bip:** `loading_orders` → `products`; `scanned_codes` / `loading_order_items` → `loading_orders` (**cascade**) + `products`.
+
+**Cross-schema (identidade):** `profiles.id`, `user_roles.user_id` e todas as colunas de dono → `auth.users(id)` (o auth único). É por isso que o remap de dono (acima) tem que ser exato.
+
+**Garantias de integridade:**
+- **Import** em ordem **pai → filho** (FK-safe), definida em `gen-import.js` (`order`).
+- No **refresh das 17h**, o **TRUNCATE** vai em ordem **filho → pai** (ou `TRUNCATE <tabelas de dados> CASCADE` num único comando), **sem tocar** em `auth.users` / `profiles` / `user_roles`.
+- **IDs preservados** → toda ligação (pedido↔itens, apontamento↔máquina, etc.) continua apontando certo após a virada.
+
 ## Observações importantes
 - **bip não tem dono por linha** nos pedidos: `loading_orders`/`scanned_codes` são **compartilhados** (sem coluna de usuário); o "quem fez" fica em `bip.audit_log`.
 - **compras.items** não tinha `CREATE TABLE` nas migrations do Lovable (criada por fora) — foi reconstruída e **conferida idêntica** ao export real (1547, todos com SKU).

@@ -16,7 +16,8 @@ Valores do Lovable estão no **git de cada app** (`.env` versionado). Reverter =
 1. **Congelar**: avisar pra pararem de usar compras e hora a hora no Lovable.
 2. **Re-export** (functions ainda vivas): `node` não — via `curl`/Invoke-WebRequest em
    `https://<ref>.supabase.co/functions/v1/export-smerp?token=smerp_export_7f3a9c2e8b14d6f05a1c9e2b&resource=tables|users|storage` (refs compras/fabrill acima).
-3. **Refresh no SMERP** (SQL Editor): `TRUNCATE` só as tabelas de DADOS de compras e fabrill (NÃO auth.users/identities/profiles/user_roles) → rodar `gen-import.js` (export fresco) → aplicar import → `cleanup_compras.sql`.
+3. **Refresh no SMERP** (SQL Editor): `TRUNCATE` só as tabelas de DADOS de compras e fabrill (NÃO auth.users/identities/profiles/user_roles), **com `CASCADE` num único comando por schema** (respeita FK) → rodar `gen-import.js` (export fresco) → aplicar import (ordem pai→filho) → `cleanup_compras.sql`.
+   - Antes de aplicar, **re-rodar o cruzamento das 3 fontes** (export × `gen-import` × schema) pra reconfirmar o de-para — ver `DE-PARA-TABELAS.md`.
 4. **Novos usuários**: `set_default_password.sql` + `fix_auth_null_tokens.sql`.
 5. **Storage**: `migrate-storage.js` (novos anexos/fotos).
 6. **Conferir 100%**: `relatorio_integridade.sql` + `relatorio_usuarios.sql` + comparar contagens com o export (igual fizemos com items = 1547).
