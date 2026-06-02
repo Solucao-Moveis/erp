@@ -1,0 +1,10 @@
+# Documentação interna com credenciais — NÃO versionar
+*.docx
+
+# Dependências / build
+node_modules/
+dist/
+
+# Sistema
+.DS_Store
+Thumbs.db

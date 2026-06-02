@@ -1,0 +1,7 @@
+.git
+.gitignore
+*.docx
+*.md
+DEPLOY-EASYPANEL.md
+node_modules
+.DS_Store
