@@ -1,6 +1,18 @@
 # Documentação interna com credenciais — NÃO versionar
 *.docx
 
+# ===== Migração (migracao/) — NÃO versionar segredos nem dumps =====
+# service_role key hardcoded (acesso total ao banco, ignora RLS)
+migracao/migrate-storage.js
+# senha do usuário master em texto puro
+migracao/master_user.sql
+# token do export + função temporária (será apagada do Lovable)
+migracao/edge-function-export/
+# dumps brutos: e-mails dos usuários + signed URLs (pesados, redundantes c/ import_*.sql)
+migracao/dados-fabrill/
+migracao/dados-bip/
+migracao/dados-compras/
+
 # Dependências / build
 node_modules/
 dist/
