@@ -29,6 +29,11 @@ window.SMERP_NOTAS = [
         app: 'Painel Executivo',
         o_que: 'Personalização de verdade: monte o painel arrastando os gráficos e mudando o tamanho de cada um.',
         como: 'Clique em "Editar layout": arraste pela alça (⋮⋮) para mover, puxe o canto inferior direito para redimensionar, remova no ✕ e adicione novos pelo botão "Adicionar". Clique em "Salvar" — fica guardado para os próximos acessos.'
+      },
+      {
+        app: 'Tela inicial (SMERP)',
+        o_que: 'Cartões de setor mais limpos: removemos o texto "1 sistema disponível" embaixo do nome, deixando só o título do setor.',
+        como: 'Não precisa fazer nada — os cartões (Administrativo, Fábrica / Produção, Expedição / Logística, Gerencial / Diretoria) já aparecem mais enxutos. É só clicar para abrir os sistemas do setor.'
       }
     ]
   },

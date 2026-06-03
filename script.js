@@ -249,7 +249,6 @@
       }
 
       // --- PRINCIPAL: card do setor (expande) ---
-      var n = mods.length;
       var card = document.createElement('article');
       card.className = 'setor';
       card.setAttribute('data-setor', setor.id);
@@ -260,7 +259,6 @@
           '<span class="setor__ic" aria-hidden="true">' + icon + '</span>' +
           '<span class="setor__b">' +
             '<span class="setor__name">' + escapeHtml(setor.nome) + '</span>' +
-            '<span class="setor__count">' + n + (n > 1 ? ' sistemas disponíveis' : ' sistema disponível') + '</span>' +
           '</span>' + SETOR_CHEVRON +
         '</button>' +
         '<div class="setor__menu"><div><div class="setor__menu-inner">' +
