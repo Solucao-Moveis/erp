@@ -183,10 +183,11 @@
   var ICONS = {
     cart:  '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
     clock: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
-    bars:  '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5v14M7 5v14M11 5v14M14 5v14M18 5v14M21 5v14"/></svg>'
+    bars:  '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5v14M7 5v14M11 5v14M14 5v14M18 5v14M21 5v14"/></svg>',
+    chart: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg>'
   };
-  var CHEVRON = '<svg class="card__chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
-  var ARROW = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  var SETOR_CHEVRON = '<svg class="setor__chev" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+  var ARROW = '<svg class="sys__go" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
 
   function escapeHtml(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -194,21 +195,33 @@
     });
   }
 
+  // #E8722A -> rgba(232,114,42,a) — para o acento "soft" de cada setor.
+  function hexToRgba(hex, a) {
+    var h = String(hex || '#E8722A').replace('#', '');
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    var r = parseInt(h.substr(0, 2), 16), g = parseInt(h.substr(2, 2), 16), b = parseInt(h.substr(4, 2), 16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+  }
+
   function closeAllMenus(except) {
-    document.querySelectorAll('.card.card--open').forEach(function (c) {
+    document.querySelectorAll('.setor.open').forEach(function (c) {
       if (c === except) return;
-      c.classList.remove('card--open');
-      var b = c.querySelector('.card__btn');
+      c.classList.remove('open');
+      var b = c.querySelector('.setor__hd');
       if (b) b.setAttribute('aria-expanded', 'false');
     });
   }
 
-  // Renderiza um card por SETOR, só com os módulos liberados pra pessoa.
-  // Clicar no card abre um dropdown interno; clicar num módulo abre na MESMA aba.
+  // Renderiza:
+  //  - barra lateral: um atalho por SISTEMA liberado (abre na mesma aba via SSO);
+  //  - principal: um card por SETOR; clicar expande os sistemas pra a pessoa escolher.
+  // Só aparecem os setores/sistemas que vierem em my_systems() (acesso da pessoa).
   function renderSetores(systems) {
     var container = $('systems');
+    var sideEl = $('sideSystems');
     if (!container) return;
     container.innerHTML = '';
+    if (sideEl) sideEl.innerHTML = '';
     var keys = systems && typeof systems === 'object' ? Object.keys(systems) : [];
     var setores = CFG.SETORES || [];
     var visible = 0;
@@ -218,33 +231,59 @@
       if (!mods.length) return;
       visible++;
 
+      var cor = setor.cor || '#E8722A';
+      var corSoft = hexToRgba(cor, 0.12);
+      var icon = ICONS[setor.icon] || '';
+
+      // --- BARRA LATERAL: um atalho por sistema ---
+      if (sideEl) {
+        mods.forEach(function (m) {
+          var b = document.createElement('button');
+          b.className = 'nav nav--sys';
+          b.type = 'button';
+          b.setAttribute('data-system', m.system);
+          b.innerHTML = '<span class="nav__dot" style="background:' + cor + '">' + icon + '</span>' + escapeHtml(m.nome);
+          b.addEventListener('click', function () { openApp(m.system); });
+          sideEl.appendChild(b);
+        });
+      }
+
+      // --- PRINCIPAL: card do setor (expande) ---
+      var n = mods.length;
       var card = document.createElement('article');
-      card.className = 'card';
+      card.className = 'setor';
       card.setAttribute('data-setor', setor.id);
+      card.style.setProperty('--ac', cor);
+      card.style.setProperty('--ac-soft', corSoft);
       card.innerHTML =
-        '<div class="card__icon" aria-hidden="true">' + (ICONS[setor.icon] || '') + '</div>' +
-        '<h2 class="card__title">' + escapeHtml(setor.nome) + '</h2>' +
-        '<button class="card__btn" type="button" aria-expanded="false">Acessar' + CHEVRON + '</button>' +
-        '<div class="card__menu" role="menu">' +
+        '<button class="setor__hd" type="button" aria-expanded="false">' +
+          '<span class="setor__ic" aria-hidden="true">' + icon + '</span>' +
+          '<span class="setor__b">' +
+            '<span class="setor__name">' + escapeHtml(setor.nome) + '</span>' +
+            '<span class="setor__count">' + n + (n > 1 ? ' sistemas disponíveis' : ' sistema disponível') + '</span>' +
+          '</span>' + SETOR_CHEVRON +
+        '</button>' +
+        '<div class="setor__menu"><div><div class="setor__menu-inner">' +
           mods.map(function (m) {
-            return '<button class="card__menu-item" type="button" role="menuitem" data-system="' + escapeHtml(m.system) + '">' +
-              '<span class="card__menu-text"><span class="card__menu-name">' + escapeHtml(m.nome) + '</span>' +
-              (m.desc ? '<span class="card__menu-desc">' + escapeHtml(m.desc) + '</span>' : '') + '</span>' +
+            return '<button class="sys" type="button" data-system="' + escapeHtml(m.system) + '">' +
+              '<span class="sys__ic" aria-hidden="true">' + icon + '</span>' +
+              '<span class="sys__b"><span class="sys__name">' + escapeHtml(m.nome) + '</span>' +
+              (m.desc ? '<span class="sys__desc">' + escapeHtml(m.desc) + '</span>' : '') + '</span>' +
               ARROW +
             '</button>';
           }).join('') +
-        '</div>';
+        '</div></div></div>';
 
-      var btn = card.querySelector('.card__btn');
-      btn.addEventListener('click', function (e) {
+      var hd = card.querySelector('.setor__hd');
+      hd.addEventListener('click', function (e) {
         e.stopPropagation();
-        var willOpen = !card.classList.contains('card--open');
+        var willOpen = !card.classList.contains('open');
         closeAllMenus(card);
-        card.classList.toggle('card--open', willOpen);
-        btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        card.classList.toggle('open', willOpen);
+        hd.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
       });
 
-      card.querySelectorAll('.card__menu-item').forEach(function (item) {
+      card.querySelectorAll('.sys').forEach(function (item) {
         item.addEventListener('click', function (e) {
           e.stopPropagation();
           openApp(item.getAttribute('data-system'));
@@ -254,15 +293,15 @@
       container.appendChild(card);
     });
 
-    var intro = document.querySelector('.intro__desc');
+    var intro = $('introDesc');
     if (intro) {
       intro.textContent = visible === 0
         ? 'Nenhum sistema liberado para o seu usuário ainda. Fale com o administrador.'
-        : 'Selecione um setor e o módulo que quer usar.';
+        : 'Escolha um setor e o sistema que quer usar.';
     }
   }
 
-  // fecha qualquer dropdown ao clicar fora
+  // fecha qualquer setor aberto ao clicar fora
   document.addEventListener('click', function () { closeAllMenus(null); });
 
   async function enterApp(session) {
@@ -352,6 +391,7 @@
     btnLogout.addEventListener('click', async function () {
       try { await sb.auth.signOut(); } catch (e) {}
       var sysc = $('systems'); if (sysc) sysc.innerHTML = '';
+      var sidec = $('sideSystems'); if (sidec) sidec.innerHTML = '';
       if (loginPassword) loginPassword.value = '';
       showLoginState();
     });

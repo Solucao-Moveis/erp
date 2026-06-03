@@ -10,6 +10,62 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '1.5',
+    data: '03/06/2026',
+    titulo: 'Painel Executivo: mais indicadores e monte do seu jeito',
+    resumo: 'O Painel Gerencial ficou bem mais completo — muitos novos indicadores de Produção (Hora a Hora) e de Compras — e agora você monta a tela arrastando e redimensionando cada gráfico como quiser.',
+    mudancas: [
+      {
+        app: 'Painel Executivo',
+        o_que: 'Produção (Hora a Hora) agora traz: meta × realizado por máquina e por setor, produção por área, o heatmap de produção por hora (máquina × hora, com cores), produção por colaborador, funcionário do mês e desvios de qualidade (contagem, peso e tendência).',
+        como: 'Abra o Painel Executivo; em "Editar layout" → "Adicionar", inclua os gráficos de Produção que quiser. O heatmap tem um seletor de dia próprio.'
+      },
+      {
+        app: 'Painel Executivo',
+        o_que: 'Compras ganhou: economia SAVE por mês, tempos médios de ciclo (abertura→aprovação→compra→chegada), top itens por gasto, itens para recomprar, solicitações por status e por setor, taxa de rejeição e conformidade dos fornecedores (Q1–Q4).',
+        como: 'No painel, use "Adicionar" para incluir esses indicadores. O período escolhido no topo vale para todos de uma vez.'
+      },
+      {
+        app: 'Painel Executivo',
+        o_que: 'Personalização de verdade: monte o painel arrastando os gráficos e mudando o tamanho de cada um.',
+        como: 'Clique em "Editar layout": arraste pela alça (⋮⋮) para mover, puxe o canto inferior direito para redimensionar, remova no ✕ e adicione novos pelo botão "Adicionar". Clique em "Salvar" — fica guardado para os próximos acessos.'
+      }
+    ]
+  },
+  {
+    versao: '1.4',
+    data: '03/06/2026',
+    titulo: 'Novo: Painel Executivo (Gerencial / Diretoria)',
+    resumo: 'Um novo sistema reúne, numa tela só, os principais números de Compras, Produção (Hora a Hora) e Expedição (Bip). Cada gerente vê a sua área; a diretoria vê tudo. Dá para escolher o período e montar o painel do seu jeito.',
+    mudancas: [
+      {
+        app: 'Tela inicial (SMERP)',
+        o_que: 'Tela inicial reformulada: um menu lateral lista direto os seus sistemas e, no centro, os setores ficam organizados em cartões. Mais limpa, rápida e fácil de usar no celular.',
+        como: 'Ao entrar, clique no cartão do setor (ex.: Administrativo) para abrir os sistemas daquele setor e escolher qual usar. Para ir direto, use o atalho do sistema no menu à esquerda. No celular, esse menu aparece no topo.'
+      },
+      {
+        app: 'Painel Executivo',
+        o_que: 'Novo card "Gerencial / Diretoria" na tela inicial do SMERP, que abre o Painel Executivo com os indicadores consolidados dos sistemas.',
+        como: 'Na tela inicial, clique no card "Gerencial / Diretoria" e depois em "Painel Executivo". O card só aparece para quem tem acesso liberado pela diretoria.'
+      },
+      {
+        app: 'Painel Executivo',
+        o_que: 'Visão consolidada: valor comprado e solicitações pendentes (Compras), produção x meta (Hora a Hora) e carregamentos por status (Bip), com cartões de destaque e gráficos.',
+        como: 'Ao abrir o painel, os números aparecem no topo e os gráficos abaixo. Use o seletor de período (Hoje, 7 dias, 30 dias, Mês, Trimestre ou Personalizado) no canto superior para mudar a janela de tempo de tudo de uma vez.'
+      },
+      {
+        app: 'Painel Executivo',
+        o_que: 'Acesso por área: o gerente de cada setor vê apenas os indicadores da sua área; a diretoria vê os três sistemas.',
+        como: 'Não precisa fazer nada — o painel já mostra só o que é da sua alçada. O menu lateral (Compras, Produção, Expedição) também só lista as áreas que você pode ver.'
+      },
+      {
+        app: 'Painel Executivo',
+        o_que: 'Painel personalizável: cada pessoa monta a tela do seu jeito (veja a v1.5 para arrastar e redimensionar).',
+        como: 'Use "Editar layout" para escolher, mover e dimensionar os gráficos. Clique em "Salvar" — sua configuração fica guardada para os próximos acessos.'
+      }
+    ]
+  },
+  {
     versao: '1.3',
     data: '03/06/2026',
     titulo: 'Visual unificado: a mesma cara em todos os sistemas',
