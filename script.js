@@ -53,12 +53,14 @@
     function shotsHtml(m) {
       if (!m.antes && !m.depois) return '';
       var shot = function (src, label, mod) {
-        if (!src) return '';
-        // Se o print ainda não foi adicionado, a imagem some sozinha (onerror).
+        // Quadro com "Print em breve" ao fundo; se o print existir, a imagem cobre.
+        // Se o arquivo ainda não foi adicionado, a imagem some (onerror) e fica o aviso.
         return '<figure class="upd__shot upd__shot--' + mod + '">' +
           '<figcaption class="upd__shot-label">' + label + '</figcaption>' +
-          '<img src="' + escapeHtml(src) + '" alt="' + label + '" loading="lazy" ' +
-          'onerror="this.closest(&quot;.upd__shot&quot;).remove()" />' +
+          '<div class="upd__shot-frame">' +
+            '<span class="upd__shot-ph">Print em breve</span>' +
+            (src ? '<img src="' + escapeHtml(src) + '" alt="' + label + '" loading="lazy" onerror="this.remove()" />' : '') +
+          '</div>' +
         '</figure>';
       };
       return '<div class="upd__shots">' + shot(m.antes, 'Antes', 'antes') + shot(m.depois, 'Depois', 'depois') + '</div>';

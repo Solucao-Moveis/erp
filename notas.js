@@ -19,7 +19,7 @@ window.SMERP_NOTAS = [
         app: 'Todos os sistemas',
         o_que: 'Agora todos os sistemas têm a MESMA barra lateral à esquerda, sempre no mesmo lugar. Antes cada um colocava o menu num canto diferente — um no topo, outro na lateral.',
         como: 'O menu fica sempre à esquerda. Clique no botão de recolher (ao lado do título, no topo) para encolher a barra e ganhar espaço na tela — ou use o atalho Ctrl + B. No celular, a barra vira uma gaveta que abre por cima.',
-        antes: 'assets/updates/v1-3/menu-antes.png',
+        antes: 'assets/updates/v1-3/menu-antes.jpg',
         depois: 'assets/updates/v1-3/menu-depois.png'
       },
       {
