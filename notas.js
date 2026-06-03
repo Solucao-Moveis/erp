@@ -10,6 +10,31 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '1.3',
+    data: '03/06/2026',
+    titulo: 'Visual unificado: a mesma cara em todos os sistemas',
+    resumo: 'Compras, Produção Hora a Hora e Expedição agora têm a MESMA barra lateral, as mesmas cores e a mesma fonte. Ao trocar de um sistema para outro, parece que você nunca saiu do lugar.',
+    mudancas: [
+      {
+        app: 'Todos os sistemas',
+        o_que: 'Agora todos os sistemas têm a MESMA barra lateral à esquerda, sempre no mesmo lugar. Antes cada um colocava o menu num canto diferente — um no topo, outro na lateral.',
+        como: 'O menu fica sempre à esquerda. Clique no botão de recolher (ao lado do título, no topo) para encolher a barra e ganhar espaço na tela — ou use o atalho Ctrl + B. No celular, a barra vira uma gaveta que abre por cima.',
+        antes: 'assets/updates/v1-3/menu-antes.png',
+        depois: 'assets/updates/v1-3/menu-depois.png'
+      },
+      {
+        app: 'Todos os sistemas',
+        o_que: 'Mesma identidade visual em tudo: a mesma cor (laranja), a mesma fonte e o mesmo estilo de botões, caixas e cantos arredondados.',
+        como: 'Não precisa fazer nada — é automático. A mudança aparece sozinha ao abrir cada sistema.'
+      },
+      {
+        app: 'Todos os sistemas',
+        o_que: 'O botão "Sair" foi retirado da barra lateral dos sistemas, para evitar saída acidental.',
+        como: 'Para sair, use "Voltar ao ERP" no rodapé da barra lateral e então o botão "Sair" aqui no SMERP.'
+      }
+    ]
+  },
+  {
     versao: '1.2',
     data: '03/06/2026',
     titulo: 'Compras: Avaliação de Fornecedores (ISO 9001)',

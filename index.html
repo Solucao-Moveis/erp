@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=5" />
+  <link rel="stylesheet" href="styles.css?v=6" />
 </head>
 <body class="smerp-booting">
   <!-- ===================== TELA DE CARREGAMENTO ===================== -->
@@ -43,15 +43,24 @@
     </form>
   </div>
 
-  <!-- ===================== MODAL: NOTAS DE ATUALIZAÇÃO ===================== -->
-  <div class="smerp-modal" id="notasModal" hidden>
+  <!-- ===================== ATUALIZAÇÕES (página dedicada) ===================== -->
+  <div class="smerp-overlay smerp-updates" id="updatesOverlay" hidden>
     <div class="smerp-modal__backdrop" data-close></div>
-    <div class="smerp-modal__card" role="dialog" aria-modal="true" aria-labelledby="notasTitle">
-      <div class="smerp-modal__head">
-        <h2 class="smerp-modal__title" id="notasTitle">Notas de Atualização</h2>
-        <button class="smerp-modal__close" id="notasClose" type="button" aria-label="Fechar" data-close>&times;</button>
+    <div class="upd" role="dialog" aria-modal="true" aria-labelledby="updTitle">
+      <header class="upd__top">
+        <div class="upd__brand">
+          <img class="upd__logo" src="assets/logo-solucao-moveis.png" alt="Solução Móveis" />
+          <div>
+            <h2 class="upd__title" id="updTitle">Atualizações</h2>
+            <p class="upd__sub">O que mudou em cada versão do SMERP</p>
+          </div>
+        </div>
+        <button class="smerp-modal__close" id="updatesClose" type="button" aria-label="Fechar" data-close>&times;</button>
+      </header>
+      <div class="upd__body">
+        <aside class="upd__filters" id="updFilters" aria-label="Filtrar por atualização"></aside>
+        <div class="upd__detail" id="updDetail"></div>
       </div>
-      <div class="smerp-modal__body" id="notasList"></div>
     </div>
   </div>
 
@@ -68,11 +77,11 @@
       </a>
 
       <div class="header__right">
-        <button class="btn-notas" id="btnNotas" type="button" title="Notas de atualização">
+        <button class="btn-notas" id="btnUpdates" type="button" title="Atualizações">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3z"/></svg>
-          Novidades
+          Atualizações
         </button>
-        <span class="badge-version">v1.1</span>
+        <span class="badge-version">v1.3</span>
         <span class="user-email" id="userEmail" hidden></span>
         <button class="btn-logout" id="btnLogout" type="button" hidden>Sair</button>
         <div class="avatar" title="Solução Móveis" aria-hidden="true">SM</div>
@@ -111,7 +120,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=5"></script>
-  <script src="notas.js?v=5"></script>
-  <script src="script.js?v=5"></script>
+  <script src="notas.js?v=6"></script>
+  <script src="script.js?v=6"></script>
 </body>
 </html>

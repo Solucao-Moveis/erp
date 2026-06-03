@@ -25,36 +25,85 @@
   function show(el) { if (el) el.hidden = false; }
   function hide(el) { if (el) el.hidden = true; }
 
-  /* ---- Notas de Atualização (independe do login) ---- */
-  (function initNotas() {
-    var btnNotas = $('btnNotas');
-    var modal = $('notasModal');
-    var listEl = $('notasList');
-    if (!btnNotas || !modal) return;
+  /* ---- Atualizações: página dedicada com filtro por versão (independe do login) ---- */
+  (function initUpdates() {
+    var btn = $('btnUpdates');
+    var modal = $('updatesOverlay');
+    var filtersEl = $('updFilters');
+    var detailEl = $('updDetail');
+    if (!btn || !modal) return;
 
-    function render() {
-      if (!listEl) return;
-      var notas = window.SMERP_NOTAS || [];
-      if (!notas.length) { listEl.innerHTML = '<p class="nota__vazio">Nenhuma nota ainda.</p>'; return; }
-      listEl.innerHTML = notas.map(function (n) {
-        var itens = (n.mudancas || []).map(function (m) {
-          return '<li class="nota__item">' +
-            '<span class="nota__oque">' + escapeHtml(m.o_que) + '</span>' +
-            (m.como ? '<span class="nota__como"><b>Como usar:</b> ' + escapeHtml(m.como) + '</span>' : '') +
-          '</li>';
-        }).join('');
-        return '<section class="nota">' +
-          '<div class="nota__head"><span class="nota__ver">v' + escapeHtml(n.versao) + '</span>' +
-          '<span class="nota__data">' + escapeHtml(n.data) + '</span></div>' +
-          '<h3 class="nota__titulo">' + escapeHtml(n.titulo) + '</h3>' +
-          '<ul class="nota__itens">' + itens + '</ul>' +
-        '</section>';
+    var notas = window.SMERP_NOTAS || [];
+    var selected = 'all';
+
+    function renderFilters() {
+      if (!filtersEl) return;
+      var items = [{ key: 'all', ver: 'Todas', date: '' }].concat(notas.map(function (n) {
+        return { key: n.versao, ver: 'v' + n.versao, date: n.data };
+      }));
+      filtersEl.innerHTML = items.map(function (it) {
+        var active = it.key === selected ? ' upd__filter--active' : '';
+        return '<button type="button" class="upd__filter' + active + '" data-ver="' + escapeHtml(it.key) + '">' +
+          '<span class="upd__filter-ver">' + escapeHtml(it.ver) + '</span>' +
+          (it.date ? '<span class="upd__filter-date">' + escapeHtml(it.date) + '</span>' : '') +
+        '</button>';
       }).join('');
     }
+
+    function shotsHtml(m) {
+      if (!m.antes && !m.depois) return '';
+      var shot = function (src, label, mod) {
+        if (!src) return '';
+        // Se o print ainda não foi adicionado, a imagem some sozinha (onerror).
+        return '<figure class="upd__shot upd__shot--' + mod + '">' +
+          '<figcaption class="upd__shot-label">' + label + '</figcaption>' +
+          '<img src="' + escapeHtml(src) + '" alt="' + label + '" loading="lazy" ' +
+          'onerror="this.closest(&quot;.upd__shot&quot;).remove()" />' +
+        '</figure>';
+      };
+      return '<div class="upd__shots">' + shot(m.antes, 'Antes', 'antes') + shot(m.depois, 'Depois', 'depois') + '</div>';
+    }
+
+    function releaseHtml(n) {
+      var changes = (n.mudancas || []).map(function (m) {
+        return '<div class="upd__change">' +
+          (m.app ? '<span class="upd__app">' + escapeHtml(m.app) + '</span>' : '') +
+          '<span class="upd__oque">' + escapeHtml(m.o_que) + '</span>' +
+          (m.como ? '<span class="upd__como"><b>Como usar:</b> ' + escapeHtml(m.como) + '</span>' : '') +
+          shotsHtml(m) +
+        '</div>';
+      }).join('');
+      return '<section class="upd__release">' +
+        '<div class="nota__head"><span class="nota__ver">v' + escapeHtml(n.versao) + '</span>' +
+        '<span class="nota__data">' + escapeHtml(n.data) + '</span></div>' +
+        '<h3 class="nota__titulo">' + escapeHtml(n.titulo) + '</h3>' +
+        (n.resumo ? '<p class="upd__resumo">' + escapeHtml(n.resumo) + '</p>' : '') +
+        changes +
+      '</section>';
+    }
+
+    function renderDetail() {
+      if (!detailEl) return;
+      var list = selected === 'all' ? notas : notas.filter(function (n) { return n.versao === selected; });
+      detailEl.innerHTML = list.length
+        ? list.map(releaseHtml).join('')
+        : '<p class="nota__vazio">Nenhuma atualização.</p>';
+      detailEl.scrollTop = 0;
+    }
+
+    function render() { renderFilters(); renderDetail(); }
+
+    if (filtersEl) filtersEl.addEventListener('click', function (e) {
+      var b = e.target.closest('.upd__filter');
+      if (!b) return;
+      selected = b.getAttribute('data-ver');
+      render();
+    });
+
     function open() { render(); modal.hidden = false; requestAnimationFrame(function () { modal.classList.add('is-open'); }); }
     function close() { modal.classList.remove('is-open'); setTimeout(function () { modal.hidden = true; }, 200); }
 
-    btnNotas.addEventListener('click', open);
+    btn.addEventListener('click', open);
     modal.querySelectorAll('[data-close]').forEach(function (el) { el.addEventListener('click', close); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.hidden) close(); });
   })();
