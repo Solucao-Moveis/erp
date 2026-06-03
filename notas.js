@@ -10,6 +10,25 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '1.2',
+    data: '03/06/2026',
+    titulo: 'Compras: Avaliação de Fornecedores (ISO 9001)',
+    mudancas: [
+      {
+        o_que: 'Nova aba "Avaliações" no sistema de Compras para avaliar o fornecedor no ato da entrega, conforme o Procedimento P-04.',
+        como: 'No menu do Compras, clique em "Avaliações" e depois em "Nova avaliação". Preencha fornecedor, NF e seu nome, responda as 4 perguntas (Sim/Não) e, quando marcar "Não", informe o detalhe (dias de atraso, % faltante ou nº de quesitos). A nota e a classificação (Ótimo/Bom/Regular/Insuficiente) são calculadas sozinhas.'
+      },
+      {
+        o_que: 'Ao concluir, o sistema gera o formulário em PDF (igual ao modelo), baixa automaticamente e guarda no sistema com o nome de quem avaliou.',
+        como: 'Clique em "Concluir avaliação": o PDF baixa na hora. Depois você pode reabrir a avaliação para baixar de novo ou excluir, caso tenha preenchido errado.'
+      },
+      {
+        o_que: 'A avaliação fica ligada à entrega: dá para ver quem avaliou cada recebimento.',
+        como: 'Na solicitação que já chegou, aparece o botão "Avaliar fornecedor" e, depois de avaliada, o selo "Avaliada" com a nota. A aba "Avaliações" ainda mostra as entregas que faltam avaliar, filtros e exportação em CSV.'
+      }
+    ]
+  },
+  {
     versao: '1.1',
     data: '02/06/2026',
     titulo: 'Login único e nova tela inicial',
