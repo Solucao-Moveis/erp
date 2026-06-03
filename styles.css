@@ -525,12 +525,11 @@ body.smerp-booting .footer { visibility: hidden; }
 .upd__shot--antes .upd__shot-label { color: var(--ink-soft); }
 .upd__shot--depois .upd__shot-label { color: var(--orange); }
 .upd__shot-frame {
-  position: relative; min-height: 150px; overflow: hidden;
+  position: relative; height: 260px; overflow: hidden;
   border: 1px dashed var(--border); border-radius: 10px; background: #FAFBFC;
-  display: grid; place-items: center;
 }
 .upd__shot-ph { position: absolute; inset: 0; display: grid; place-items: center; font-size: 12px; font-weight: 600; color: var(--ink-soft); }
-.upd__shot-frame img { position: relative; z-index: 1; width: 100%; display: block; }
+.upd__shot-frame img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
 
 @media (max-width: 680px) {
   .upd { max-height: 92vh; }
