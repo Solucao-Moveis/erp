@@ -10,6 +10,24 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '2.0',
+    data: '04/06/2026',
+    titulo: 'Criar conta na tela de login + liberar acesso com um clique',
+    resumo: 'Agora a própria pessoa pode se cadastrar na tela de entrada do SMERP (a conta nasce sem acesso a nada). Depois, na aba "Usuários", o administrador clica no nome da pessoa e marca os sistemas e o tipo de acesso dela.',
+    mudancas: [
+      {
+        app: 'Tela de login (SMERP)',
+        o_que: 'Botão "Criar conta" na tela de entrada: a pessoa se cadastra sozinha com nome, e-mail e senha. A conta é criada sem acesso a nenhum sistema — só depois o administrador libera.',
+        como: 'Na tela de login, clique em "Criar conta", preencha nome, e-mail e senha (e confirme a senha) e clique em "Criar conta". Depois é só entrar normalmente; enquanto o acesso não for liberado, a tela mostra um aviso para procurar o administrador.'
+      },
+      {
+        app: 'Tela inicial (SMERP)',
+        o_que: 'Na aba "Usuários", a lista de pessoas ficou clicável. Quem ainda não tem acesso aparece marcado como "sem acesso".',
+        como: 'Abra "Usuários", clique no nome da pessoa na lista da direita: o formulário abre o acesso atual dela. Marque/desmarque os sistemas e os papéis e clique em "Salvar permissões". Para voltar a cadastrar alguém novo, clique em "＋ Novo usuário".'
+      }
+    ]
+  },
+  {
     versao: '1.9',
     data: '04/06/2026',
     titulo: 'Compras: Exportar respeita as solicitações marcadas',

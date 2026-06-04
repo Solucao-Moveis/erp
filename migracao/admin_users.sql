@@ -196,8 +196,185 @@ $$;
 revoke all on function public.admin_list_users() from public, anon;
 grant execute on function public.admin_list_users() to authenticated;
 
+-- ------------------------------------------------------------
+-- 4) AUTOCADASTRO (tela de login) — cria SÓ o login, sem acesso a nada.
+--    Liberado para anon (qualquer e-mail). A conta nasce sem nenhum
+--    sistema; o master libera depois pela aba Usuários. Por isso é
+--    seguro deixar anon chamar: no pior caso cria um login que não vê nada.
+-- ------------------------------------------------------------
+create or replace function public.self_register(
+  p_email     text,
+  p_password  text,
+  p_full_name text
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  new_id  uuid := gen_random_uuid();
+  v_email text := lower(trim(coalesce(p_email, '')));
+  v_name  text := nullif(trim(coalesce(p_full_name, '')), '');
+begin
+  if v_email = '' or v_email !~ '^[^@\s]+@[^@\s]+\.[^@\s]+$' then
+    raise exception 'Informe um e-mail válido.';
+  end if;
+  if p_password is null or length(p_password) < 6 then
+    raise exception 'A senha precisa ter ao menos 6 caracteres.';
+  end if;
+  if exists (select 1 from auth.users where lower(email) = v_email) then
+    raise exception 'Já existe uma conta com o e-mail %. Tente entrar ou recuperar a senha.', v_email;
+  end if;
+
+  -- mesmo INSERT do admin_create_user (tokens '' p/ não quebrar o GoTrue)
+  insert into auth.users (
+    instance_id, id, aud, role, email, encrypted_password,
+    email_confirmed_at, created_at, updated_at,
+    raw_app_meta_data, raw_user_meta_data, is_sso_user, is_anonymous,
+    confirmation_token, recovery_token, email_change_token_new, email_change,
+    email_change_token_current, phone_change, phone_change_token, reauthentication_token
+  ) values (
+    '00000000-0000-0000-0000-000000000000', new_id, 'authenticated', 'authenticated', v_email,
+    extensions.crypt(p_password, extensions.gen_salt('bf')),
+    now(), now(), now(),
+    '{"provider":"email","providers":["email"]}'::jsonb,
+    jsonb_strip_nulls(jsonb_build_object('full_name', v_name)),
+    false, false,
+    '', '', '', '', '', '', '', ''
+  );
+
+  insert into auth.identities (
+    provider_id, user_id, identity_data, provider,
+    last_sign_in_at, created_at, updated_at
+  ) values (
+    new_id::text, new_id,
+    jsonb_build_object('sub', new_id::text, 'email', v_email, 'email_verified', true),
+    'email', now(), now(), now()
+  );
+
+  return jsonb_build_object('id', new_id, 'email', v_email);
+end;
+$$;
+
+revoke all on function public.self_register(text, text, text) from public;
+grant execute on function public.self_register(text, text, text) to anon, authenticated;
+
+
+-- ------------------------------------------------------------
+-- 5) DEFINIR os sistemas+papéis de um usuário JÁ existente.
+--    A aba Usuários chama isto quando o master clica numa pessoa e
+--    ajusta o acesso. O resultado fica EXATAMENTE igual a p_systems:
+--    o que não vier marcado é REMOVIDO; o que vier é garantido.
+--    (mesmo formato de p_systems do admin_create_user)
+-- ------------------------------------------------------------
+create or replace function public.admin_set_user_systems(
+  p_user_id uuid,
+  p_systems jsonb
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_email text;
+  v_name  text;
+  desired jsonb;
+begin
+  if not public.can_manage_users() then
+    raise exception 'Sem permissão para alterar usuários.' using errcode = '42501';
+  end if;
+  if p_user_id is null then
+    raise exception 'Usuário inválido.';
+  end if;
+
+  select email, nullif(coalesce(raw_user_meta_data->>'full_name', ''), '')
+    into v_email, v_name
+    from auth.users where id = p_user_id;
+  if v_email is null then
+    raise exception 'Usuário não encontrado.';
+  end if;
+
+  -- COMPRAS
+  desired := coalesce(p_systems->'compras', '[]'::jsonb);
+  if jsonb_array_length(desired) > 0 then
+    insert into compras.profiles (id, email, full_name)
+      values (p_user_id, v_email, v_name) on conflict (id) do nothing;
+    delete from compras.user_roles
+      where user_id = p_user_id and role::text not in (select jsonb_array_elements_text(desired));
+    insert into compras.user_roles (user_id, role)
+      select p_user_id, x::compras.app_role from jsonb_array_elements_text(desired) as x
+      on conflict (user_id, role) do nothing;
+  else
+    delete from compras.user_roles where user_id = p_user_id;
+    begin delete from compras.profiles where id = p_user_id;
+    exception when foreign_key_violation then null; end;
+  end if;
+
+  -- FABRILL
+  desired := coalesce(p_systems->'fabrill', '[]'::jsonb);
+  if jsonb_array_length(desired) > 0 then
+    insert into fabrill.profiles (id, email, full_name)
+      values (p_user_id, v_email, v_name) on conflict (id) do nothing;
+    delete from fabrill.user_roles
+      where user_id = p_user_id and role::text not in (select jsonb_array_elements_text(desired));
+    insert into fabrill.user_roles (user_id, role)
+      select p_user_id, x::fabrill.app_role from jsonb_array_elements_text(desired) as x
+      on conflict (user_id, role) do nothing;
+  else
+    delete from fabrill.user_roles where user_id = p_user_id;
+    begin delete from fabrill.profiles where id = p_user_id;
+    exception when foreign_key_violation then null; end;
+  end if;
+
+  -- BIP
+  desired := coalesce(p_systems->'bip', '[]'::jsonb);
+  if jsonb_array_length(desired) > 0 then
+    insert into bip.profiles (id, email, full_name)
+      values (p_user_id, v_email, v_name) on conflict (id) do nothing;
+    delete from bip.user_roles
+      where user_id = p_user_id and role::text not in (select jsonb_array_elements_text(desired));
+    insert into bip.user_roles (user_id, role)
+      select p_user_id, x::bip.app_role from jsonb_array_elements_text(desired) as x
+      on conflict (user_id, role) do nothing;
+  else
+    delete from bip.user_roles where user_id = p_user_id;
+    begin delete from bip.profiles where id = p_user_id;
+    exception when foreign_key_violation then null; end;
+  end if;
+
+  -- GESTAO (escopos de área; a tabela tem CHECK nos valores válidos)
+  desired := coalesce(p_systems->'gestao', '[]'::jsonb);
+  if jsonb_array_length(desired) > 0 then
+    insert into gestao.profiles (id, email, full_name)
+      values (p_user_id, v_email, v_name) on conflict (id) do nothing;
+    delete from gestao.user_scopes
+      where user_id = p_user_id and scope not in (select jsonb_array_elements_text(desired));
+    insert into gestao.user_scopes (user_id, scope)
+      select p_user_id, x from jsonb_array_elements_text(desired) as x
+      on conflict (user_id, scope) do nothing;
+  else
+    delete from gestao.user_scopes where user_id = p_user_id;
+    begin delete from gestao.profiles where id = p_user_id;
+    exception when foreign_key_violation then null; end;
+  end if;
+
+  return jsonb_build_object('id', p_user_id, 'email', v_email);
+end;
+$$;
+
+revoke all on function public.admin_set_user_systems(uuid, jsonb) from public, anon;
+grant execute on function public.admin_set_user_systems(uuid, jsonb) to authenticated;
+
+
 -- Teste (logado como master/diretoria):
 --   select public.can_manage_users();
 --   select * from public.admin_list_users();
 --   select public.admin_create_user('fulano@empresa.com','12345678','Fulano de Tal',
 --            '{"compras":["solicitante"],"bip":["user"]}'::jsonb);
+--   -- autocadastro (como anon, pela tela de login):
+--   select public.self_register('novo@empresa.com','12345678','Pessoa Nova');
+--   -- master libera depois:
+--   select public.admin_set_user_systems('<uuid-da-pessoa>'::uuid,
+--            '{"compras":["solicitante"],"gestao":["compras"]}'::jsonb);

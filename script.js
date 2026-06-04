@@ -354,6 +354,7 @@
     loginForm.addEventListener('submit', async function (e) {
       e.preventDefault();
       setError('');
+      var lok = $('loginOk'); if (lok) lok.hidden = true;
       var email = (loginEmail.value || '').trim();
       var password = loginPassword.value || '';
       if (!email || !password) { setError('Informe e-mail e senha.'); return; }
@@ -377,6 +378,58 @@
       }
     });
   }
+
+  // Alternar Entrar <-> Criar conta + AUTOCADASTRO (self_register)
+  (function initRegister() {
+    var registerForm = $('registerForm');
+    var btnShowReg = $('btnShowRegister');
+    var btnShowLog = $('btnShowLogin');
+    var loginOk = $('loginOk');
+    if (!registerForm || !loginForm) return;
+
+    var regName = $('regName'), regEmail = $('regEmail'), regPwd = $('regPwd'), regPwd2 = $('regPwd2');
+    var regError = $('regError'), regSubmit = $('regSubmit');
+
+    function setRegError(msg) { if (!regError) return; if (msg) { regError.textContent = msg; regError.hidden = false; } else { regError.hidden = true; } }
+    function setLoginOk(msg)  { if (!loginOk) return;  if (msg) { loginOk.textContent = msg;  loginOk.hidden = false; }  else { loginOk.hidden = true; } }
+
+    function showRegister() { setError(''); setLoginOk(''); setRegError(''); loginForm.hidden = true; registerForm.hidden = false; try { regName.focus(); } catch (e) {} }
+    function showLoginCard() { setRegError(''); registerForm.hidden = true; loginForm.hidden = false; try { loginEmail.focus(); } catch (e) {} }
+
+    if (btnShowReg) btnShowReg.addEventListener('click', showRegister);
+    if (btnShowLog) btnShowLog.addEventListener('click', showLoginCard);
+
+    registerForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      setRegError('');
+      var name = (regName.value || '').trim();
+      var email = (regEmail.value || '').trim();
+      var pwd = regPwd.value || '';
+      var pwd2 = regPwd2.value || '';
+      if (!name) { setRegError('Informe seu nome.'); return; }
+      if (!email) { setRegError('Informe seu e-mail.'); return; }
+      if (pwd.length < 6) { setRegError('A senha precisa ter ao menos 6 caracteres.'); return; }
+      if (pwd !== pwd2) { setRegError('As senhas não conferem.'); return; }
+
+      regSubmit.disabled = true;
+      var prev = regSubmit.textContent; regSubmit.textContent = 'Criando…';
+      try {
+        var res = await sb.rpc('self_register', { p_email: email, p_password: pwd, p_full_name: name });
+        if (res.error) { setRegError(res.error.message || 'Não foi possível criar a conta.'); return; }
+        // sucesso -> volta pro login com o e-mail preenchido e um aviso verde
+        registerForm.reset();
+        showLoginCard();
+        if (loginEmail) loginEmail.value = email;
+        if (loginPassword) loginPassword.value = '';
+        setLoginOk('Conta criada! Faça login. Seu acesso aos sistemas será liberado pelo administrador.');
+      } catch (err) {
+        setRegError('Falha ao criar a conta. Tente novamente.');
+        console.error(err);
+      } finally {
+        regSubmit.disabled = false; regSubmit.textContent = prev;
+      }
+    });
+  })();
 
   // Esqueci minha senha
   if (btnForgot) {
@@ -417,8 +470,11 @@
     var elName = $('usrName'), elEmail = $('usrEmail'), elPwd = $('usrPwd');
     var elSystems = $('usrSystems'), elErr = $('usrError'), elOk = $('usrOk');
     var elSubmit = $('usrSubmit'), elList = $('usrList'), elCount = $('usrCount');
+    var editBar = $('usrEditBar'), editWho = $('usrEditWho'), newBtn = $('usrNewBtn'), pwdField = $('usrPwdField');
     var cfg = (CFG.USUARIOS && CFG.USUARIOS.SISTEMAS) || [];
     var built = false;
+    var editingId = null;   // null = modo "criar"; uuid = editando o acesso de alguém
+    var lastRows = [];      // últimas pessoas carregadas (pra achar quem foi clicado)
 
     function setErr(msg) { if (!elErr) return; if (msg) { elErr.textContent = msg; elErr.hidden = false; } else { elErr.hidden = true; } }
     function setOk(msg)  { if (!elOk) return;  if (msg) { elOk.textContent = msg;  elOk.hidden = false; }  else { elOk.hidden = true; } }
@@ -481,6 +537,52 @@
       elSystems.querySelectorAll('.usr__sys').forEach(function (b) { b.classList.remove('is-on'); });
     }
 
+    // Marca no formulário os sistemas/papéis que a pessoa já tem (modo edição).
+    function setSystems(systemsObj) {
+      var obj = systemsObj || {};
+      elSystems.querySelectorAll('.usr__sys').forEach(function (box) {
+        var key = box.getAttribute('data-system');
+        var roles = obj[key] || [];
+        var on = roles.length > 0;
+        var chk = box.querySelector('.usr__sys-chk');
+        if (chk) chk.checked = on;
+        box.classList.toggle('is-on', on);
+        box.querySelectorAll('.usr__role-chk').forEach(function (c) {
+          c.checked = roles.indexOf(c.value) !== -1;
+        });
+      });
+    }
+
+    // Modo CRIAR: campos limpos, com senha, botão "Criar usuário".
+    function enterCreateMode() {
+      editingId = null;
+      setErr(''); setOk('');
+      if (editBar) editBar.hidden = true;
+      if (pwdField) pwdField.hidden = false;
+      if (elName) elName.disabled = false;
+      if (elEmail) elEmail.disabled = false;
+      resetForm();
+      if (elList) elList.querySelectorAll('.usr__item.is-editing').forEach(function (n) { n.classList.remove('is-editing'); });
+      elSubmit.textContent = 'Criar usuário';
+    }
+
+    // Modo EDITAR: nome/e-mail só leitura, sem senha, botão "Salvar permissões".
+    function enterEditMode(user) {
+      build();
+      editingId = user.id;
+      setErr(''); setOk('');
+      if (elName)  { elName.value = user.full_name || '';  elName.disabled = true; }
+      if (elEmail) { elEmail.value = user.email || '';     elEmail.disabled = true; }
+      if (pwdField) pwdField.hidden = true;
+      setSystems(user.systems);
+      if (editWho) editWho.innerHTML = 'Editando o acesso de <b>' + escapeHtml(user.email || '') + '</b>';
+      if (editBar) editBar.hidden = false;
+      elSubmit.textContent = 'Salvar permissões';
+      if (elList) elList.querySelectorAll('.usr__item').forEach(function (n) {
+        n.classList.toggle('is-editing', n.getAttribute('data-id') === user.id);
+      });
+    }
+
     // Lista de quem já existe (admin_list_users) — evita duplicar e confirma a criação.
     async function loadList() {
       if (!elList) return;
@@ -489,17 +591,29 @@
         var res = await client.rpc('admin_list_users');
         if (res.error) throw res.error;
         var rows = res.data || [];
+        lastRows = rows;
         if (elCount) elCount.textContent = rows.length;
         if (!rows.length) { elList.innerHTML = '<p class="usr__empty">Ninguém cadastrado ainda.</p>'; return; }
         elList.innerHTML = rows.map(function (u) {
           var sys = u.systems || {};
-          var tags = Object.keys(sys).map(function (k) { return '<span class="usr__tag">' + escapeHtml(k) + '</span>'; }).join('');
-          return '<div class="usr__item">' +
+          var keys = Object.keys(sys);
+          var tags = keys.length
+            ? '<div class="usr__item-tags">' + keys.map(function (k) { return '<span class="usr__tag">' + escapeHtml(k) + '</span>'; }).join('') + '</div>'
+            : '<span class="usr__item-none">sem acesso — clique p/ liberar</span>';
+          return '<div class="usr__item" data-id="' + escapeHtml(u.id) + '" title="Clique para definir o acesso">' +
             '<div class="usr__item-name">' + escapeHtml(u.full_name || '(sem nome)') + '</div>' +
             '<div class="usr__item-mail">' + escapeHtml(u.email || '') + '</div>' +
-            (tags ? '<div class="usr__item-tags">' + tags + '</div>' : '') +
+            tags +
           '</div>';
         }).join('');
+        // clicar numa pessoa abre o modo edição com o acesso atual dela
+        elList.querySelectorAll('.usr__item').forEach(function (node) {
+          node.addEventListener('click', function () {
+            var id = node.getAttribute('data-id'), u = null;
+            for (var i = 0; i < lastRows.length; i++) { if (lastRows[i].id === id) { u = lastRows[i]; break; } }
+            if (u) enterEditMode(u);
+          });
+        });
       } catch (e) {
         elList.innerHTML = '<p class="usr__empty">Não foi possível carregar a lista.</p>';
         console.warn('[SMERP] admin_list_users:', e && e.message);
@@ -507,7 +621,8 @@
     }
 
     function open() {
-      build(); setErr(''); setOk('');
+      build();
+      enterCreateMode();
       overlay.hidden = false;
       requestAnimationFrame(function () { overlay.classList.add('is-open'); });
       loadList();
@@ -519,6 +634,7 @@
     }
 
     navBtn.addEventListener('click', open);
+    if (newBtn) newBtn.addEventListener('click', enterCreateMode);
     overlay.querySelectorAll('[data-close]').forEach(function (el) { el.addEventListener('click', close); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !overlay.hidden) close(); });
 
@@ -538,22 +654,42 @@
       elPwd.value = p; elPwd.type = 'text';
     });
 
-    // submit -> cria o usuário via RPC segura
+    // submit -> CRIA (modo novo) OU SALVA permissões (modo edição)
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
       setErr(''); setOk('');
+      var systems = collectSystems();
+
+      // ---- MODO EDIÇÃO: só ajusta sistemas/papéis (pode zerar p/ revogar tudo) ----
+      if (editingId) {
+        var who = (elEmail.value || '').trim();
+        elSubmit.disabled = true; elSubmit.textContent = 'Salvando…';
+        try {
+          var resE = await client.rpc('admin_set_user_systems', { p_user_id: editingId, p_systems: systems });
+          if (resE.error) { setErr(resE.error.message || 'Não foi possível salvar.'); return; }
+          enterCreateMode();
+          setOk('Acesso de ' + who + ' atualizado.');
+          loadList();
+        } catch (err) {
+          setErr('Falha ao salvar. Tente novamente.');
+          console.error(err);
+        } finally {
+          elSubmit.disabled = false;
+          if (editingId) elSubmit.textContent = 'Salvar permissões';
+        }
+        return;
+      }
+
+      // ---- MODO CRIAR ----
       var name = (elName.value || '').trim();
       var email = (elEmail.value || '').trim();
       var pwd = elPwd.value || '';
-      var systems = collectSystems();
-
       if (!name) { setErr('Informe o nome da pessoa.'); return; }
       if (!email) { setErr('Informe o e-mail de acesso.'); return; }
       if (pwd.length < 6) { setErr('A senha precisa ter ao menos 6 caracteres.'); return; }
       if (!Object.keys(systems).length) { setErr('Marque ao menos 1 sistema e o tipo de acesso.'); return; }
 
-      elSubmit.disabled = true;
-      var prev = elSubmit.textContent; elSubmit.textContent = 'Criando…';
+      elSubmit.disabled = true; elSubmit.textContent = 'Criando…';
       try {
         var res = await client.rpc('admin_create_user', {
           p_email: email, p_password: pwd, p_full_name: name, p_systems: systems
@@ -566,7 +702,8 @@
         setErr('Falha ao criar. Tente novamente.');
         console.error(err);
       } finally {
-        elSubmit.disabled = false; elSubmit.textContent = prev;
+        elSubmit.disabled = false;
+        if (!editingId) elSubmit.textContent = 'Criar usuário';
       }
     });
 
