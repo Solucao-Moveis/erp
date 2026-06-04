@@ -10,6 +10,24 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '2.1',
+    data: '04/06/2026',
+    titulo: 'Nova aba "Solicitações" — peça melhorias e relate problemas ao desenvolvedor',
+    resumo: 'Qualquer pessoa logada pode abrir uma solicitação para o desenvolvedor — um "Desenvolvimento novo" ou uma "Manutenção do sistema" — escolhendo a urgência e acompanhando o andamento. Quando o pedido é concluído ou recusado, aparece um aviso (um número vermelho) no botão "Solicitações" para quem abriu.',
+    mudancas: [
+      {
+        app: 'Tela inicial (SMERP)',
+        o_que: 'Novo botão "Solicitações" na barra lateral, visível para todos. Permite abrir um pedido de "Desenvolvimento novo" ou de "Manutenção do sistema", com nível de urgência (Baixa, Média, Alta ou Urgente).',
+        como: 'Clique em "Solicitações" na barra lateral, escolha o tipo e a urgência, escreva um título curto e a descrição, e clique em "Enviar solicitação". Seus pedidos ficam listados em "Minhas solicitações" com o status atual: Aberta, Em andamento, Feito ou Não feito.'
+      },
+      {
+        app: 'Tela inicial (SMERP)',
+        o_que: 'Aviso (número vermelho) no botão "Solicitações" quando algum pedido seu é concluído ou recusado pelo desenvolvedor.',
+        como: 'Quando o desenvolvedor marca seu pedido como "Feito" ou "Não feito", aparece um número vermelho no botão "Solicitações". Abra a aba para ler a resposta do dev — ao abrir, o aviso some.'
+      }
+    ]
+  },
+  {
     versao: '2.0',
     data: '04/06/2026',
     titulo: 'Criar conta na tela de login + liberar acesso com um clique',
