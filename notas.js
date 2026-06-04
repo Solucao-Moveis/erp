@@ -10,6 +10,29 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '1.8',
+    data: '04/06/2026',
+    titulo: 'Criação de usuários direto no ERP',
+    resumo: 'A tela inicial do SMERP ganhou uma aba "Usuários" (visível só para a diretoria e o master) para cadastrar novas pessoas sem precisar mexer no banco: define nome, e-mail, senha e escolhe quais sistemas a pessoa vê — e o tipo de acesso dela em cada um.',
+    mudancas: [
+      {
+        app: 'Tela inicial (SMERP)',
+        o_que: 'Nova aba "Usuários" na barra lateral, que aparece apenas para quem tem perfil de Diretoria no Gerencial (ou o usuário master). Quem não tem essa permissão não vê a aba.',
+        como: 'Entre no SMERP com um usuário da diretoria/master e clique em "Usuários" na barra lateral. Abre a tela de cadastro com a lista de quem já existe ao lado.'
+      },
+      {
+        app: 'Tela inicial (SMERP)',
+        o_que: 'Cadastro de pessoa com nome, e-mail e senha provisória (com botão para gerar uma senha forte e para mostrar/ocultar o que foi digitado).',
+        como: 'Preencha nome e e-mail, digite a senha (ou clique em "Gerar") e repasse-a para a pessoa — ela pode trocar depois. Clique em "Criar usuário" para concluir.'
+      },
+      {
+        app: 'Tela inicial (SMERP)',
+        o_que: 'Escolha de quais sistemas a pessoa vai enxergar e qual o tipo de acesso dela em cada um (ex.: em Compras, se é Administrador, Aprovador, Comprador, Solicitante ou Visualizador; no Gerencial, quais áreas ela vê).',
+        como: 'Na seção "Sistemas e tipo de acesso", marque cada sistema que a pessoa vai usar e selecione os papéis dela ali. Só os sistemas marcados são liberados; o login já entra com esses acessos.'
+      }
+    ]
+  },
+  {
     versao: '1.7',
     data: '04/06/2026',
     titulo: 'Bip: relatório Gerencial do dia + data e ordenação nos cards',

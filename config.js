@@ -37,5 +37,42 @@ window.SMERP_CONFIG = {
         { system: 'bip', nome: 'BIP — Gestão (Desktop)',      desc: 'Visão completa: pedidos, relatórios e administração',  path: '' }
       ] },
     { id: 'gerencial',      nome: 'Gerencial / Diretoria', icon: 'chart', cor: '#8B5CF6', modulos: [ { system: 'gestao',  nome: 'Painel Executivo', desc: 'KPIs consolidados dos sistemas' } ] }
-  ]
+  ],
+
+  // Tela de criar usuários (aba "Usuários", visível só p/ master/diretoria).
+  // Para cada sistema, lista os PAPÉIS (o "tipo de acesso" da pessoa naquele
+  // sistema). 'value' precisa casar EXATO com o enum/escopo do banco; 'label'
+  // é o texto amigável; 'desc' explica o que aquele papel pode fazer.
+  // No Gerencial os "papéis" são na verdade ESCOPOS de área (o que a pessoa enxerga).
+  USUARIOS: {
+    SISTEMAS: [
+      { system: 'compras', nome: 'Compras (SC Manager)', cor: '#E8722A', icon: 'cart',
+        papeis: [
+          { value: 'admin',        label: 'Administrador', desc: 'Acesso total: configura tudo e gerencia usuários' },
+          { value: 'aprovador',    label: 'Aprovador',     desc: 'Aprova ou nega solicitações de compra' },
+          { value: 'comprador',    label: 'Comprador',     desc: 'Cota, compra e finaliza os pedidos aprovados' },
+          { value: 'solicitante',  label: 'Solicitante',   desc: 'Abre solicitações de compra' },
+          { value: 'visualizador', label: 'Visualizador',  desc: 'Só consulta, sem editar' }
+        ] },
+      { system: 'fabrill', nome: 'Hora a Hora (Produção)', cor: '#2E78D2', icon: 'clock',
+        papeis: [
+          { value: 'administrador', label: 'Administrador', desc: 'Acesso total ao apontamento e configurações' },
+          { value: 'pcp',           label: 'PCP',           desc: 'Planejamento e controle da produção' },
+          { value: 'lider',         label: 'Líder',         desc: 'Líder de turno: lança e acompanha a produção' },
+          { value: 'qualidade',     label: 'Qualidade',     desc: 'Registra e acompanha desvios de qualidade' }
+        ] },
+      { system: 'bip', nome: 'BIP (Expedição)', cor: '#1F9D55', icon: 'bars',
+        papeis: [
+          { value: 'admin', label: 'Administrador', desc: 'Visão completa: pedidos, relatórios e administração' },
+          { value: 'user',  label: 'Operador',      desc: 'Cria e bipa carregamentos (modo celular)' }
+        ] },
+      { system: 'gestao', nome: 'Gerencial (Diretoria)', cor: '#8B5CF6', icon: 'chart',
+        papeis: [
+          { value: 'diretoria',  label: 'Diretoria (vê tudo)', desc: 'Enxerga todos os módulos do painel executivo' },
+          { value: 'compras',    label: 'Compras',             desc: 'Só os KPIs de Compras' },
+          { value: 'producao',   label: 'Produção',            desc: 'Só os KPIs de Produção' },
+          { value: 'expedicao',  label: 'Expedição',           desc: 'Só os KPIs de Expedição' }
+        ] }
+    ]
+  }
 };

@@ -21,6 +21,7 @@
   var btnForgot = $('btnForgot');
   var btnLogout = $('btnLogout');
   var userEmail = $('userEmail');
+  var usersUI = null; // inicializado depois de criar o client (sb)
 
   function show(el) { if (el) el.hidden = false; }
   function hide(el) { if (el) el.hidden = true; }
@@ -318,6 +319,8 @@
       console.error('[SMERP] my_systems falhou:', e);
       renderSetores({});
     }
+    // libera (ou esconde) a aba "Usuários" conforme a permissão de quem entrou
+    if (usersUI) usersUI.gate();
     // revela o hub: some a splash (se visível) e o login (se visível) em fade suave
     fadeOutLoading(function () {
       hideLogin(function () { document.body.classList.remove('smerp-booting'); });
@@ -395,14 +398,195 @@
       try { await sb.auth.signOut(); } catch (e) {}
       var sysc = $('systems'); if (sysc) sysc.innerHTML = '';
       var sidec = $('sideSystems'); if (sidec) sidec.innerHTML = '';
+      if (usersUI) usersUI.hide();
       if (loginPassword) loginPassword.value = '';
       showLoginState();
     });
   }
 
+  // ============================================================
+  //  USUÁRIOS — criar acesso direto no ERP (só master/diretoria)
+  //  A aba só aparece se public.can_manage_users() devolver true.
+  // ============================================================
+  function initUsers(client) {
+    var overlay = $('usersOverlay');
+    var navBtn  = $('btnUsers');
+    var form    = $('usersForm');
+    if (!overlay || !navBtn || !form) return null;
+
+    var elName = $('usrName'), elEmail = $('usrEmail'), elPwd = $('usrPwd');
+    var elSystems = $('usrSystems'), elErr = $('usrError'), elOk = $('usrOk');
+    var elSubmit = $('usrSubmit'), elList = $('usrList'), elCount = $('usrCount');
+    var cfg = (CFG.USUARIOS && CFG.USUARIOS.SISTEMAS) || [];
+    var built = false;
+
+    function setErr(msg) { if (!elErr) return; if (msg) { elErr.textContent = msg; elErr.hidden = false; } else { elErr.hidden = true; } }
+    function setOk(msg)  { if (!elOk) return;  if (msg) { elOk.textContent = msg;  elOk.hidden = false; }  else { elOk.hidden = true; } }
+
+    // Monta os blocos de sistema + papéis a partir do config (1ª vez que abre).
+    function build() {
+      if (built || !elSystems) return;
+      built = true;
+      elSystems.innerHTML = cfg.map(function (s) {
+        var icon = ICONS[s.icon] || '';
+        var soft = hexToRgba(s.cor, 0.14);
+        var roles = (s.papeis || []).map(function (p) {
+          return '<label class="usr__role">' +
+            '<input type="checkbox" class="usr__role-chk" value="' + escapeHtml(p.value) + '" />' +
+            '<span class="usr__role-b">' +
+              '<span class="usr__role-name">' + escapeHtml(p.label) + '</span>' +
+              (p.desc ? '<span class="usr__role-desc">' + escapeHtml(p.desc) + '</span>' : '') +
+            '</span></label>';
+        }).join('');
+        return '<div class="usr__sys" data-system="' + escapeHtml(s.system) + '" style="--ac:' + escapeHtml(s.cor) + ';--ac-soft:' + soft + '">' +
+          '<label class="usr__sys-hd">' +
+            '<span class="usr__sys-ic">' + icon + '</span>' +
+            '<span class="usr__sys-name">' + escapeHtml(s.nome) + '</span>' +
+            '<input type="checkbox" class="usr__sys-chk" />' +
+          '</label>' +
+          '<div class="usr__roles">' + roles + '</div>' +
+        '</div>';
+      }).join('');
+
+      elSystems.querySelectorAll('.usr__sys').forEach(function (box) {
+        var chk = box.querySelector('.usr__sys-chk');
+        chk.addEventListener('change', function () {
+          box.classList.toggle('is-on', chk.checked);
+          if (!chk.checked) box.querySelectorAll('.usr__role-chk').forEach(function (c) { c.checked = false; });
+        });
+        // marcar um papel já liga o sistema
+        box.querySelectorAll('.usr__role-chk').forEach(function (rc) {
+          rc.addEventListener('change', function () {
+            if (rc.checked && !chk.checked) { chk.checked = true; box.classList.add('is-on'); }
+          });
+        });
+      });
+    }
+
+    // Lê do form: { sistema: [papéis marcados] } só dos sistemas marcados.
+    function collectSystems() {
+      var out = {};
+      elSystems.querySelectorAll('.usr__sys').forEach(function (box) {
+        var chk = box.querySelector('.usr__sys-chk');
+        if (!chk || !chk.checked) return;
+        var roles = [];
+        box.querySelectorAll('.usr__role-chk').forEach(function (c) { if (c.checked) roles.push(c.value); });
+        if (roles.length) out[box.getAttribute('data-system')] = roles;
+      });
+      return out;
+    }
+
+    function resetForm() {
+      form.reset();
+      elSystems.querySelectorAll('.usr__sys').forEach(function (b) { b.classList.remove('is-on'); });
+    }
+
+    // Lista de quem já existe (admin_list_users) — evita duplicar e confirma a criação.
+    async function loadList() {
+      if (!elList) return;
+      elList.innerHTML = '<p class="usr__empty">Carregando…</p>';
+      try {
+        var res = await client.rpc('admin_list_users');
+        if (res.error) throw res.error;
+        var rows = res.data || [];
+        if (elCount) elCount.textContent = rows.length;
+        if (!rows.length) { elList.innerHTML = '<p class="usr__empty">Ninguém cadastrado ainda.</p>'; return; }
+        elList.innerHTML = rows.map(function (u) {
+          var sys = u.systems || {};
+          var tags = Object.keys(sys).map(function (k) { return '<span class="usr__tag">' + escapeHtml(k) + '</span>'; }).join('');
+          return '<div class="usr__item">' +
+            '<div class="usr__item-name">' + escapeHtml(u.full_name || '(sem nome)') + '</div>' +
+            '<div class="usr__item-mail">' + escapeHtml(u.email || '') + '</div>' +
+            (tags ? '<div class="usr__item-tags">' + tags + '</div>' : '') +
+          '</div>';
+        }).join('');
+      } catch (e) {
+        elList.innerHTML = '<p class="usr__empty">Não foi possível carregar a lista.</p>';
+        console.warn('[SMERP] admin_list_users:', e && e.message);
+      }
+    }
+
+    function open() {
+      build(); setErr(''); setOk('');
+      overlay.hidden = false;
+      requestAnimationFrame(function () { overlay.classList.add('is-open'); });
+      loadList();
+      try { elName.focus(); } catch (e) {}
+    }
+    function close() {
+      overlay.classList.remove('is-open');
+      setTimeout(function () { overlay.hidden = true; }, 200);
+    }
+
+    navBtn.addEventListener('click', open);
+    overlay.querySelectorAll('[data-close]').forEach(function (el) { el.addEventListener('click', close); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !overlay.hidden) close(); });
+
+    // mostrar/ocultar senha + gerar uma forte
+    var pwdToggle = $('usrPwdToggle'), pwdGen = $('usrPwdGen');
+    if (pwdToggle) pwdToggle.addEventListener('click', function () {
+      elPwd.type = elPwd.type === 'password' ? 'text' : 'password';
+    });
+    if (pwdGen) pwdGen.addEventListener('click', function () {
+      var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+      var arr = new Uint32Array(10), p = '';
+      if (window.crypto && window.crypto.getRandomValues) window.crypto.getRandomValues(arr);
+      for (var i = 0; i < 10; i++) {
+        var n = arr[i] || Math.floor(Math.random() * 1e9);
+        p += chars[n % chars.length];
+      }
+      elPwd.value = p; elPwd.type = 'text';
+    });
+
+    // submit -> cria o usuário via RPC segura
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      setErr(''); setOk('');
+      var name = (elName.value || '').trim();
+      var email = (elEmail.value || '').trim();
+      var pwd = elPwd.value || '';
+      var systems = collectSystems();
+
+      if (!name) { setErr('Informe o nome da pessoa.'); return; }
+      if (!email) { setErr('Informe o e-mail de acesso.'); return; }
+      if (pwd.length < 6) { setErr('A senha precisa ter ao menos 6 caracteres.'); return; }
+      if (!Object.keys(systems).length) { setErr('Marque ao menos 1 sistema e o tipo de acesso.'); return; }
+
+      elSubmit.disabled = true;
+      var prev = elSubmit.textContent; elSubmit.textContent = 'Criando…';
+      try {
+        var res = await client.rpc('admin_create_user', {
+          p_email: email, p_password: pwd, p_full_name: name, p_systems: systems
+        });
+        if (res.error) { setErr(res.error.message || 'Não foi possível criar o usuário.'); return; }
+        setOk('Usuário ' + email + ' criado com sucesso.');
+        resetForm();
+        loadList();
+      } catch (err) {
+        setErr('Falha ao criar. Tente novamente.');
+        console.error(err);
+      } finally {
+        elSubmit.disabled = false; elSubmit.textContent = prev;
+      }
+    });
+
+    // Mostra/oculta a aba conforme a permissão do usuário logado.
+    async function gate() {
+      try {
+        var res = await client.rpc('can_manage_users');
+        navBtn.hidden = !(!res.error && res.data === true);
+      } catch (e) { navBtn.hidden = true; }
+    }
+
+    return { gate: gate, hide: function () { navBtn.hidden = true; close(); } };
+  }
+
+  usersUI = initUsers(sb);
+
   // Reage a expiração/refresh/troca de sessão
   sb.auth.onAuthStateChange(function (event, session) {
     if (event === 'SIGNED_OUT' || !session) {
+      if (usersUI) usersUI.hide();
       if (!document.body.classList.contains('smerp-booting')) showLoginState();
     }
   });

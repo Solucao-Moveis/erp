@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=9" />
+  <link rel="stylesheet" href="styles.css?v=10" />
 </head>
 <body class="smerp-booting">
   <!-- ===================== TELA DE CARREGAMENTO ===================== -->
@@ -64,6 +64,69 @@
     </div>
   </div>
 
+  <!-- ===================== USUÁRIOS (criar/gerir — só master/diretoria) ===================== -->
+  <div class="smerp-overlay smerp-users" id="usersOverlay" hidden>
+    <div class="smerp-modal__backdrop" data-close></div>
+    <div class="usr" role="dialog" aria-modal="true" aria-labelledby="usrTitle">
+      <header class="upd__top">
+        <div class="upd__brand">
+          <img class="upd__logo" src="assets/logo-solucao-moveis.png" alt="Solução Móveis" />
+          <div>
+            <h2 class="upd__title" id="usrTitle">Usuários</h2>
+            <p class="upd__sub">Crie um acesso e escolha o que a pessoa vê em cada sistema</p>
+          </div>
+        </div>
+        <button class="smerp-modal__close" id="usersClose" type="button" aria-label="Fechar" data-close>&times;</button>
+      </header>
+
+      <div class="usr__body">
+        <!-- COLUNA: formulário de criação -->
+        <form class="usr__form" id="usersForm" autocomplete="off">
+          <div class="usr__row2">
+            <label class="smerp-field">
+              <span>Nome completo</span>
+              <input id="usrName" type="text" placeholder="Ex.: Maria Silva" autocomplete="off" />
+            </label>
+            <label class="smerp-field">
+              <span>E-mail de acesso</span>
+              <input id="usrEmail" type="email" placeholder="pessoa@empresa.com" required autocomplete="off" />
+            </label>
+          </div>
+
+          <label class="smerp-field">
+            <span>Senha provisória</span>
+            <div class="usr__pwd">
+              <input id="usrPwd" type="password" placeholder="mín. 6 caracteres" required autocomplete="new-password" />
+              <button type="button" class="usr__pwd-btn" id="usrPwdToggle" title="Mostrar/ocultar">👁</button>
+              <button type="button" class="usr__pwd-btn" id="usrPwdGen" title="Gerar senha">Gerar</button>
+            </div>
+            <small class="usr__hint">A pessoa usa essa senha pra entrar e pode trocar depois.</small>
+          </label>
+
+          <div class="usr__sysblock">
+            <span class="usr__lbl">Sistemas e tipo de acesso</span>
+            <p class="usr__hint">Marque os sistemas que a pessoa vai usar e escolha o papel dela em cada um.</p>
+            <div id="usrSystems" class="usr__systems"></div>
+          </div>
+
+          <p class="smerp-login__error" id="usrError" hidden></p>
+          <p class="usr__ok" id="usrOk" hidden></p>
+
+          <button class="smerp-login__btn" id="usrSubmit" type="submit">Criar usuário</button>
+        </form>
+
+        <!-- COLUNA: usuários já cadastrados -->
+        <aside class="usr__side" aria-label="Usuários cadastrados">
+          <div class="usr__side-top">
+            <span class="usr__lbl">Já cadastrados</span>
+            <span class="usr__count" id="usrCount"></span>
+          </div>
+          <div class="usr__list" id="usrList"></div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================== APP SHELL (sidebar por sistema + principal por setor) ===================== -->
   <div class="app">
     <!-- SIDEBAR: atalhos por SISTEMA -->
@@ -81,6 +144,10 @@
       <button class="nav nav--home" id="btnUpdates" type="button" title="Atualizações">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3z"/></svg>
         Atualizações
+      </button>
+      <button class="nav nav--home" id="btnUsers" type="button" title="Usuários" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+        Usuários
       </button>
 
       <div class="side__lbl">Sistemas</div>
@@ -104,19 +171,19 @@
           <h1 class="h1">Seu painel de gestão <span>· SMERP</span></h1>
           <p class="sub" id="introDesc">Escolha um setor e o sistema que quer usar.</p>
         </div>
-        <span class="pill">v1.5</span>
+        <span class="pill">v1.8</span>
       </div>
 
       <div class="secttl">Setores</div>
       <section class="tiles" id="systems" aria-label="Setores"></section>
 
-      <div class="main__foot"><span>SMERP</span><i>·</i><span>Solução Móveis</span><i>·</i><span>v1.5</span></div>
+      <div class="main__foot"><span>SMERP</span><i>·</i><span>Solução Móveis</span><i>·</i><span>v1.8</span></div>
     </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js?v=6"></script>
-  <script src="notas.js?v=7"></script>
-  <script src="script.js?v=8"></script>
+  <script src="config.js?v=7"></script>
+  <script src="notas.js?v=8"></script>
+  <script src="script.js?v=9"></script>
 </body>
 </html>
