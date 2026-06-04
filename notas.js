@@ -10,6 +10,29 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '1.7',
+    data: '04/06/2026',
+    titulo: 'Bip: relatório Gerencial do dia + data e ordenação nos cards',
+    resumo: 'O Bip (Desktop) ganhou uma aba Gerencial para ver e imprimir o relatório de separação por período, com início, fim e quebra por operador. Os cards de carregamento agora mostram a data e dá para ordenar a lista.',
+    mudancas: [
+      {
+        app: 'Bip (Expedição)',
+        o_que: 'Nova aba "Gerencial" (no modo Desktop) com o relatório de separação por período: total de carregamentos, pacotes bipados, horário de início e fim da separação, duração e quanto cada operador bipou.',
+        como: 'No menu lateral do Bip, clique em "Gerencial", escolha o período (De / Até) e veja o resumo na tela. Clique em "Imprimir" para gerar o relatório para impressão.'
+      },
+      {
+        app: 'Bip (Expedição)',
+        o_que: 'O relatório Gerencial detalha os produtos: um resumo consolidado (cada produto com total de pacotes e unidades no período) e o detalhamento item a item de cada carregamento.',
+        como: 'Na aba Gerencial, o consolidado por produto aparece junto do relatório. Para ver/imprimir o item a item por carregamento, mantenha marcada a opção "Detalhar itens por carregamento" (desmarque para um relatório mais enxuto).'
+      },
+      {
+        app: 'Bip (Expedição)',
+        o_que: 'Os cards de carregamento agora mostram a data do carregamento, e a lista pode ser ordenada por data ou por quantidade.',
+        como: 'Na tela de Carregamentos, use o seletor "Ordenar" (Data mais recentes/antigos ou Quantidade maior/menor). A data aparece em destaque em cada card.'
+      }
+    ]
+  },
+  {
     versao: '1.6',
     data: '04/06/2026',
     titulo: 'Bip mais rápido e com modo Celular para apontar',
