@@ -242,8 +242,9 @@
           b.className = 'nav nav--sys';
           b.type = 'button';
           b.setAttribute('data-system', m.system);
+          b.setAttribute('data-path', m.path || '');
           b.innerHTML = '<span class="nav__dot" style="background:' + cor + '">' + icon + '</span>' + escapeHtml(m.nome);
-          b.addEventListener('click', function () { openApp(m.system); });
+          b.addEventListener('click', function () { openApp(m.system, m.path || ''); });
           sideEl.appendChild(b);
         });
       }
@@ -263,7 +264,7 @@
         '</button>' +
         '<div class="setor__menu"><div><div class="setor__menu-inner">' +
           mods.map(function (m) {
-            return '<button class="sys" type="button" data-system="' + escapeHtml(m.system) + '">' +
+            return '<button class="sys" type="button" data-system="' + escapeHtml(m.system) + '" data-path="' + escapeHtml(m.path || '') + '">' +
               '<span class="sys__ic" aria-hidden="true">' + icon + '</span>' +
               '<span class="sys__b"><span class="sys__name">' + escapeHtml(m.nome) + '</span>' +
               (m.desc ? '<span class="sys__desc">' + escapeHtml(m.desc) + '</span>' : '') + '</span>' +
@@ -284,7 +285,7 @@
       card.querySelectorAll('.sys').forEach(function (item) {
         item.addEventListener('click', function (e) {
           e.stopPropagation();
-          openApp(item.getAttribute('data-system'));
+          openApp(item.getAttribute('data-system'), item.getAttribute('data-path') || '');
         });
       });
 
@@ -324,9 +325,13 @@
   }
 
   // Abre o app na MESMA aba, levando a sessão atual no hash (SSO).
-  async function openApp(system) {
+  async function openApp(system, path) {
     var url = CFG.APPS && CFG.APPS[system];
     if (!url) return;
+    // 'path' opcional: abre uma sub-rota do app (ex.: bip em modo celular -> /apontar).
+    if (path) {
+      url = url.replace(/\/+$/, '') + '/' + String(path).replace(/^\/+/, '');
+    }
     try {
       var s = (await sb.auth.getSession()).data.session;
       if (s && s.access_token && s.refresh_token) {

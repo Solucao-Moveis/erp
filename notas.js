@@ -10,6 +10,34 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '1.6',
+    data: '04/06/2026',
+    titulo: 'Bip mais rápido e com modo Celular para apontar',
+    resumo: 'O Bip (Expedição) ficou bem mais rápido para abrir e agora tem dois jeitos de entrar: um modo Celular enxuto, feito para quem está bipando no chão de fábrica, e o modo Desktop completo para a gestão.',
+    mudancas: [
+      {
+        app: 'Tela inicial (SMERP)',
+        o_que: 'O cartão de Expedição / Logística agora oferece duas opções de Bip: "BIP — Apontamento (Celular)" e "BIP — Gestão (Desktop)".',
+        como: 'Na tela inicial, abra o cartão "Expedição / Logística" e escolha: "Apontamento (Celular)" para criar e bipar carregamentos numa tela leve e rápida no celular, ou "Gestão (Desktop)" para a visão completa com relatórios e administração.'
+      },
+      {
+        app: 'Bip (Expedição)',
+        o_que: 'Novo modo Celular: tela enxuta só com o essencial do apontamento — criar carregamento e bipar — sem o peso das telas de gestão, para não travar quem está conferindo.',
+        como: 'Entre pelo "BIP — Apontamento (Celular)". Toque em "Novo carregamento" para abrir um pedido ou toque num carregamento da lista para começar a bipar. Para ver relatórios e cadastros, use o modo Gestão (Desktop).'
+      },
+      {
+        app: 'Bip (Expedição)',
+        o_que: 'Abertura muito mais rápida: a tela de carregamentos e a abertura de cada pedido carregam bem mais ágeis, e as fotos agora aparecem como miniaturas leves em vez de baixar a imagem cheia.',
+        como: 'Não precisa fazer nada — já está mais rápido. As fotos novas são otimizadas automaticamente ao enviar; toque numa foto para ver em tamanho cheio.'
+      },
+      {
+        app: 'Bip (Expedição)',
+        o_que: 'Apagar carregamento criado errado direto no modo Celular.',
+        como: 'No "BIP — Apontamento (Celular)", cada carregamento da lista tem o ícone de lixeira: toque nele e confirme para apagar (o pedido e os bipes são removidos). No modo Desktop, use o botão "Cancelar" do carregamento.'
+      }
+    ]
+  },
+  {
     versao: '1.5',
     data: '03/06/2026',
     titulo: 'Painel Executivo: mais indicadores e monte do seu jeito',

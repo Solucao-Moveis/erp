@@ -32,7 +32,10 @@ window.SMERP_CONFIG = {
   SETORES: [
     { id: 'administrativo', nome: 'Administrativo',        icon: 'cart',  cor: '#E8722A', modulos: [ { system: 'compras', nome: 'SC Manager',  desc: 'Gestão de suprimentos e compras' } ] },
     { id: 'producao',       nome: 'Fábrica / Produção',    icon: 'clock', cor: '#2E78D2', modulos: [ { system: 'fabrill', nome: 'Hora a Hora', desc: 'Apontamento de produção por hora' } ] },
-    { id: 'logistica',      nome: 'Expedição / Logística', icon: 'bars',  cor: '#1F9D55', modulos: [ { system: 'bip',     nome: 'BIP Solução', desc: 'Conferência de lotes por bipagem' } ] },
+    { id: 'logistica',      nome: 'Expedição / Logística', icon: 'bars',  cor: '#1F9D55', modulos: [
+        { system: 'bip', nome: 'BIP — Apontamento (Celular)', desc: 'Modo enxuto: criar e bipar carregamentos no celular', path: 'apontar' },
+        { system: 'bip', nome: 'BIP — Gestão (Desktop)',      desc: 'Visão completa: pedidos, relatórios e administração',  path: '' }
+      ] },
     { id: 'gerencial',      nome: 'Gerencial / Diretoria', icon: 'chart', cor: '#8B5CF6', modulos: [ { system: 'gestao',  nome: 'Painel Executivo', desc: 'KPIs consolidados dos sistemas' } ] }
   ]
 };
