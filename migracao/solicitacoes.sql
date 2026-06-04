@@ -33,11 +33,15 @@ create table if not exists public.solicitacoes (
   status       text not null default 'aberta'
                  check (status in ('aberta','em_andamento','concluida','recusada')),
   resposta     text,                    -- nota do dev ao resolver (o solicitante vê)
+  whatsapp     text,                     -- opt-in: número (só dígitos, DDI) p/ avisar quando resolver
   visto_em     timestamptz,             -- quando o solicitante viu a resolução
   resolved_at  timestamptz,             -- quando virou concluida/recusada
   created_at   timestamptz not null default now(),
   updated_at   timestamptz not null default now()
 );
+
+-- idempotente: garante a coluna em bancos que já tinham a tabela antiga.
+alter table public.solicitacoes add column if not exists whatsapp text;
 
 create index if not exists solicitacoes_requester_idx on public.solicitacoes (requester_id, created_at desc);
 create index if not exists solicitacoes_status_idx     on public.solicitacoes (status);
@@ -117,11 +121,15 @@ grant select, insert, update on public.solicitacoes to authenticated;
 -- ------------------------------------------------------------
 -- 4) ABRIR uma solicitação (qualquer pessoa logada).
 -- ------------------------------------------------------------
+-- assinatura antiga (4 args) é substituída pela de 5 args; dropa pra não virar overload.
+drop function if exists public.create_solicitacao(text, text, text, text);
+
 create or replace function public.create_solicitacao(
   p_tipo      text,
   p_urgencia  text,
   p_titulo    text,
-  p_descricao text
+  p_descricao text,
+  p_whatsapp  text default null          -- opcional: avisar no WhatsApp quando resolver
 )
 returns jsonb
 language plpgsql
@@ -132,6 +140,7 @@ declare
   new_id   uuid;
   v_titulo text := nullif(btrim(coalesce(p_titulo, '')), '');
   v_desc   text := nullif(btrim(coalesce(p_descricao, '')), '');
+  v_wpp    text := nullif(regexp_replace(coalesce(p_whatsapp, ''), '\D', '', 'g'), '');
 begin
   if auth.uid() is null then
     raise exception 'Faça login para abrir uma solicitação.' using errcode = '42501';
@@ -148,26 +157,36 @@ begin
   if v_desc is null then
     raise exception 'Descreva a solicitação.';
   end if;
+  -- WhatsApp é opt-in: vazio = não avisar. Se informado, normaliza p/ DDI+DDD+número.
+  if v_wpp is not null then
+    if length(v_wpp) in (10, 11) then v_wpp := '55' || v_wpp; end if;   -- sem DDI -> assume Brasil
+    if length(v_wpp) not in (12, 13) then
+      raise exception 'WhatsApp inválido — use DDD + número, ex.: 54 9 9999-9999.';
+    end if;
+  end if;
 
-  insert into public.solicitacoes (requester_id, tipo, urgencia, titulo, descricao)
-    values (auth.uid(), p_tipo, p_urgencia, v_titulo, v_desc)
+  insert into public.solicitacoes (requester_id, tipo, urgencia, titulo, descricao, whatsapp)
+    values (auth.uid(), p_tipo, p_urgencia, v_titulo, v_desc, v_wpp)
     returning id into new_id;
 
   return jsonb_build_object('id', new_id);
 end;
 $$;
 
-revoke all on function public.create_solicitacao(text, text, text, text) from public, anon;
-grant execute on function public.create_solicitacao(text, text, text, text) to authenticated;
+revoke all on function public.create_solicitacao(text, text, text, text, text) from public, anon;
+grant execute on function public.create_solicitacao(text, text, text, text, text) to authenticated;
 
 
 -- ------------------------------------------------------------
 -- 5) MINHAS solicitações (as do próprio usuário). Não marca visto.
 -- ------------------------------------------------------------
+-- a forma do retorno mudou (ganhou whatsapp) -> dropa antes de recriar.
+drop function if exists public.list_my_solicitacoes();
+
 create or replace function public.list_my_solicitacoes()
 returns table (
   id uuid, tipo text, urgencia text, titulo text, descricao text,
-  status text, resposta text,
+  status text, resposta text, whatsapp text,
   created_at timestamptz, resolved_at timestamptz, visto_em timestamptz
 )
 language sql
@@ -175,7 +194,7 @@ stable
 security definer
 set search_path = public
 as $$
-  select id, tipo, urgencia, titulo, descricao, status, resposta,
+  select id, tipo, urgencia, titulo, descricao, status, resposta, whatsapp,
          created_at, resolved_at, visto_em
   from public.solicitacoes
   where requester_id = auth.uid()

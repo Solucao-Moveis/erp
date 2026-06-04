@@ -754,6 +754,7 @@
     if (!overlay || !navBtn || !form) return null;
 
     var elTipo = $('solTipo'), elUrg = $('solUrgencia'), elTit = $('solTitulo'), elDesc = $('solDescricao');
+    var elWhats = $('solWhats');
     var elErr = $('solError'), elOk = $('solOk'), elSubmit = $('solSubmit');
     var elMyList = $('solMyList'), elMaster = $('solMaster'), elAllList = $('solAllList');
     var elBadge = $('solBadge');
@@ -820,6 +821,12 @@
         var res = await client.rpc('list_my_solicitacoes');
         if (res.error) throw res.error;
         var rows = res.data || [];
+        // "lembra o último": pré-preenche o WhatsApp com o mais recente já usado.
+        if (elWhats && !elWhats.value) {
+          for (var i = 0; i < rows.length; i++) {
+            if (rows[i].whatsapp) { elWhats.value = rows[i].whatsapp; break; }
+          }
+        }
         elMyList.innerHTML = rows.length
           ? rows.map(myItemHtml).join('')
           : '<p class="usr__empty">Você ainda não abriu nenhuma solicitação.</p>';
@@ -929,12 +936,20 @@
       var urg = elUrg ? elUrg.value : '';
       var tit = (elTit.value || '').trim();
       var desc = (elDesc.value || '').trim();
+      var wpp = elWhats ? (elWhats.value || '').trim() : '';
       if (!tit) { setErr('Informe um título.'); return; }
       if (!desc) { setErr('Descreva a solicitação.'); return; }
+      // WhatsApp é opcional; se preenchido, confere a quantidade de dígitos antes de enviar.
+      if (wpp) {
+        var dig = wpp.replace(/\D/g, '');
+        if (dig.length < 10 || dig.length > 13) {
+          setErr('Confira o WhatsApp — use DDD + número, ex.: 54 9 9999-9999.'); return;
+        }
+      }
 
       elSubmit.disabled = true; var prev = elSubmit.textContent; elSubmit.textContent = 'Enviando…';
       try {
-        var res = await client.rpc('create_solicitacao', { p_tipo: tipo, p_urgencia: urg, p_titulo: tit, p_descricao: desc });
+        var res = await client.rpc('create_solicitacao', { p_tipo: tipo, p_urgencia: urg, p_titulo: tit, p_descricao: desc, p_whatsapp: wpp });
         if (res.error) { setErr(res.error.message || 'Não foi possível enviar.'); return; }
         setOk('Solicitação enviada! O desenvolvedor já pode ver.');
         if (elTit) elTit.value = ''; if (elDesc) elDesc.value = '';

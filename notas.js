@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '2.2',
+    data: '04/06/2026',
+    titulo: 'Seja avisado(a) no WhatsApp quando sua solicitação for resolvida',
+    resumo: 'Ao abrir uma solicitação, agora você pode deixar seu número de WhatsApp (é opcional). Quando o desenvolvedor marca seu pedido como "Feito" ou "Não feito", chega uma mensagem no seu WhatsApp avisando — além do número vermelho que já aparece no botão "Solicitações".',
+    mudancas: [
+      {
+        app: 'Tela inicial (SMERP)',
+        o_que: 'Campo "WhatsApp (opcional)" no formulário de abrir solicitação. Preenchendo, você recebe uma mensagem no WhatsApp quando o pedido for concluído ("Feito") ou recusado ("Não feito"), com a resposta do desenvolvedor quando houver. O número fica lembrado e já vem preenchido no próximo pedido.',
+        como: 'Abra "Solicitações", preencha tipo, urgência, título e descrição e, se quiser ser avisado(a), escreva seu WhatsApp com DDD (ex.: 54 9 9999-9999). Clique em "Enviar solicitação". Quando o desenvolvedor resolver o chamado, você recebe a mensagem no WhatsApp. Deixar o campo em branco mantém tudo como antes (só o aviso dentro do sistema).'
+      }
+    ]
+  },
+  {
     versao: '2.1',
     data: '04/06/2026',
     titulo: 'Nova aba "Solicitações" — peça melhorias e relate problemas ao desenvolvedor',
