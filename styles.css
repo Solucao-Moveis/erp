@@ -630,6 +630,12 @@ body.smerp-booting .side { visibility: hidden; }
   border-radius: 8px; padding: 6px 12px; transition: background .15s ease, color .15s ease;
 }
 .sol__ctrl-save:hover { background: var(--orange); color: #fff; }
+.sol__ctrl-del {
+  font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+  border: 1px solid #DC2626; background: #FEECEC; color: #DC2626;
+  border-radius: 8px; padding: 6px 12px; transition: background .15s ease, color .15s ease;
+}
+.sol__ctrl-del:hover { background: #DC2626; color: #fff; }
 
 /* aviso (badge) no botão "Solicitações" da sidebar */
 .nav__badge {

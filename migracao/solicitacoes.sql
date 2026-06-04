@@ -312,6 +312,33 @@ grant execute on function public.set_solicitacao_status(uuid, text, text) to aut
 
 
 -- ------------------------------------------------------------
+-- 8.1) EXCLUIR uma solicitação (só o master). Ação definitiva.
+-- ------------------------------------------------------------
+create or replace function public.delete_solicitacao(p_id uuid)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not public.is_master() then
+    raise exception 'Sem permissão para excluir solicitações.' using errcode = '42501';
+  end if;
+
+  delete from public.solicitacoes where id = p_id;
+  if not found then
+    raise exception 'Solicitação não encontrada.';
+  end if;
+
+  return jsonb_build_object('id', p_id, 'deleted', true);
+end;
+$$;
+
+revoke all on function public.delete_solicitacao(uuid) from public, anon;
+grant execute on function public.delete_solicitacao(uuid) to authenticated;
+
+
+-- ------------------------------------------------------------
 -- 9) BADGE (número do aviso na sidebar). Uma RPC serve aos dois papéis:
 --    master  -> quantas estão ABERTAS (pendentes pra ele resolver)
 --    comum   -> quantas das MINHAS foram resolvidas e ainda não vi

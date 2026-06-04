@@ -858,6 +858,7 @@
           '<select class="sol__ctrl-status">' + opts + '</select>' +
           '<input class="sol__ctrl-resp" type="text" maxlength="2000" placeholder="Resposta (opcional)" value="' + escapeHtml(s.resposta || '') + '" />' +
           '<button type="button" class="sol__ctrl-save">Salvar</button>' +
+          '<button type="button" class="sol__ctrl-del" title="Excluir solicitação">Excluir</button>' +
         '</div>' +
       '</div>';
     }
@@ -889,6 +890,24 @@
               console.error(err); alert('Falha ao salvar. Tente novamente.');
             } finally {
               btn.disabled = false; btn.textContent = prev;
+            }
+          });
+
+          // Excluir (só o master vê esta lista) — ação definitiva, pede confirmação.
+          var del = node.querySelector('.sol__ctrl-del');
+          if (del) del.addEventListener('click', async function () {
+            var id = node.getAttribute('data-id');
+            if (!confirm('Excluir esta solicitação? Essa ação não pode ser desfeita.')) return;
+            del.disabled = true; var prevD = del.textContent; del.textContent = 'Excluindo…';
+            try {
+              var rd = await client.rpc('delete_solicitacao', { p_id: id });
+              if (rd.error) { alert(rd.error.message || 'Não foi possível excluir.'); return; }
+              await loadAllList();
+              refreshBadge();
+            } catch (err) {
+              console.error(err); alert('Falha ao excluir. Tente novamente.');
+            } finally {
+              del.disabled = false; del.textContent = prevD;
             }
           });
         });
