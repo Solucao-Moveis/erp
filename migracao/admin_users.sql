@@ -5,8 +5,7 @@
 --   1) public.can_manage_users()  -> bool   (mostra/oculta a aba "Usuários")
 --   2) public.admin_create_user(...) -> jsonb (cria o login + libera sistemas)
 --
--- Quem pode criar: o MASTER (master@solucaomoveis.ind.br) e quem tem
--- escopo 'diretoria' no Gerencial (gestao.user_scopes).
+-- Quem pode criar/editar: SOMENTE o MASTER (master@solucaomoveis.ind.br).
 --
 -- A senha vem digitada pelo admin (guardada em bcrypt, igual ao master_user.sql).
 -- Rodar no SQL Editor do Supabase SMERP. Idempotente (create or replace).
@@ -22,17 +21,11 @@ stable
 security definer
 set search_path = public
 as $$
-  select
-    -- diretoria no Gerencial vê tudo e pode criar gente
-    exists (
-      select 1 from gestao.user_scopes
-      where user_id = auth.uid() and scope = 'diretoria'
-    )
-    -- o usuário master, identificado pelo e-mail no auth
-    or exists (
-      select 1 from auth.users
-      where id = auth.uid() and lower(email) = 'master@solucaomoveis.ind.br'
-    );
+  -- SOMENTE o master pode gerenciar usuários (criar/editar/listar).
+  select exists (
+    select 1 from auth.users
+    where id = auth.uid() and lower(email) = 'master@solucaomoveis.ind.br'
+  );
 $$;
 
 revoke all on function public.can_manage_users() from public, anon;
@@ -189,7 +182,7 @@ as $$
   left join fabrill.profiles fp on fp.id = u.id
   left join bip.profiles     bp on bp.id = u.id
   left join gestao.profiles  gp on gp.id = u.id
-  where public.can_manage_users()   -- só master/diretoria recebem a lista
+  where public.can_manage_users()   -- só o master recebe a lista
   order by u.created_at desc;
 $$;
 
@@ -368,7 +361,7 @@ revoke all on function public.admin_set_user_systems(uuid, jsonb) from public, a
 grant execute on function public.admin_set_user_systems(uuid, jsonb) to authenticated;
 
 
--- Teste (logado como master/diretoria):
+-- Teste (logado como master):
 --   select public.can_manage_users();
 --   select * from public.admin_list_users();
 --   select public.admin_create_user('fulano@empresa.com','12345678','Fulano de Tal',
