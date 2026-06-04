@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '1.9',
+    data: '04/06/2026',
+    titulo: 'Compras: Exportar respeita as solicitações marcadas',
+    resumo: 'Na lista de Solicitações do Compras, o botão "Exportar" agora gera a planilha apenas com as solicitações que você marcou. Sem nada marcado, ele continua exportando a lista inteira que está na tela.',
+    mudancas: [
+      {
+        app: 'Compras',
+        o_que: 'O botão "Exportar" da tela de Solicitações agora leva só as solicitações marcadas. Antes ele sempre baixava a lista toda, mesmo com itens selecionados.',
+        como: 'Marque as solicitações que quer exportar na caixinha à esquerda de cada linha e clique em "Exportar" — o botão mostra a quantidade escolhida, ex.: "Exportar (3)". Para baixar a lista inteira, deixe tudo desmarcado e clique em "Exportar".'
+      }
+    ]
+  },
+  {
     versao: '1.8',
     data: '04/06/2026',
     titulo: 'Criação de usuários direto no ERP',

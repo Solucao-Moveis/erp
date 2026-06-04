@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=10" />
+  <link rel="stylesheet" href="styles.css?v=11" />
 </head>
 <body class="smerp-booting">
   <!-- ===================== TELA DE CARREGAMENTO ===================== -->
@@ -22,10 +22,13 @@
 
   <!-- ===================== TELA DE LOGIN ===================== -->
   <div class="smerp-overlay smerp-login" id="loginOverlay" hidden>
+    <!-- ENTRAR -->
     <form class="smerp-login__card" id="loginForm" autocomplete="on">
       <img class="smerp-login__logo" src="assets/logo-solucao-moveis.png" alt="Solução Móveis" />
       <h1 class="smerp-login__title">SMERP</h1>
       <p class="smerp-login__sub">Entre para acessar seus sistemas</p>
+
+      <p class="smerp-login__ok" id="loginOk" hidden></p>
 
       <label class="smerp-field">
         <span>E-mail</span>
@@ -40,6 +43,42 @@
 
       <button class="smerp-login__btn" id="loginSubmit" type="submit">Entrar</button>
       <button class="smerp-login__forgot" id="btnForgot" type="button">Esqueci minha senha</button>
+
+      <div class="smerp-login__alt">
+        Não tem conta? <button type="button" id="btnShowRegister">Criar conta</button>
+      </div>
+    </form>
+
+    <!-- CRIAR CONTA (autocadastro — nasce sem acesso; o admin libera depois) -->
+    <form class="smerp-login__card" id="registerForm" autocomplete="off" hidden>
+      <img class="smerp-login__logo" src="assets/logo-solucao-moveis.png" alt="Solução Móveis" />
+      <h1 class="smerp-login__title">Criar conta</h1>
+      <p class="smerp-login__sub">Cadastre-se. O acesso aos sistemas é liberado pelo administrador.</p>
+
+      <label class="smerp-field">
+        <span>Nome completo</span>
+        <input id="regName" type="text" placeholder="Ex.: Maria Silva" autocomplete="off" />
+      </label>
+      <label class="smerp-field">
+        <span>E-mail</span>
+        <input id="regEmail" type="email" placeholder="voce@empresa.com" required autocomplete="off" />
+      </label>
+      <label class="smerp-field">
+        <span>Senha</span>
+        <input id="regPwd" type="password" placeholder="mín. 6 caracteres" required autocomplete="new-password" />
+      </label>
+      <label class="smerp-field">
+        <span>Confirmar senha</span>
+        <input id="regPwd2" type="password" placeholder="repita a senha" required autocomplete="new-password" />
+      </label>
+
+      <p class="smerp-login__error" id="regError" hidden></p>
+
+      <button class="smerp-login__btn" id="regSubmit" type="submit">Criar conta</button>
+
+      <div class="smerp-login__alt">
+        Já tem conta? <button type="button" id="btnShowLogin">Entrar</button>
+      </div>
     </form>
   </div>
 
@@ -80,8 +119,14 @@
       </header>
 
       <div class="usr__body">
-        <!-- COLUNA: formulário de criação -->
+        <!-- COLUNA: formulário (cria OU edita permissões de quem já existe) -->
         <form class="usr__form" id="usersForm" autocomplete="off">
+          <!-- barra que aparece quando está editando uma pessoa existente -->
+          <div class="usr__editbar" id="usrEditBar" hidden>
+            <span class="usr__editwho" id="usrEditWho"></span>
+            <button type="button" class="usr__pwd-btn" id="usrNewBtn">＋ Novo usuário</button>
+          </div>
+
           <div class="usr__row2">
             <label class="smerp-field">
               <span>Nome completo</span>
@@ -93,7 +138,7 @@
             </label>
           </div>
 
-          <label class="smerp-field">
+          <label class="smerp-field" id="usrPwdField">
             <span>Senha provisória</span>
             <div class="usr__pwd">
               <input id="usrPwd" type="password" placeholder="mín. 6 caracteres" required autocomplete="new-password" />
@@ -171,19 +216,19 @@
           <h1 class="h1">Seu painel de gestão <span>· SMERP</span></h1>
           <p class="sub" id="introDesc">Escolha um setor e o sistema que quer usar.</p>
         </div>
-        <span class="pill">v1.8</span>
+        <span class="pill">v1.9</span>
       </div>
 
       <div class="secttl">Setores</div>
       <section class="tiles" id="systems" aria-label="Setores"></section>
 
-      <div class="main__foot"><span>SMERP</span><i>·</i><span>Solução Móveis</span><i>·</i><span>v1.8</span></div>
+      <div class="main__foot"><span>SMERP</span><i>·</i><span>Solução Móveis</span><i>·</i><span>v1.9</span></div>
     </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=7"></script>
-  <script src="notas.js?v=8"></script>
-  <script src="script.js?v=9"></script>
+  <script src="notas.js?v=10"></script>
+  <script src="script.js?v=10"></script>
 </body>
 </html>
