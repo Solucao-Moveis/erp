@@ -379,25 +379,43 @@
     });
   }
 
-  // Alternar Entrar <-> Criar conta + AUTOCADASTRO (self_register)
+  // Switch Entrar | Criar conta + AUTOCADASTRO (self_register)
   (function initRegister() {
     var registerForm = $('registerForm');
-    var btnShowReg = $('btnShowRegister');
-    var btnShowLog = $('btnShowLogin');
     var loginOk = $('loginOk');
     if (!registerForm || !loginForm) return;
 
+    var sw = $('authSwitch'), tabLogin = $('tabLogin'), tabReg = $('tabRegister'), authSub = $('authSub');
     var regName = $('regName'), regEmail = $('regEmail'), regPwd = $('regPwd'), regPwd2 = $('regPwd2');
     var regError = $('regError'), regSubmit = $('regSubmit');
 
     function setRegError(msg) { if (!regError) return; if (msg) { regError.textContent = msg; regError.hidden = false; } else { regError.hidden = true; } }
     function setLoginOk(msg)  { if (!loginOk) return;  if (msg) { loginOk.textContent = msg;  loginOk.hidden = false; }  else { loginOk.hidden = true; } }
 
-    function showRegister() { setError(''); setLoginOk(''); setRegError(''); loginForm.hidden = true; registerForm.hidden = false; try { regName.focus(); } catch (e) {} }
-    function showLoginCard() { setRegError(''); registerForm.hidden = true; loginForm.hidden = false; try { loginEmail.focus(); } catch (e) {} }
+    function setTab(reg) {
+      if (sw) sw.classList.toggle('is-register', reg);
+      if (tabLogin) { tabLogin.classList.toggle('is-active', !reg); tabLogin.setAttribute('aria-selected', String(!reg)); }
+      if (tabReg)   { tabReg.classList.toggle('is-active', reg);    tabReg.setAttribute('aria-selected', String(reg)); }
+      if (authSub) authSub.textContent = reg
+        ? 'Cadastre-se. O acesso aos sistemas é liberado pelo administrador.'
+        : 'Entre para acessar seus sistemas';
+    }
 
-    if (btnShowReg) btnShowReg.addEventListener('click', showRegister);
-    if (btnShowLog) btnShowLog.addEventListener('click', showLoginCard);
+    function showRegister() {
+      setError(''); setLoginOk(''); setRegError('');
+      setTab(true);
+      loginForm.hidden = true; registerForm.hidden = false;
+      try { regName.focus(); } catch (e) {}
+    }
+    function showLoginCard() {
+      setRegError('');
+      setTab(false);
+      registerForm.hidden = true; loginForm.hidden = false;
+      try { loginEmail.focus(); } catch (e) {}
+    }
+
+    if (tabReg) tabReg.addEventListener('click', showRegister);
+    if (tabLogin) tabLogin.addEventListener('click', showLoginCard);
 
     registerForm.addEventListener('submit', async function (e) {
       e.preventDefault();

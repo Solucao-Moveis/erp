@@ -323,17 +323,28 @@ body.smerp-booting .side { visibility: hidden; }
 }
 .smerp-login__forgot:hover { color: var(--ink); }
 
-/* alternância Entrar <-> Criar conta */
-.smerp-login__alt {
-  margin-top: 6px; padding-top: 12px; border-top: 1px solid var(--border);
-  text-align: center; font-size: 13px; color: var(--ink-soft);
+/* switch Entrar | Criar conta (controle segmentado com pílula deslizante) */
+.auth-switch {
+  position: relative; display: grid; grid-template-columns: 1fr 1fr;
+  background: #EEF1F5; border: 1px solid var(--border); border-radius: 12px;
+  padding: 4px; margin-bottom: 2px;
 }
-.smerp-login__alt button {
-  font: inherit; font-size: 13px; font-weight: 800; cursor: pointer;
-  background: none; border: none; color: var(--orange);
-  text-decoration: underline; text-underline-offset: 3px; padding: 2px;
+.auth-switch__pill {
+  position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px);
+  background: #fff; border-radius: 9px; box-shadow: var(--shadow-rest);
+  transition: transform .24s cubic-bezier(.2,.8,.2,1);
 }
-.smerp-login__alt button:hover { color: var(--orange-dark); }
+.auth-switch.is-register .auth-switch__pill { transform: translateX(100%); }
+.auth-switch__btn {
+  position: relative; z-index: 1; font: inherit; font-size: 14px; font-weight: 700;
+  cursor: pointer; background: none; border: none; color: var(--ink-soft);
+  padding: 9px 0; border-radius: 9px; transition: color .18s ease;
+}
+.auth-switch__btn.is-active { color: var(--orange); }
+
+/* os dois formulários ocupam o MESMO card; só um aparece por vez */
+.auth-form { display: flex; flex-direction: column; gap: 14px; }
+.auth-form[hidden] { display: none; }
 
 /* aviso verde de sucesso na tela de login (conta criada) */
 .smerp-login__ok {

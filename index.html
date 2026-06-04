@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=11" />
+  <link rel="stylesheet" href="styles.css?v=12" />
 </head>
 <body class="smerp-booting">
   <!-- ===================== TELA DE CARREGAMENTO ===================== -->
@@ -20,66 +20,63 @@
     </div>
   </div>
 
-  <!-- ===================== TELA DE LOGIN ===================== -->
+  <!-- ===================== TELA DE LOGIN / CRIAR CONTA ===================== -->
   <div class="smerp-overlay smerp-login" id="loginOverlay" hidden>
-    <!-- ENTRAR -->
-    <form class="smerp-login__card" id="loginForm" autocomplete="on">
+    <div class="smerp-login__card">
       <img class="smerp-login__logo" src="assets/logo-solucao-moveis.png" alt="Solução Móveis" />
       <h1 class="smerp-login__title">SMERP</h1>
-      <p class="smerp-login__sub">Entre para acessar seus sistemas</p>
+      <p class="smerp-login__sub" id="authSub">Entre para acessar seus sistemas</p>
+
+      <!-- SWITCH Entrar | Criar conta -->
+      <div class="auth-switch" id="authSwitch" role="tablist" aria-label="Entrar ou criar conta">
+        <span class="auth-switch__pill" aria-hidden="true"></span>
+        <button type="button" class="auth-switch__btn is-active" id="tabLogin" role="tab" aria-selected="true">Entrar</button>
+        <button type="button" class="auth-switch__btn" id="tabRegister" role="tab" aria-selected="false">Criar conta</button>
+      </div>
 
       <p class="smerp-login__ok" id="loginOk" hidden></p>
 
-      <label class="smerp-field">
-        <span>E-mail</span>
-        <input id="loginEmail" name="email" type="email" required autocomplete="username" />
-      </label>
-      <label class="smerp-field">
-        <span>Senha</span>
-        <input id="loginPassword" name="password" type="password" required autocomplete="current-password" />
-      </label>
+      <!-- ENTRAR -->
+      <form class="auth-form" id="loginForm" autocomplete="on">
+        <label class="smerp-field">
+          <span>E-mail</span>
+          <input id="loginEmail" name="email" type="email" required autocomplete="username" />
+        </label>
+        <label class="smerp-field">
+          <span>Senha</span>
+          <input id="loginPassword" name="password" type="password" required autocomplete="current-password" />
+        </label>
 
-      <p class="smerp-login__error" id="loginError" hidden></p>
+        <p class="smerp-login__error" id="loginError" hidden></p>
 
-      <button class="smerp-login__btn" id="loginSubmit" type="submit">Entrar</button>
-      <button class="smerp-login__forgot" id="btnForgot" type="button">Esqueci minha senha</button>
+        <button class="smerp-login__btn" id="loginSubmit" type="submit">Entrar</button>
+        <button class="smerp-login__forgot" id="btnForgot" type="button">Esqueci minha senha</button>
+      </form>
 
-      <div class="smerp-login__alt">
-        Não tem conta? <button type="button" id="btnShowRegister">Criar conta</button>
-      </div>
-    </form>
+      <!-- CRIAR CONTA (autocadastro — nasce sem acesso; o admin libera depois) -->
+      <form class="auth-form" id="registerForm" autocomplete="off" hidden>
+        <label class="smerp-field">
+          <span>Nome completo</span>
+          <input id="regName" type="text" placeholder="Ex.: Maria Silva" autocomplete="off" />
+        </label>
+        <label class="smerp-field">
+          <span>E-mail</span>
+          <input id="regEmail" type="email" placeholder="voce@empresa.com" required autocomplete="off" />
+        </label>
+        <label class="smerp-field">
+          <span>Senha</span>
+          <input id="regPwd" type="password" placeholder="mín. 6 caracteres" required autocomplete="new-password" />
+        </label>
+        <label class="smerp-field">
+          <span>Confirmar senha</span>
+          <input id="regPwd2" type="password" placeholder="repita a senha" required autocomplete="new-password" />
+        </label>
 
-    <!-- CRIAR CONTA (autocadastro — nasce sem acesso; o admin libera depois) -->
-    <form class="smerp-login__card" id="registerForm" autocomplete="off" hidden>
-      <img class="smerp-login__logo" src="assets/logo-solucao-moveis.png" alt="Solução Móveis" />
-      <h1 class="smerp-login__title">Criar conta</h1>
-      <p class="smerp-login__sub">Cadastre-se. O acesso aos sistemas é liberado pelo administrador.</p>
+        <p class="smerp-login__error" id="regError" hidden></p>
 
-      <label class="smerp-field">
-        <span>Nome completo</span>
-        <input id="regName" type="text" placeholder="Ex.: Maria Silva" autocomplete="off" />
-      </label>
-      <label class="smerp-field">
-        <span>E-mail</span>
-        <input id="regEmail" type="email" placeholder="voce@empresa.com" required autocomplete="off" />
-      </label>
-      <label class="smerp-field">
-        <span>Senha</span>
-        <input id="regPwd" type="password" placeholder="mín. 6 caracteres" required autocomplete="new-password" />
-      </label>
-      <label class="smerp-field">
-        <span>Confirmar senha</span>
-        <input id="regPwd2" type="password" placeholder="repita a senha" required autocomplete="new-password" />
-      </label>
-
-      <p class="smerp-login__error" id="regError" hidden></p>
-
-      <button class="smerp-login__btn" id="regSubmit" type="submit">Criar conta</button>
-
-      <div class="smerp-login__alt">
-        Já tem conta? <button type="button" id="btnShowLogin">Entrar</button>
-      </div>
-    </form>
+        <button class="smerp-login__btn" id="regSubmit" type="submit">Criar conta</button>
+      </form>
+    </div>
   </div>
 
   <!-- ===================== ATUALIZAÇÕES (página dedicada) ===================== -->
@@ -229,6 +226,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=7"></script>
   <script src="notas.js?v=10"></script>
-  <script src="script.js?v=10"></script>
+  <script src="script.js?v=11"></script>
 </body>
 </html>
