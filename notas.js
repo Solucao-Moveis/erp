@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '2.6',
+    data: '05/06/2026',
+    titulo: 'Compras: lista de solicitações mais limpa no celular',
+    resumo: 'No celular, a lista de solicitações do Compras passa a mostrar só as colunas essenciais (Número, Descrição, Status e Ações), sem precisar arrastar a tabela para o lado. No computador continua com todas as colunas.',
+    mudancas: [
+      {
+        app: 'Compras (SC Manager)',
+        o_que: 'A tabela de solicitações se adapta ao celular: em telas pequenas aparecem apenas Número, Descrição, Status e Ações; as demais colunas (abertura, item, setor, solicitante, prioridade) ficam visíveis no computador. A seleção em massa e o "Exportar" continuam no computador.',
+        como: 'No celular, abra "Solicitações": a lista mostra o essencial sem rolagem para os lados. Toque no número da solicitação para ver todos os detalhes na tela de detalhe. No computador, nada muda — todas as colunas continuam aparecendo.'
+      }
+    ]
+  },
+  {
     versao: '2.5',
     data: '05/06/2026',
     titulo: 'Hora a Hora: apontamento do líder mais confortável no celular',
