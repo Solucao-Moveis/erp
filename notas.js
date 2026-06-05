@@ -10,6 +10,24 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '3.2',
+    data: '05/06/2026',
+    titulo: 'Novo: Gerenciador de Projetos (Kanban) no Gerencial',
+    resumo: 'O sistema Gerencial ganhou a aba "Projetos", um quadro estilo Trello para tocar projetos dentro do próprio ERP. Cada pessoa cria seus projetos, monta as colunas, cria cards e arrasta de uma coluna para outra. Dentro do card dá para colocar descrição, responsável, prazo, etiquetas coloridas, checklist, comentários e anexar arquivos. Nos comentários dá para mencionar alguém com @ — e a pessoa mencionada recebe um aviso no sininho do topo. Cada projeto tem membros: o dono adiciona quem quiser, e só os membros (e a diretoria) enxergam aquele projeto. A diretoria libera o acesso na aba "Usuários".',
+    mudancas: [
+      {
+        app: 'Gerenciador de Projetos (Gerencial)',
+        o_que: 'Uma aba "Projetos" no sistema Gerencial com quadros Kanban: criar/excluir projetos, adicionar/renomear/remover colunas, criar cards e arrastá-los entre as colunas. No card: descrição, responsável, prazo, etiquetas, checklist, comentários e upload de anexos. Projetos são por membros (só membros e a diretoria veem); o dono define os membros. É preciso ter o acesso "Projetos" liberado.',
+        como: 'Abra o sistema Gerencial e clique em "Projetos" na barra lateral (só aparece se o seu acesso estiver liberado). Use "Novo projeto" para criar um quadro; dentro dele, escreva o nome em "+ Adicionar coluna" para criar listas e "Adicionar card" para criar tarefas. Arraste os cards entre as colunas. Clique num card para abrir e definir responsável, prazo, etiquetas, checklist, comentários e anexar arquivos. No botão "Membros" (sendo dono) você adiciona quem participa. Para liberar o acesso a alguém, a diretoria abre "Usuários" no SMERP, clica na pessoa e marca, em "Gerencial", o item "Projetos (Gerenciador)".'
+      },
+      {
+        app: 'Menções e avisos (Gerencial)',
+        o_que: 'Nos comentários dos cards dá para mencionar uma pessoa do projeto digitando "@" e escolhendo o nome na lista. A pessoa mencionada recebe um aviso no sininho que apareceu no topo do Gerencial (com um número vermelho de não lidas). Só aparecem na lista de menção os membros daquele projeto.',
+        como: 'Ao escrever um comentário no card, digite "@" e comece a escrever o nome — escolha a pessoa na listinha que abre. Ela vai ver um aviso no sininho (canto superior direito). Clicando no aviso, o projeto e o card abrem direto. Use "Marcar todas" para limpar os avisos.'
+      }
+    ]
+  },
+  {
     versao: '3.1',
     data: '05/06/2026',
     titulo: 'Usuários: editar o acesso não pede mais senha',

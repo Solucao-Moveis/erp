@@ -75,7 +75,8 @@ window.SMERP_CONFIG = {
           { value: 'diretoria',  label: 'Diretoria (vê tudo)', desc: 'Enxerga todos os módulos do painel executivo' },
           { value: 'compras',    label: 'Compras',             desc: 'Só os KPIs de Compras' },
           { value: 'producao',   label: 'Produção',            desc: 'Só os KPIs de Produção' },
-          { value: 'expedicao',  label: 'Expedição',           desc: 'Só os KPIs de Expedição' }
+          { value: 'expedicao',  label: 'Expedição',           desc: 'Só os KPIs de Expedição' },
+          { value: 'projetos',   label: 'Projetos (Gerenciador)', desc: 'Acessa a aba Gerenciador de Projetos (Kanban)' }
         ] },
       { system: 'sobras', nome: 'Gestor de Sobras', cor: '#2E78D2', icon: 'clock',
         papeis: [
