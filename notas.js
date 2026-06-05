@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '2.7',
+    data: '05/06/2026',
+    titulo: 'Agora também dá para instalar o SMERP no iPhone',
+    resumo: 'Além do Android, o SMERP pode ser adicionado à tela inicial do iPhone e abrir em tela cheia, como um aplicativo. No iPhone a instalação é manual, feita pelo Safari.',
+    mudancas: [
+      {
+        app: 'Tela inicial (SMERP)',
+        o_que: 'O atalho do SMERP no iPhone passa a abrir em tela cheia (sem a barra do Safari), com o ícone do "S" e o nome "SMERP". É o mesmo sistema, com o mesmo login — só a aparência fica de aplicativo.',
+        como: 'No iPhone, abra o SMERP no Safari (precisa ser o Safari), toque no botão Compartilhar (o quadrado com a seta para cima, embaixo) e escolha "Adicionar à Tela de Início". O ícone aparece na tela do celular; toque nele para entrar direto, em tela cheia.'
+      }
+    ]
+  },
+  {
     versao: '2.6',
     data: '05/06/2026',
     titulo: 'Compras: lista de solicitações mais limpa no celular',
