@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '2.5',
+    data: '05/06/2026',
+    titulo: 'Hora a Hora: apontamento do líder mais confortável no celular',
+    resumo: 'No Hora a Hora, as caixas de seleção de Área e Máquina passam a ocupar a largura inteira da tela no celular, em vez de ficarem estreitas com espaço vazio ao lado. No computador continua igual.',
+    mudancas: [
+      {
+        app: 'Hora a Hora (Produção)',
+        o_que: 'Os seletores de Área (na tela de apontamento do líder) e de Área/Máquina (no Dashboard da área) agora preenchem a linha no celular, ficando mais fáceis de tocar e ler.',
+        como: 'No celular, abra o Hora a Hora como líder: na tela de apontamento, o seletor de Área aparece ocupando a linha toda; no Dashboard da Área, os filtros de Área e Máquina também. Nada muda na forma de usar — só fica mais confortável de operar com o dedo.'
+      }
+    ]
+  },
+  {
     versao: '2.4',
     data: '05/06/2026',
     titulo: 'BIP: criar carregamento ficou mais confortável no celular',
