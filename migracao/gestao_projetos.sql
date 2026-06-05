@@ -204,10 +204,14 @@ alter table gestao.project_checklist_items  enable row level security;
 alter table gestao.project_comments         enable row level security;
 alter table gestao.project_attachments      enable row level security;
 
--- projects: membro lê; criador com escopo 'projetos' cria; dono/diretoria edita.
+-- projects: membro (ou o dono) lê; criador com escopo 'projetos' cria; dono/diretoria edita.
+-- IMPORTANTE: incluir `owner_id = auth.uid()` aqui é o que permite o dono ver o
+-- projeto recém-criado no `insert ... returning` ANTES de a linha de membro existir
+-- (o membro 'dono' só é inserido no passo seguinte). Sem isso, criar projeto falha
+-- para quem não é diretoria.
 drop policy if exists "proj_select" on gestao.projects;
 create policy "proj_select" on gestao.projects for select to authenticated
-  using (gestao.is_project_member(id));
+  using (gestao.is_project_member(id) or owner_id = auth.uid());
 drop policy if exists "proj_insert" on gestao.projects;
 create policy "proj_insert" on gestao.projects for insert to authenticated
   with check (owner_id = auth.uid() and gestao.can_see('projetos'));
@@ -355,6 +359,21 @@ create policy "notif_insert_mention" on gestao.notifications for insert to authe
 
 grant select, insert, update, delete on gestao.notifications to authenticated;
 grant all on gestao.notifications to service_role;
+
+-- ============================================================
+-- 8) TAREFAS RECORRENTES (prazo mensal + alerta antecipado)
+--    Um card recorrente tem um dia do mês como prazo e avisa N dias
+--    antes. O alerta (subir ao topo + borda vermelha + sininho) é
+--    calculado no app; aqui só guardamos a configuração.
+-- ============================================================
+alter table gestao.project_cards
+  add column if not exists recurring boolean not null default false,
+  add column if not exists recur_day int,                            -- 1..31: dia do prazo no mês
+  add column if not exists recur_alert_days int not null default 0,  -- avisar N dias antes
+  add column if not exists recur_done_period text;                   -- 'YYYY-MM' do último mês concluído
+alter table gestao.project_cards drop constraint if exists project_cards_recur_day_chk;
+alter table gestao.project_cards add constraint project_cards_recur_day_chk
+  check (recur_day is null or (recur_day between 1 and 31));
 
 -- ============================================================
 -- Recarrega o cache de schema do PostgREST (expõe as tabelas/RPC novos).

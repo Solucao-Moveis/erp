@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '3.3',
+    data: '05/06/2026',
+    titulo: 'Projetos: tarefas recorrentes com prazo do mês e alerta',
+    resumo: 'No Gerenciador de Projetos, agora um card pode ser marcado como "recorrente": você escolhe o dia do mês que é o prazo máximo e quantos dias antes quer ser avisado. Quando chega perto (ou passou) e a tarefa ainda não foi concluída no mês, o card sobe para o topo da coluna, fica com a borda vermelha e aparece no sininho avisando. Ao marcar "Concluir este mês", o alerta some até o próximo mês, quando reativa sozinho.',
+    mudancas: [
+      {
+        app: 'Gerenciador de Projetos (Gerencial)',
+        o_que: 'Tarefa recorrente no card: um interruptor "Tarefa recorrente (todo mês)" com o "Dia do prazo" (1 a 31) e "Avisar antes (dias)". Dentro da janela de aviso (ou se já venceu) e não concluída no mês, o card sobe ao topo da coluna com a borda vermelha e um selo de prazo, e entra no sininho do topo. Botão "Concluir este mês" limpa o alerta até o próximo mês. Todos os membros do projeto enxergam o alerta.',
+        como: 'Abra um card, ligue "Tarefa recorrente (todo mês)", informe o dia do prazo e quantos dias antes quer o aviso. Quando faltar esse tanto de dias, o card vai pro topo com borda vermelha e aparece no sininho (clique no aviso para abrir o card). Ao fazer a tarefa, abra o card e clique em "Concluir este mês" — ele sai do vermelho e volta a avisar só no mês seguinte. Se precisar, use "Reabrir" para voltar a cobrar no mesmo mês.'
+      }
+    ]
+  },
+  {
     versao: '3.2',
     data: '05/06/2026',
     titulo: 'Novo: Gerenciador de Projetos (Kanban) no Gerencial',
