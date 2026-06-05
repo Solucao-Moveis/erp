@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '2.3',
+    data: '05/06/2026',
+    titulo: 'Instale o SMERP no celular (Android), com cara de aplicativo',
+    resumo: 'Agora dá para adicionar o SMERP à tela inicial do celular e abrir como se fosse um aplicativo — em tela cheia, com o ícone do "S". Nada muda no computador; é um extra para quem usa pelo celular Android.',
+    mudancas: [
+      {
+        app: 'Tela inicial (SMERP)',
+        o_que: 'O SMERP virou um "app instalável" (PWA): pelo celular Android você cria um atalho na tela inicial que abre em tela cheia, sem a barra do navegador, e carrega mais rápido. Continua sendo o mesmo sistema, com o mesmo login.',
+        como: 'No celular, abra o SMERP pelo Google Chrome. Toque no menu (os três pontinhos no canto) e escolha "Instalar aplicativo" (ou aceite o aviso "Adicionar à tela inicial" quando ele aparecer). Pronto: o ícone do "S" fica na tela do celular, junto dos outros apps. Toque nele para entrar direto. Não precisa baixar nada de loja.'
+      }
+    ]
+  },
+  {
     versao: '2.2',
     data: '04/06/2026',
     titulo: 'Seja avisado(a) no WhatsApp quando sua solicitação for resolvida',
