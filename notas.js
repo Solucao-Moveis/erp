@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '2.8',
+    data: '05/06/2026',
+    titulo: 'Tela inicial do SMERP repaginada para o celular',
+    resumo: 'No celular, a tela inicial ganhou um menu ☰ no topo que abre uma gaveta lateral com tudo: Início, Atualizações, Solicitações, Usuários, seus sistemas e Sair. Antes os atalhos ficavam espremidos numa fileira e alguns botões nem apareciam no celular. No computador continua igual.',
+    mudancas: [
+      {
+        app: 'Tela inicial (SMERP)',
+        o_que: 'Menu de navegação próprio para celular: um botão ☰ no canto superior esquerdo abre uma gaveta com todos os atalhos (Início, Atualizações, Solicitações — com o aviso vermelho —, Usuários quando você tem acesso, a lista dos seus sistemas e o botão Sair). Os cards de setor passam a ocupar a tela inteira.',
+        como: 'No celular, toque no ☰ no topo para abrir o menu; toque em qualquer item para ir até ele (a gaveta fecha sozinha) ou toque fora dela para fechar. Quando houver novidade em Solicitações, aparece um pontinho vermelho no ☰. Para escolher um sistema, você também pode tocar direto no card do setor, que abre a lista.'
+      }
+    ]
+  },
+  {
     versao: '2.7',
     data: '05/06/2026',
     titulo: 'Agora também dá para instalar o SMERP no iPhone',

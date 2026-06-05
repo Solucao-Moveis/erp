@@ -11,7 +11,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Copia os arquivos do site (inclui os 3 arquivos do PWA Android:
 # manifest.webmanifest, sw.js e pwa.js — sem eles o "instalar na tela
 # inicial" não aparece no Android).
-COPY index.html styles.css script.js config.js notas.js manifest.webmanifest sw.js pwa.js /usr/share/nginx/html/
+COPY index.html styles.css script.js config.js notas.js mobilenav.js manifest.webmanifest sw.js pwa.js /usr/share/nginx/html/
 COPY assets/ /usr/share/nginx/html/assets/
 
 # O proxy do EasyPanel deste app aponta para a porta 80 (solucaomoveis_erp:80)

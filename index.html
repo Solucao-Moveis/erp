@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=15" />
+  <link rel="stylesheet" href="styles.css?v=16" />
 </head>
 <body class="smerp-booting">
   <!-- ===================== TELA DE CARREGAMENTO ===================== -->
@@ -247,7 +247,18 @@
 
   <!-- ===================== APP SHELL (sidebar por sistema + principal por setor) ===================== -->
   <div class="app">
-    <!-- SIDEBAR: atalhos por SISTEMA -->
+    <!-- TOPO MOBILE: hambúrguer + marca (só aparece no celular) -->
+    <header class="topbar">
+      <button class="hamburger" id="navToggle" type="button" aria-label="Abrir menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        <span class="topbar__dot" id="navDot" hidden></span>
+      </button>
+      <a class="topbar__brand" href="#" aria-label="SMERP — Início">
+        <img src="assets/favicon.png" alt="" /><b>SMERP</b>
+      </a>
+    </header>
+
+    <!-- SIDEBAR: atalhos por SISTEMA (no celular vira gaveta) -->
     <aside class="side">
       <a class="side__brand" href="#" aria-label="SMERP — Início">
         <img src="assets/logo-solucao-moveis.png" alt="Solução Móveis" />
@@ -286,6 +297,9 @@
       </div>
     </aside>
 
+    <!-- fundo escuro do menu mobile (fecha a gaveta ao tocar) -->
+    <div class="backdrop" id="navBackdrop"></div>
+
     <!-- PRINCIPAL: setores (clicar expande os sistemas pra escolher) -->
     <main class="main">
       <div class="main__top">
@@ -306,8 +320,9 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=8"></script>
-  <script src="notas.js?v=17"></script>
+  <script src="notas.js?v=18"></script>
   <script src="script.js?v=14"></script>
+  <script src="mobilenav.js?v=1"></script>
   <script src="pwa.js?v=1"></script>
 </body>
 </html>
