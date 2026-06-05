@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '2.9',
+    data: '05/06/2026',
+    titulo: 'Visão "Simplificado": todos os sistemas abertos de uma vez',
+    resumo: 'Na tela inicial do SMERP, um novo botão "Simplificado" no rodapé da barra lateral (logo acima do seu nome) abre todos os setores ao mesmo tempo, mostrando só o nome de cada sistema — sem precisar clicar setor por setor. É como enxergar tudo aberto numa olhada só. A sua escolha fica guardada para a próxima vez.',
+    mudancas: [
+      {
+        app: 'Tela inicial (SMERP)',
+        o_que: 'Um botão "Simplificado" no rodapé da barra lateral, perto do seu nome. Quando ligado, todos os cards de setor ficam abertos de uma vez e cada sistema aparece só com o nome (sem a descrição). Quando desligado, volta ao normal: cada setor abre quando você clica nele.',
+        como: 'Na barra lateral, embaixo (ao lado do "Solução Móveis"), toque no botão "Simplificado" para ligar — na hora os setores abrem todos e você vê a lista completa de sistemas só com o nome; toque em qualquer um para entrar. Toque de novo para desligar e voltar a abrir um setor por vez. A sua escolha fica guardada para a próxima vez que você entrar.'
+      }
+    ]
+  },
+  {
     versao: '2.8',
     data: '05/06/2026',
     titulo: 'Tela inicial do SMERP repaginada para o celular',

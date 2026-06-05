@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=16" />
+  <link rel="stylesheet" href="styles.css?v=17" />
 </head>
 <body class="smerp-booting">
   <!-- ===================== TELA DE CARREGAMENTO ===================== -->
@@ -287,6 +287,14 @@
       <div class="side__lbl">Sistemas</div>
       <nav class="side__sys" id="sideSystems" aria-label="Sistemas liberados"></nav>
 
+      <!-- Visão simplificada: abre todos os setores de uma vez, só com o nome -->
+      <button class="side__simple" id="simpleToggle" type="button" role="switch" aria-checked="false"
+              title="Mostra todos os sistemas abertos de uma vez, só com o nome">
+        <svg class="side__simple-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18M3 12h18M3 19h18"/></svg>
+        <span class="side__simple-txt">Simplificado</span>
+        <span class="side__simple-sw" aria-hidden="true"></span>
+      </button>
+
       <div class="side__user">
         <div class="side__av" title="Solução Móveis" aria-hidden="true">SM</div>
         <div class="side__userinfo">
@@ -320,8 +328,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js?v=8"></script>
-  <script src="notas.js?v=18"></script>
-  <script src="script.js?v=14"></script>
+  <script src="notas.js?v=19"></script>
+  <script src="script.js?v=15"></script>
   <script src="mobilenav.js?v=1"></script>
   <script src="pwa.js?v=1"></script>
 </body>

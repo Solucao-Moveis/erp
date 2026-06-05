@@ -27,6 +27,26 @@
   function show(el) { if (el) el.hidden = false; }
   function hide(el) { if (el) el.hidden = true; }
 
+  /* ---- Visão simplificada: abre todos os setores de uma vez, só com o nome ---- */
+  (function initSimpleView() {
+    var btn = $('simpleToggle');
+    if (!btn) return;
+    var KEY = 'smerp:simple';
+    function apply(on) {
+      document.body.classList.toggle('simple', on);
+      btn.classList.toggle('is-on', on);
+      btn.setAttribute('aria-checked', on ? 'true' : 'false');
+    }
+    var saved = false;
+    try { saved = localStorage.getItem(KEY) === '1'; } catch (e) {}
+    apply(saved);
+    btn.addEventListener('click', function () {
+      var on = !document.body.classList.contains('simple');
+      apply(on);
+      try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {}
+    });
+  })();
+
   /* ---- Atualizações: página dedicada com filtro por versão (independe do login) ---- */
   (function initUpdates() {
     var btn = $('btnUpdates');

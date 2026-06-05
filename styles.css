@@ -80,8 +80,34 @@ body.smerp-booting .app { visibility: hidden; }
 .nav--sys .nav__dot svg { width: 14px; height: 14px; }
 .nav--sys:hover { color: var(--ink); background: #F2F4F7; }
 
+/* botão "Simplificado" (abre todos os setores de uma vez) — fica no rodapé da barra */
+.side__simple {
+  margin-top: auto;
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 10px 11px; border-radius: 11px;
+  border: none; background: none; cursor: pointer;
+  color: var(--ink-soft); font: inherit; font-size: 13px; font-weight: 600; text-align: left;
+  transition: background .18s ease, color .18s ease;
+}
+.side__simple:hover { background: #F2F4F7; color: var(--ink); }
+.side__simple-ic { width: 18px; height: 18px; flex-shrink: 0; }
+.side__simple-txt { flex: 1; min-width: 0; }
+.side__simple-sw {
+  position: relative; flex-shrink: 0; width: 38px; height: 22px;
+  border-radius: 999px; background: var(--border); transition: background .2s ease;
+}
+.side__simple-sw::after {
+  content: ''; position: absolute; top: 2px; left: 2px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.18);
+  transition: transform .2s ease;
+}
+.side__simple.is-on { color: var(--orange); }
+.side__simple.is-on .side__simple-sw { background: var(--orange); }
+.side__simple.is-on .side__simple-sw::after { transform: translateX(16px); }
+
 .side__user {
-  margin-top: auto; display: flex; align-items: center; gap: 10px;
+  display: flex; align-items: center; gap: 10px;
   padding: 12px 8px 4px; border-top: 1px solid var(--border);
 }
 .side__av {
@@ -177,6 +203,15 @@ body.smerp-booting .app { visibility: hidden; }
 .sys__desc { font-size: 12px; color: var(--ink-soft); margin-top: 1px; }
 .sys svg.sys__go { color: var(--ac); flex-shrink: 0; transition: transform .2s ease; }
 .sys:hover svg.sys__go { transform: translateX(4px); }
+
+/* ----- Visão simplificada: todos os setores abertos de uma vez, só com o nome ----- */
+body.simple .setor__menu { grid-template-rows: 1fr; }
+body.simple .setor__menu > div { overflow: visible; }
+body.simple .setor__hd { cursor: default; }
+body.simple .setor__hd::before { transform: scaleY(1); }
+body.simple .setor__chev { display: none; }
+body.simple .sys { padding: 10px 13px; }
+body.simple .sys__desc { display: none; }
 
 .main__foot { margin-top: 46px; color: var(--ink-soft); font-size: 12px; font-weight: 600; display: flex; gap: 8px; }
 .main__foot i { color: var(--orange); font-style: normal; }
