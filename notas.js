@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '2.4',
+    data: '05/06/2026',
+    titulo: 'BIP: criar carregamento ficou mais confortável no celular',
+    resumo: 'No modo celular do BIP (Apontamento), o formulário de "Novo carregamento" e a tela de edição ganharam um layout mais espaçado: os campos de produto deixam de ficar espremidos numa única linha em telas pequenas. No computador continua igual.',
+    mudancas: [
+      {
+        app: 'BIP (Expedição)',
+        o_que: 'A linha de produtos (Tipo de Pacote, Pacotes, Unidades por pacote e o botão de excluir) agora se reorganiza no celular: cada campo ganha mais espaço, ficando mais fácil de tocar e preencher. Vale para criar e para editar um carregamento.',
+        como: 'No celular, abra o BIP em modo Apontamento, toque em "Novo carregamento" (ou edite um existente) e adicione produtos: os campos aparecem em linhas mais largas, sem aperto. A forma de usar é a mesma — só ficou mais confortável.'
+      }
+    ]
+  },
+  {
     versao: '2.3',
     data: '05/06/2026',
     titulo: 'Instale o SMERP no celular (Android), com cara de aplicativo',
