@@ -40,6 +40,13 @@ as $$
               (select jsonb_agg(scope) from gestao.user_scopes where user_id = auth.uid()),
               '[]'::jsonb)
           end
+        ),
+        'sobras', (
+          select case when exists (select 1 from sobras.profiles where id = auth.uid())
+            then coalesce(
+              (select jsonb_agg(role) from sobras.user_roles where user_id = auth.uid()),
+              '[]'::jsonb)
+          end
         )
       )
     ),

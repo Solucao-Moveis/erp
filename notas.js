@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '3.0',
+    data: '05/06/2026',
+    titulo: 'Novo sistema: Gestor de Sobras',
+    resumo: 'Entrou no SMERP o Gestor de Sobras, dentro do setor "Fábrica / Produção" (ao lado do Hora a Hora). Ele controla as sobras de produção por setor (Metalurgia, Solda, Pintura, Montagem) e por local, com entradas e saídas que atualizam o estoque na hora. Aparece só para quem a diretoria liberar na aba "Usuários".',
+    mudancas: [
+      {
+        app: 'Gestor de Sobras (novo)',
+        o_que: 'Um sistema novo para controlar as sobras/retalhos de produção: cadastro de itens (com foto), cadastro de funcionários, lançamento de entradas e saídas por setor e por local, e um painel com o estoque atual. Na saída, o número da OP é obrigatório. Usa o mesmo login do SMERP (login único) e, por dentro, traz o botão "Voltar ao ERP".',
+        como: 'Na tela inicial, abra o setor "Fábrica / Produção" e toque em "Gestor de Sobras" (só aparece se o seu acesso estiver liberado). Lá dentro: use "Cadastro de Itens" para criar os itens, "Funcionários" para as pessoas, "Estoque" para ver o que há disponível, e registre entradas/saídas — o estoque soma ou dá baixa sozinho. Para liberar alguém, a diretoria abre a aba "Usuários" do SMERP, clica na pessoa e marca "Gestor de Sobras".'
+      }
+    ]
+  },
+  {
     versao: '2.9',
     data: '05/06/2026',
     titulo: 'Visão "Simplificado": todos os sistemas abertos de uma vez',

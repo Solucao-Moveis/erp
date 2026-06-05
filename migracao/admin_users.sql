@@ -143,6 +143,14 @@ begin
         insert into gestao.user_scopes (user_id, scope)
           values (new_id, r) on conflict (user_id, scope) do nothing;
       end loop;
+
+    elsif sys = 'sobras' then
+      insert into sobras.profiles (id, email, full_name)
+        values (new_id, v_email, v_name) on conflict (id) do nothing;
+      for r in select jsonb_array_elements_text(roles) loop
+        insert into sobras.user_roles (user_id, role)
+          values (new_id, r::sobras.app_role) on conflict (user_id, role) do nothing;
+      end loop;
     end if;
   end loop;
 
@@ -169,19 +177,21 @@ as $$
     u.id,
     u.email::text,
     coalesce(u.raw_user_meta_data->>'full_name',
-             cp.full_name, fp.full_name, bp.full_name, gp.full_name) as full_name,
+             cp.full_name, fp.full_name, bp.full_name, gp.full_name, sp.full_name) as full_name,
     u.created_at,
     jsonb_strip_nulls(jsonb_build_object(
       'compras', (select jsonb_agg(role) from compras.user_roles where user_id = u.id),
       'fabrill', (select jsonb_agg(role) from fabrill.user_roles where user_id = u.id),
       'bip',     (select jsonb_agg(role) from bip.user_roles     where user_id = u.id),
-      'gestao',  (select jsonb_agg(scope) from gestao.user_scopes where user_id = u.id)
+      'gestao',  (select jsonb_agg(scope) from gestao.user_scopes where user_id = u.id),
+      'sobras',  (select jsonb_agg(role) from sobras.user_roles  where user_id = u.id)
     )) as systems
   from auth.users u
   left join compras.profiles cp on cp.id = u.id
   left join fabrill.profiles fp on fp.id = u.id
   left join bip.profiles     bp on bp.id = u.id
   left join gestao.profiles  gp on gp.id = u.id
+  left join sobras.profiles  sp on sp.id = u.id
   where public.can_manage_users()   -- só o master recebe a lista
   order by u.created_at desc;
 $$;
@@ -350,6 +360,22 @@ begin
   else
     delete from gestao.user_scopes where user_id = p_user_id;
     begin delete from gestao.profiles where id = p_user_id;
+    exception when foreign_key_violation then null; end;
+  end if;
+
+  -- SOBRAS (papel único 'usuario'; "todo mundo igual")
+  desired := coalesce(p_systems->'sobras', '[]'::jsonb);
+  if jsonb_array_length(desired) > 0 then
+    insert into sobras.profiles (id, email, full_name)
+      values (p_user_id, v_email, v_name) on conflict (id) do nothing;
+    delete from sobras.user_roles
+      where user_id = p_user_id and role::text not in (select jsonb_array_elements_text(desired));
+    insert into sobras.user_roles (user_id, role)
+      select p_user_id, x::sobras.app_role from jsonb_array_elements_text(desired) as x
+      on conflict (user_id, role) do nothing;
+  else
+    delete from sobras.user_roles where user_id = p_user_id;
+    begin delete from sobras.profiles where id = p_user_id;
     exception when foreign_key_violation then null; end;
   end if;
 
