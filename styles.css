@@ -355,6 +355,7 @@ body.smerp-booting .side { visibility: hidden; }
 .smerp-login__sub { text-align: center; font-size: 13px; color: var(--ink-soft); margin-top: -8px; margin-bottom: 6px; }
 
 .smerp-field { display: flex; flex-direction: column; gap: 6px; }
+.smerp-field[hidden] { display: none; }  /* sem isto, o display:flex acima ignora o hidden */
 .smerp-field span { font-size: 12px; font-weight: 700; color: var(--ink); }
 .smerp-field input {
   font: inherit; font-size: 15px; color: var(--ink);

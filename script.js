@@ -601,6 +601,7 @@
       setErr(''); setOk('');
       if (editBar) editBar.hidden = true;
       if (pwdField) pwdField.hidden = false;
+      if (elPwd) elPwd.required = true;
       if (elName) elName.disabled = false;
       if (elEmail) elEmail.disabled = false;
       resetForm();
@@ -616,6 +617,7 @@
       if (elName)  { elName.value = user.full_name || '';  elName.disabled = true; }
       if (elEmail) { elEmail.value = user.email || '';     elEmail.disabled = true; }
       if (pwdField) pwdField.hidden = true;
+      if (elPwd) elPwd.required = false;
       setSystems(user.systems);
       if (editWho) editWho.innerHTML = 'Editando o acesso de <b>' + escapeHtml(user.email || '') + '</b>';
       if (editBar) editBar.hidden = false;

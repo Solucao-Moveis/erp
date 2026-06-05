@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '3.1',
+    data: '05/06/2026',
+    titulo: 'Usuários: editar o acesso não pede mais senha',
+    resumo: 'Na aba "Usuários", ao clicar numa pessoa já cadastrada só para mudar os sistemas e papéis dela, o sistema pedia uma "senha provisória" sem necessidade (a senha só serve para criar gente nova). Agora, ao editar, o campo de senha some e dá para salvar as permissões direto.',
+    mudancas: [
+      {
+        app: 'Usuários (SMERP)',
+        o_que: 'O campo "Senha provisória" passa a aparecer só na criação de um usuário novo. Ao clicar numa pessoa que já existe para ajustar o acesso, o campo fica oculto e não é mais exigido para salvar.',
+        como: 'Abra "Usuários", clique numa pessoa da lista, marque ou desmarque os sistemas e papéis e clique em "Salvar permissões" — sem precisar digitar senha nenhuma. Para criar alguém do zero, use "+ Novo usuário", onde a senha continua sendo pedida normalmente.'
+      }
+    ]
+  },
+  {
     versao: '3.0',
     data: '05/06/2026',
     titulo: 'Novo sistema: Gestor de Sobras',
