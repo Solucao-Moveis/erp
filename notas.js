@@ -12,13 +12,13 @@ window.SMERP_NOTAS = [
   {
     versao: '4.0',
     data: '08/06/2026',
-    titulo: 'Novo sistema: Pro-Care (Manutenção)',
-    resumo: 'Entrou no SMERP o Pro-Care, o sistema de Manutenção, dentro do setor "Fábrica / Produção" (ao lado do Hora a Hora e do Gestor de Sobras). Ele cuida das máquinas e do trabalho de manutenção: abrir chamados (ordens de serviço) quando uma máquina dá problema, acompanhar até o conserto, programar manutenções preventivas, controlar o estoque de peças e guardar os manuais/documentos de cada máquina. Aparece só para quem a diretoria liberar na aba "Usuários", e o que cada um pode fazer depende do papel: Administrador, Manutenção ou Produção.',
+    titulo: 'Novo sistema: Manutenção',
+    resumo: 'Entrou no SMERP o sistema de Manutenção, dentro do setor "Fábrica / Produção" (ao lado do Hora a Hora e do Gestor de Sobras). Ele cuida das máquinas e do trabalho de manutenção: abrir chamados (ordens de serviço) quando uma máquina dá problema, acompanhar até o conserto, programar manutenções preventivas, controlar o estoque de peças e guardar os manuais/documentos de cada máquina. Aparece só para quem a diretoria liberar na aba "Usuários", e o que cada um pode fazer depende do papel: Administrador, Manutenção ou Produção.',
     mudancas: [
       {
-        app: 'Pro-Care (Manutenção)',
+        app: 'Manutenção',
         o_que: 'Sistema completo de manutenção com: cadastro de máquinas (com status automático: ok, chamado aberto, parada), setores e técnicos; ordens de serviço (chamados) com descrição do problema, possível causa, diagnóstico, serviço executado e peças usadas; manutenções preventivas com checklist e agendamento; estoque de peças com entradas/saídas e aviso de estoque baixo; painel e indicadores; e documentos/manuais por máquina. O acesso de escrita depende do papel: Administrador e Manutenção editam tudo e fecham OS; Produção abre chamados e consulta.',
-        como: 'No hub do ERP, abra o setor "Fábrica / Produção" e escolha "Pro-Care — Manutenção" (só aparece se o seu acesso estiver liberado). Para abrir um chamado, vá em "Ordens de Serviço", descreva o problema e a máquina; quem é da manutenção registra o diagnóstico e fecha. Em "Preventivas" você agenda e marca como concluída com checklist. Em "Estoque" controla as peças (o sistema avisa quando uma peça fica abaixo do limite). Para liberar o acesso a alguém, a diretoria abre "Usuários" no SMERP, clica na pessoa e marca, em "Pro-Care (Manutenção)", o papel desejado (Administrador, Manutenção ou Produção).'
+        como: 'No hub do ERP, abra o setor "Fábrica / Produção" e escolha "Manutenção" (só aparece se o seu acesso estiver liberado). Para abrir um chamado, vá em "Ordens de Serviço", descreva o problema e a máquina; quem é da manutenção registra o diagnóstico e fecha. Em "Preventivas" você agenda e marca como concluída com checklist. Em "Estoque" controla as peças (o sistema avisa quando uma peça fica abaixo do limite). Para liberar o acesso a alguém, a diretoria abre "Usuários" no SMERP, clica na pessoa e marca, em "Manutenção", o papel desejado (Administrador, Manutenção ou Produção).'
       }
     ]
   },

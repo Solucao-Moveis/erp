@@ -36,7 +36,7 @@ window.SMERP_CONFIG = {
     { id: 'producao',       nome: 'Fábrica / Produção',    icon: 'clock', cor: '#2E78D2', modulos: [
         { system: 'fabrill',    nome: 'Hora a Hora',      desc: 'Apontamento de produção por hora' },
         { system: 'sobras',     nome: 'Gestor de Sobras',  desc: 'Controle de sobras de produção por setor' },
-        { system: 'manutencao', nome: 'Pro-Care — Manutenção', desc: 'Ordens de serviço, preventivas e estoque de peças' }
+        { system: 'manutencao', nome: 'Manutenção', desc: 'Ordens de serviço, preventivas e estoque de peças' }
       ] },
     { id: 'logistica',      nome: 'Expedição / Logística', icon: 'bars',  cor: '#1F9D55', modulos: [
         { system: 'bip', nome: 'BIP — Apontamento (Celular)', desc: 'Modo enxuto: criar e bipar carregamentos no celular', path: 'apontar' },
@@ -84,7 +84,7 @@ window.SMERP_CONFIG = {
         papeis: [
           { value: 'usuario', label: 'Usuário', desc: 'Acessa e usa o Gestor de Sobras (todos com acesso fazem tudo)' }
         ] },
-      { system: 'manutencao', nome: 'Pro-Care (Manutenção)', cor: '#0D9488', icon: 'wrench',
+      { system: 'manutencao', nome: 'Manutenção', cor: '#0D9488', icon: 'wrench',
         papeis: [
           { value: 'admin',      label: 'Administrador', desc: 'Acesso total: máquinas, técnicos, estoque e usuários' },
           { value: 'manutencao', label: 'Manutenção',    desc: 'Abre/fecha OS, faz preventivas e mexe no estoque de peças' },
