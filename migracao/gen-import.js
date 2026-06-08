@@ -40,6 +40,28 @@ const SCHEMAS = {
       ["request_attachments", "notifications"],
     ],
   },
+  manutencao: {
+    dir: "dados-manutencao",
+    order: ["profiles", "user_roles", "setores", "maquinas", "tecnicos",
+      "ordens_servico", "estoque_itens", "estoque_movimentacoes",
+      "preventivas", "maquina_documentos"],
+    generated: {},
+    // Dedup de identidade: além dos sistemas já migrados, contra a lista VIVA
+    // do auth.users do SMERP (técnicos/PCP do Pro-Care provavelmente já têm login).
+    // live_users.json = json_agg(json_build_object('email',email,'id',id)) do SMERP.
+    liveUsersFile: "dados-manutencao/live_users.json",
+    priorSystems: ["dados-fabrill", "dados-bip", "dados-compras"],
+    userRefs: [["profiles", "id"], ["user_roles", "user_id"],
+      ["ordens_servico", "solicitante_id"], ["estoque_movimentacoes", "user_id"]],
+    // a OS tem numero SERIAL: importamos o valor e desligamos o trigger de status
+    // (sync_maquina_status) p/ não sobrescrever maquinas.status durante o import.
+    disableTriggersTables: ["ordens_servico"],
+    // colunas jsonb (array JS != text[] do Postgres): força serialização ::jsonb.
+    jsonb: { preventivas: ["checklist"] },
+    // após inserir tudo, avança a sequência do numero p/ a próxima OS não colidir.
+    postSql: "SELECT setval(pg_get_serial_sequence('manutencao.ordens_servico','numero'), " +
+      "COALESCE((SELECT MAX(numero) FROM manutencao.ordens_servico), 1));",
+  },
 };
 
 const schema = process.argv[2];
@@ -51,8 +73,22 @@ const tables = JSON.parse(fs.readFileSync(path.join(DIR, "tables.json"), "utf8")
 const users = JSON.parse(fs.readFileSync(path.join(DIR, "users.json"), "utf8")).users;
 
 // ----- Identidade compartilhada entre sistemas (dedup por email) -----
-// Emails já importados por sistemas anteriores: id canônico = o que já está no auth.users.
+// id canônico = o que já está no auth.users do SMERP.
 const priorEmailToId = {};
+// (1) Lista VIVA do SMERP (mais autoritativa: inclui usuários criados pelo hub).
+if (cfg.liveUsersFile) {
+  const lf = path.join(__dirname, cfg.liveUsersFile);
+  if (fs.existsSync(lf)) {
+    const live = JSON.parse(fs.readFileSync(lf, "utf8"));
+    const arr = Array.isArray(live) ? live : (live.users || []);
+    for (const u of arr) if (u.email && !(u.email in priorEmailToId)) priorEmailToId[u.email] = u.id;
+    console.log("live_users:", arr.length, "emails do SMERP carregados p/ dedup");
+  } else {
+    console.warn("AVISO: liveUsersFile não encontrado (" + cfg.liveUsersFile + "). " +
+      "Dedup só contra os sistemas já migrados — gere live_users.json antes do import real.");
+  }
+}
+// (2) Emails já importados por sistemas anteriores (preenche o que faltar).
 for (const pdir of (cfg.priorSystems || [])) {
   const pu = JSON.parse(fs.readFileSync(path.join(__dirname, pdir, "users.json"), "utf8")).users;
   for (const u of pu) if (u.email && !(u.email in priorEmailToId)) priorEmailToId[u.email] = u.id;
@@ -63,6 +99,10 @@ for (const u of users) idMap[u.id] = (u.email && priorEmailToId[u.email]) ? prio
 const mapId = (v) => (v != null && idMap[v]) ? idMap[v] : v;
 // Conjunto de colunas (tabela.coluna) que referenciam auth.users e precisam remapear.
 const userRefSet = new Set((cfg.userRefs || []).map(([t, c]) => `${t}.${c}`));
+// Conjunto de colunas jsonb (serializar como ::jsonb, não como array text[]).
+const jsonbSet = new Set();
+for (const [t, cs] of Object.entries(cfg.jsonb || {})) for (const c of cs) jsonbSet.add(`${t}.${c}`);
+function valJsonb(v) { return v == null ? "NULL" : q(JSON.stringify(v)) + "::jsonb"; }
 
 function q(s) { return "'" + String(s).replace(/'/g, "''") + "'"; }
 function val(v) {
@@ -102,16 +142,24 @@ function authSection() {
   return s + "\n";
 }
 
+const disableSet = new Set(cfg.disableTriggersTables || []);
+
 function tableSection(t) {
   const rows = tables[t] || [];
   let s = `-- ===== ${schema}.${t} (${rows.length}) =====\n`;
   if (rows.length === 0) return s + "\n";
+  const off = disableSet.has(t);
+  if (off) s += `ALTER TABLE ${schema}.${t} DISABLE TRIGGER USER;\n`;
   const skip = cfg.generated[t] || [];
   const cols = Object.keys(rows[0]).filter((c) => !skip.includes(c));
   for (const r of rows) {
-    const vs = cols.map((c) => userRefSet.has(`${t}.${c}`) ? val(mapId(r[c])) : val(r[c]));
+    const vs = cols.map((c) =>
+      jsonbSet.has(`${t}.${c}`) ? valJsonb(r[c])
+      : userRefSet.has(`${t}.${c}`) ? val(mapId(r[c]))
+      : val(r[c]));
     s += `INSERT INTO ${schema}.${t} (${cols.join(",")}) VALUES (${vs.join(",")}) ON CONFLICT DO NOTHING;\n`;
   }
+  if (off) s += `ALTER TABLE ${schema}.${t} ENABLE TRIGGER USER;\n`;
   return s + "\n";
 }
 
@@ -123,6 +171,8 @@ parts.forEach((groupTables, i) => {
   let s = header + `\nBEGIN;\n\n`;
   if (i === 0) s += authSection();           // auth só na 1ª parte
   for (const t of groupTables) s += tableSection(t);
+  if (cfg.postSql && i === parts.length - 1)  // pós-processamento na última parte
+    s += `\n-- ===== pós-import =====\n${cfg.postSql}\n`;
   s += "COMMIT;\n";
   const suffix = single ? "" : `_${i + 1}`;
   const outPath = path.join(__dirname, `import_${schema}${suffix}.sql`);

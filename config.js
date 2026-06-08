@@ -21,7 +21,8 @@ window.SMERP_CONFIG = {
     fabrill: 'https://solucaomoveis-horaahora.h5xdag.easypanel.host/',
     bip: 'https://solucaomoveis-bip.h5xdag.easypanel.host/',
     gestao: 'https://solucaomoveis-gerencial.h5xdag.easypanel.host/',
-    sobras: 'https://solucaomoveis-sobras.h5xdag.easypanel.host/'
+    sobras: 'https://solucaomoveis-sobras.h5xdag.easypanel.host/',
+    manutencao: 'https://solucaomoveis-manutencao.h5xdag.easypanel.host/'
   },
 
   // Cards por SETOR. Cada setor tem 1+ módulos; o card mostra o setor e,
@@ -33,8 +34,9 @@ window.SMERP_CONFIG = {
   SETORES: [
     { id: 'administrativo', nome: 'Administrativo',        icon: 'cart',  cor: '#E8722A', modulos: [ { system: 'compras', nome: 'SC Manager',  desc: 'Gestão de suprimentos e compras' } ] },
     { id: 'producao',       nome: 'Fábrica / Produção',    icon: 'clock', cor: '#2E78D2', modulos: [
-        { system: 'fabrill', nome: 'Hora a Hora',      desc: 'Apontamento de produção por hora' },
-        { system: 'sobras',  nome: 'Gestor de Sobras',  desc: 'Controle de sobras de produção por setor' }
+        { system: 'fabrill',    nome: 'Hora a Hora',      desc: 'Apontamento de produção por hora' },
+        { system: 'sobras',     nome: 'Gestor de Sobras',  desc: 'Controle de sobras de produção por setor' },
+        { system: 'manutencao', nome: 'Pro-Care — Manutenção', desc: 'Ordens de serviço, preventivas e estoque de peças' }
       ] },
     { id: 'logistica',      nome: 'Expedição / Logística', icon: 'bars',  cor: '#1F9D55', modulos: [
         { system: 'bip', nome: 'BIP — Apontamento (Celular)', desc: 'Modo enxuto: criar e bipar carregamentos no celular', path: 'apontar' },
@@ -81,6 +83,12 @@ window.SMERP_CONFIG = {
       { system: 'sobras', nome: 'Gestor de Sobras', cor: '#2E78D2', icon: 'clock',
         papeis: [
           { value: 'usuario', label: 'Usuário', desc: 'Acessa e usa o Gestor de Sobras (todos com acesso fazem tudo)' }
+        ] },
+      { system: 'manutencao', nome: 'Pro-Care (Manutenção)', cor: '#0D9488', icon: 'wrench',
+        papeis: [
+          { value: 'admin',      label: 'Administrador', desc: 'Acesso total: máquinas, técnicos, estoque e usuários' },
+          { value: 'manutencao', label: 'Manutenção',    desc: 'Abre/fecha OS, faz preventivas e mexe no estoque de peças' },
+          { value: 'producao',   label: 'Produção',      desc: 'Abre chamados (OS) e consulta; não edita cadastros' }
         ] }
     ]
   },

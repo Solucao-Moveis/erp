@@ -14,6 +14,9 @@ migracao/edge-function-export/
 migracao/dados-fabrill/
 migracao/dados-bip/
 migracao/dados-compras/
+migracao/dados-manutencao/
+# script de download usa o token do export (mesma razão do edge-function-export/)
+migracao/baixar-manutencao.ps1
 
 # Dependências / build
 node_modules/
