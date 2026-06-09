@@ -23,7 +23,8 @@ window.SMERP_CONFIG = {
     gestao: 'https://solucaomoveis-gerencial.h5xdag.easypanel.host/',
     sobras: 'https://solucaomoveis-sobras.h5xdag.easypanel.host/',
     manutencao: 'https://solucaomoveis-manutencao.h5xdag.easypanel.host/',
-    planos_acao: 'https://solucaomoveis-pmo.h5xdag.easypanel.host/'
+    planos_acao: 'https://solucaomoveis-pmo.h5xdag.easypanel.host/',
+    expedicao: 'https://solucaomoveis-bip.h5xdag.easypanel.host/'
   },
 
   // Cards por SETOR. Cada setor tem 1+ módulos; o card mostra o setor e,
@@ -41,7 +42,8 @@ window.SMERP_CONFIG = {
       ] },
     { id: 'logistica',      nome: 'Expedição / Logística', icon: 'bars',  cor: '#1F9D55', modulos: [
         { system: 'bip', nome: 'BIP — Apontamento (Celular)', desc: 'Modo enxuto: criar e bipar carregamentos no celular', path: 'apontar' },
-        { system: 'bip', nome: 'BIP — Gestão (Desktop)',      desc: 'Visão completa: pedidos, relatórios e administração',  path: '' }
+        { system: 'bip', nome: 'BIP — Gestão (Desktop)',      desc: 'Visão completa: pedidos, relatórios e administração',  path: '' },
+        { system: 'expedicao', nome: 'Registro de Carregamento', desc: 'Documento da carga: planejado x carregado, com assinatura', path: 'cargas' }
       ] },
     { id: 'gerencial',      nome: 'Gerencial / Diretoria', icon: 'chart', cor: '#8B5CF6', modulos: [
         { system: 'gestao',      nome: 'Painel Executivo',   desc: 'KPIs consolidados + Quadro/Kanban de projetos' },
@@ -98,6 +100,13 @@ window.SMERP_CONFIG = {
         papeis: [
           { value: 'admin', label: 'Administrador', desc: 'Acesso total: gerencia usuários/papéis e edita perfis' },
           { value: 'user',  label: 'Usuário',       desc: 'Usa o app: cria/edita projetos, ações, subtarefas e comentários' }
+        ] },
+      { system: 'expedicao', nome: 'Registro de Carregamento (Expedição)', cor: '#1F9D55', icon: 'bars',
+        papeis: [
+          { value: 'admin',       label: 'Administrador', desc: 'Acesso total: faz tudo e vê todas as cargas' },
+          { value: 'pcp',         label: 'PCP',           desc: 'Cria a demanda de carga (quantidades planejadas)' },
+          { value: 'carregador',  label: 'Carregador',    desc: 'Marca o que foi carregado, observação e assina a carga' },
+          { value: 'faturamento', label: 'Faturamento',   desc: 'Vê o quadro pronto (planejado x real) e baixa o PDF' }
         ] }
     ]
   },

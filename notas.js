@@ -10,6 +10,29 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.0',
+    data: '09/06/2026',
+    titulo: 'Novo sistema: Registro de Carregamento (Expedição)',
+    resumo: 'Entrou no SMERP o "Registro de Carregamento", dentro do setor "Expedição / Logística" (ao lado dos dois BIPs). É a versão digital daquele documento de carregamento de caminhão. Funciona assim: o PCP lança a carga com os itens e as quantidades planejadas, agrupados por destino (cidade/UF); o carregador abre a carga, marca quanto REALMENTE foi de cada item (ex.: pediu 650, foi 600), escreve observações e assina; o faturamento abre depois e enxerga o quadro completo (planejado x carregado) e baixa o PDF do documento, no mesmo formato do papel. Para facilitar, dá para COLAR os itens de uma planilha de uma vez — o sistema separa em uma prévia que você confere antes de salvar. Aparece só para quem a diretoria liberar na aba "Usuários", com o papel PCP, Carregador, Faturamento ou Administrador.',
+    mudancas: [
+      {
+        app: 'Registro de Carregamento',
+        o_que: 'Sistema novo para registrar o carregamento do caminhão: cabeçalho da carga (número, motorista, placa, datas e horas), itens organizados por destino (cidade/UF) com código, descrição, quantidade solicitada, pedido e nota fiscal. O carregador preenche a quantidade que realmente foi carregada (o sistema mostra o planejado ao lado, destacando quando ficou diferente), pode escrever observações e assinar. Gera um PDF do documento. Dá para colar os itens de uma vez (de uma planilha ou texto) com uma prévia editável. Cada papel faz uma parte: PCP cria a carga; Carregador preenche o real e assina; Faturamento só consulta e baixa o PDF; Administrador faz tudo.',
+        como: 'No hub do ERP, abra o setor "Expedição / Logística" e escolha "Registro de Carregamento" (só aparece se o seu acesso estiver liberado). O PCP clica em "Nova carga", preenche os dados e adiciona os destinos e itens — pode usar o botão "Colar tabela" para trazer tudo de uma planilha. Depois, o carregador abre a carga, ajusta a coluna "Real" de cada item, escreve observações, põe o nome no campo "Assinante" e clica em "Assinar e concluir". O faturamento abre a carga assinada e clica em "Baixar PDF". Para liberar o acesso a alguém, a diretoria abre "Usuários" no SMERP, clica na pessoa e marca, em "Registro de Carregamento", o papel desejado. Ele também aparece dentro do BIP — como aba no menu lateral (Gestão) e na tela de Apontamento (celular).'
+      },
+      {
+        app: 'Registro de Carregamento — saída e faturamento',
+        o_que: 'A carga agora tem "Previsão de saída" (data e hora). Na lista, as cargas que ainda não tiveram a nota emitida e estão mais próximas do horário de saída sobem para o topo (as atrasadas em vermelho, as próximas em amarelo), para o faturamento priorizar. Quando o faturamento emite a nota, marca a carga como "NF emitida" e ela sai da fila de prioridade.',
+        como: 'O PCP (ou administrador) preenche "Previsão de saída" ao criar/editar a carga. O faturamento abre a carga e clica em "Marcar NF como emitida" (pode desmarcar, se errar). Na lista, o topo sempre mostra o que está mais perto de sair e ainda sem nota.',
+      },
+      {
+        app: 'BIP — Gestão (Desktop)',
+        o_que: 'O pedido/carregamento do BIP ganhou um campo opcional "Número do carregamento", para anotar a qual carga (do Registro de Carregamento) aquele carregamento corresponde. Esse número aparece no card e no relatório gerencial, ajudando a cruzar as duas telas.',
+        como: 'No BIP — Gestão, ao criar ou editar um carregamento, preencha o campo "Nº do carregamento" (opcional). Ele passa a aparecer no card do carregamento e na coluna do relatório gerencial.'
+      }
+    ]
+  },
+  {
     versao: '5.1',
     data: '09/06/2026',
     titulo: 'Mais segurança: troca de senha obrigatória',
