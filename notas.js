@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.1',
+    data: '09/06/2026',
+    titulo: 'Compras: agora dá para registrar compra PARCIAL',
+    resumo: 'No sistema de Compras, ao registrar a compra de uma solicitação com vários itens, você não precisa mais comprar tudo de uma vez. Agora dá para registrar só uma parte — alguns itens, ou só uma parte da quantidade de um item (ex.: pediram 400 máscaras, você comprou 200 agora e o resto depois). Enquanto faltar algo para comprar, a solicitação fica com o status "Parcial"; quando tudo for comprado, vira "Comprado". Cada compra parcial fica registrada num histórico (data, item, quantidade, preço e quem comprou).',
+    mudancas: [
+      {
+        app: 'Compras',
+        o_que: 'Registro de compra parcial, por item e por quantidade. Na tela da solicitação, cada item passou a mostrar quanto já foi comprado (ex.: "200/400") e quanto ainda falta. Ao registrar a compra, para cada item você informa a quantidade que está comprando agora e o preço unitário — pode deixar itens de fora ou comprar só parte da quantidade. A solicitação ganha o status "Parcial" (cor âmbar) enquanto não comprar tudo, e "Comprado" quando completar. Há um novo quadro "Compras registradas" com o histórico de cada compra parcial (data, item, quantidade, preço, total e comprador). O valor total da compra vai sendo somado a cada registro.',
+        como: 'No app de Compras, abra a solicitação aprovada e vá em "Ações". Na tabela de itens, preencha em cada linha a quantidade que está comprando agora (já vem sugerida a quantidade que falta) e o preço unitário — deixe em zero/em branco os itens que não vai comprar agora. Clique em "Registrar compra": se ainda faltar algo, a solicitação fica "Parcial" e você pode registrar o restante depois, repetindo o passo. Quando todos os itens estiverem completos, ela vira "Comprado" automaticamente. Para acompanhar, veja o quadro "Compras registradas" logo abaixo. Na lista de solicitações, dá para filtrar pelo status "Parcial".'
+      }
+    ]
+  },
+  {
     versao: '6.0',
     data: '09/06/2026',
     titulo: 'Novo sistema: Registro de Carregamento (Expedição)',
