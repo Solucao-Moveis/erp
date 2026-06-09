@@ -327,7 +327,98 @@
   // fecha qualquer setor aberto ao clicar fora
   document.addEventListener('click', function () { closeAllMenus(null); });
 
+  // ── Troca de senha obrigatória ──────────────────────────────────────────────
+  // Quem tem a marca must_change_password (ligada por SQL na virada e, idealmente,
+  // em todo usuário novo) recebe um modal bloqueante antes de usar o Hub.
+  // O master é exceção: não recebe o popup.
+  function needsPwdChange(u) {
+    if (!u) return false;
+    if ((u.email || '').toLowerCase() === 'master@solucaomoveis.ind.br') return false;
+    return !!(u.user_metadata && u.user_metadata.must_change_password === true);
+  }
+
+  function showPasswordChangeGate(session) {
+    try { fadeOutLoading(function () {}); } catch (e) {}
+    try { hideLogin(function () {}); } catch (e) {}
+    document.body.classList.remove('smerp-booting');
+    if (document.getElementById('pwdGate')) return;
+
+    var style = document.createElement('style');
+    style.id = 'pwdGateStyle';
+    style.textContent =
+      '#pwdGate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,.78);padding:16px}' +
+      '#pwdGate .pwd-card{background:#fff;border-radius:16px;max-width:420px;width:100%;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.35)}' +
+      '#pwdGate h2{margin:0 0 6px;font-size:20px;color:#0f172a}' +
+      '#pwdGate p.sub{margin:0 0 18px;font-size:14px;color:#475569;line-height:1.45}' +
+      '#pwdGate label{display:block;font-size:13px;color:#334155;margin:12px 0 4px;font-weight:600}' +
+      '#pwdGate input{width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid #cbd5e1;border-radius:10px;font-size:15px}' +
+      '#pwdGate input:focus{outline:none;border-color:#2E78D2;box-shadow:0 0 0 3px rgba(46,120,210,.15)}' +
+      '#pwdGate .hint{font-size:12px;color:#64748b;margin-top:8px}' +
+      '#pwdGate .err{font-size:13px;color:#dc2626;margin-top:10px;min-height:18px}' +
+      '#pwdGate button{margin-top:16px;width:100%;padding:12px;border:0;border-radius:10px;background:#2E78D2;color:#fff;font-size:15px;font-weight:600;cursor:pointer}' +
+      '#pwdGate button:disabled{opacity:.6;cursor:default}';
+    document.head.appendChild(style);
+
+    var ov = document.createElement('div');
+    ov.id = 'pwdGate';
+    ov.setAttribute('role', 'dialog');
+    ov.setAttribute('aria-modal', 'true');
+    ov.innerHTML =
+      '<div class="pwd-card">' +
+        '<h2>Atualize sua senha</h2>' +
+        '<p class="sub">Por segurança, você precisa criar uma nova senha antes de continuar. Esta etapa é obrigatória.</p>' +
+        '<label for="pg1">Nova senha</label>' +
+        '<input id="pg1" type="password" autocomplete="new-password" />' +
+        '<label for="pg2">Confirmar nova senha</label>' +
+        '<input id="pg2" type="password" autocomplete="new-password" />' +
+        '<div class="hint">Mínimo de 8 caracteres. Não pode ser a senha padrão.</div>' +
+        '<div class="err" id="pgErr"></div>' +
+        '<button id="pgBtn" type="button">Salvar e continuar</button>' +
+      '</div>';
+    document.body.appendChild(ov);
+
+    // não fecha de jeito nenhum: ESC e clique fora bloqueados
+    ov.addEventListener('keydown', function (e) { if (e.key === 'Escape') e.preventDefault(); });
+    ov.addEventListener('mousedown', function (e) { if (e.target === ov) e.preventDefault(); });
+
+    var i1 = document.getElementById('pg1');
+    var i2 = document.getElementById('pg2');
+    var err = document.getElementById('pgErr');
+    var btn = document.getElementById('pgBtn');
+    try { i1.focus(); } catch (e) {}
+
+    async function save() {
+      err.textContent = '';
+      var p1 = i1.value || '', p2 = i2.value || '';
+      if (p1.length < 8) { err.textContent = 'A senha precisa ter ao menos 8 caracteres.'; return; }
+      if (p1 === '12345678') { err.textContent = 'Escolha uma senha diferente da padrão.'; return; }
+      if (p1 !== p2) { err.textContent = 'As senhas não conferem.'; return; }
+      btn.disabled = true; var prev = btn.textContent; btn.textContent = 'Salvando…';
+      try {
+        var res = await sb.auth.updateUser({ password: p1, data: { must_change_password: false } });
+        if (res.error) { err.textContent = res.error.message || 'Não foi possível salvar.'; return; }
+        try { document.head.removeChild(style); } catch (e) {}
+        try { document.body.removeChild(ov); } catch (e) {}
+        var s2 = (await sb.auth.getSession()).data.session;
+        if (s2 && res.data && res.data.user) { s2 = Object.assign({}, s2, { user: res.data.user }); }
+        await enterApp(s2 || session);
+      } catch (e2) {
+        err.textContent = 'Falha ao salvar. Tente novamente.';
+      } finally {
+        btn.disabled = false; btn.textContent = prev;
+      }
+    }
+    btn.addEventListener('click', save);
+    i2.addEventListener('keydown', function (e) { if (e.key === 'Enter') save(); });
+  }
+
   async function enterApp(session) {
+    // troca de senha obrigatória (exceto master) — lê a marca FRESCA do servidor
+    // (getUser evita o caso de sessão antiga, emitida antes da marca ser ligada)
+    try {
+      var freshUser = (await sb.auth.getUser()).data.user;
+      if (needsPwdChange(freshUser)) { showPasswordChangeGate(session); return; }
+    } catch (e) { /* erro de rede não trava o login */ }
     if (userEmail && session && session.user) {
       userEmail.textContent = session.user.email || '';
       show(userEmail);

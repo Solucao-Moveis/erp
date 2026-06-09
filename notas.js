@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '5.1',
+    data: '09/06/2026',
+    titulo: 'Mais segurança: troca de senha obrigatória',
+    resumo: 'Para deixar o acesso mais seguro, na próxima vez que você entrar no ERP pode aparecer uma tela pedindo para criar uma nova senha, só sua. É rápido e acontece uma única vez: você digita a nova senha (no mínimo 8 caracteres), confirma e segue usando normalmente. Enquanto não criar a nova senha, a tela não fecha — é uma etapa obrigatória para proteger a sua conta e os dados da empresa.',
+    mudancas: [
+      {
+        app: 'Hub (SMERP)',
+        o_que: 'Tela obrigatória de troca de senha no acesso. Quando a sua conta ainda está com a senha inicial, ao entrar no ERP aparece um aviso pedindo para criar uma nova senha pessoal. A tela não pode ser fechada nem pulada até você definir a nova senha (mínimo de 8 caracteres e diferente da senha padrão). Depois de trocar, o aviso não aparece mais.',
+        como: 'Entre no ERP normalmente. Se aparecer a tela "Atualize sua senha", digite uma nova senha (8 caracteres ou mais), repita para confirmar e clique em "Salvar e continuar". Pronto: você entra direto e, das próximas vezes, não verá mais esse aviso. Dica: escolha uma senha que só você saiba.'
+      }
+    ]
+  },
+  {
     versao: '5.0',
     data: '09/06/2026',
     titulo: 'Novo sistema: Gestor de Projeto (Plano de Ação 5W2H)',

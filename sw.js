@@ -13,7 +13,7 @@
      (stale-while-revalidate): abre rápido e se mantém fresco.
    • Pra forçar atualização geral, suba o número do CACHE (v1 -> v2).
    ============================================================ */
-const CACHE = 'smerp-hub-v1';
+const CACHE = 'smerp-hub-v2';
 
 // Casca mínima pra abrir offline. URLs estáveis (sem ?v=) — o resto
 // é cacheado sozinho conforme o uso, então a lista fica curta e segura.
