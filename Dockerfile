@@ -14,6 +14,10 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY index.html styles.css script.js config.js notas.js mobilenav.js manifest.webmanifest sw.js pwa.js /usr/share/nginx/html/
 COPY assets/ /usr/share/nginx/html/assets/
 
+# Landing institucional pública (Solução Móveis) numa rota discreta: /institucional/
+# Site estático separado (HTML/CSS/JS próprios) — não interfere no hub.
+COPY landing/ /usr/share/nginx/html/institucional/
+
 # O proxy do EasyPanel deste app aponta para a porta 80 (solucaomoveis_erp:80)
 EXPOSE 80
 
