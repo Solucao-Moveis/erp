@@ -23,7 +23,7 @@ window.SMERP_CONFIG = {
     gestao: 'https://solucaomoveis-gerencial.h5xdag.easypanel.host/',
     sobras: 'https://solucaomoveis-sobras.h5xdag.easypanel.host/',
     manutencao: 'https://solucaomoveis-manutencao.h5xdag.easypanel.host/',
-    planos_acao: 'https://solucaomoveis-planos-acao.h5xdag.easypanel.host/'
+    planos_acao: 'https://solucaomoveis-pmo.h5xdag.easypanel.host/'
   },
 
   // Cards por SETOR. Cada setor tem 1+ módulos; o card mostra o setor e,
