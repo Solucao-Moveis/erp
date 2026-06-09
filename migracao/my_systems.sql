@@ -69,6 +69,13 @@ as $$
               (select jsonb_agg(role) from expedicao.user_roles where user_id = auth.uid()),
               '[]'::jsonb)
           end
+        ),
+        'frota', (
+          select case when exists (select 1 from frota.profiles where id = auth.uid())
+            then coalesce(
+              (select jsonb_agg(role) from frota.user_roles where user_id = auth.uid()),
+              '[]'::jsonb)
+          end
         )
       )
     ),

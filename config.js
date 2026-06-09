@@ -23,7 +23,8 @@ window.SMERP_CONFIG = {
     gestao: 'https://solucaomoveis-gerencial.h5xdag.easypanel.host/',
     sobras: 'https://solucaomoveis-sobras.h5xdag.easypanel.host/',
     manutencao: 'https://solucaomoveis-manutencao.h5xdag.easypanel.host/',
-    planos_acao: 'https://solucaomoveis-pmo.h5xdag.easypanel.host/'
+    planos_acao: 'https://solucaomoveis-pmo.h5xdag.easypanel.host/',
+    frota: 'https://solucaomoveis-frota.h5xdag.easypanel.host/'
   },
 
   // Cards por SETOR. Cada setor tem 1+ módulos; o card mostra o setor e,
@@ -46,6 +47,9 @@ window.SMERP_CONFIG = {
     { id: 'gerencial',      nome: 'Gerencial / Diretoria', icon: 'chart', cor: '#8B5CF6', modulos: [
         { system: 'gestao',      nome: 'Painel Executivo',   desc: 'KPIs consolidados + Quadro/Kanban de projetos' },
         { system: 'planos_acao', nome: 'Gestor de Projeto',  desc: 'Plano de ação 5W2H: projetos, ações e subtarefas' }
+      ] },
+    { id: 'frota',          nome: 'Frota / Veículos',      icon: 'truck', cor: '#DC2626', modulos: [
+        { system: 'frota', nome: 'Gestor de Frota', desc: 'Veículos: abastecimento, manutenção, consumo e custos' }
       ] }
   ],
 
@@ -105,6 +109,13 @@ window.SMERP_CONFIG = {
           { value: 'pcp',         label: 'PCP',           desc: 'Cria a demanda de carga (quantidades planejadas)' },
           { value: 'carregador',  label: 'Carregador',    desc: 'Marca o que foi carregado, observação e assina a carga' },
           { value: 'faturamento', label: 'Faturamento',   desc: 'Vê o quadro pronto (planejado x real) e baixa o PDF' }
+        ] },
+      { system: 'frota', nome: 'Gestor de Frota', cor: '#DC2626', icon: 'truck',
+        papeis: [
+          { value: 'admin',        label: 'Administrador', desc: 'Acesso total: veículos, motoristas, periodicidade e usuários' },
+          { value: 'gestor',       label: 'Gestor',        desc: 'Vê tudo, revisa lançamentos, acompanha solicitações e o dashboard' },
+          { value: 'motorista',    label: 'Motorista',     desc: 'Abre solicitação e lança abastecimento do seu veículo' },
+          { value: 'visualizador', label: 'Visualizador',  desc: 'Só consulta e dashboard, sem editar' }
         ] }
     ]
   },

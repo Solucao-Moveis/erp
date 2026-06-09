@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.2',
+    data: '09/06/2026',
+    titulo: 'Novo sistema: Gestor de Frota (veículos)',
+    resumo: 'Entrou no SMERP o "Gestor de Frota", num setor novo chamado "Frota / Veículos". É o controle dos carros e ônibus da empresa: abastecimento (gasolina), troca de óleo, alinhamento, lavagem, lubrificação e manutenção corretiva. Para cada lançamento você registra o veículo, a quilometragem atual, o custo, o motorista, o posto/oficina e as fotos (da nota, do hodômetro e do serviço). O abastecimento é lançado direto (só precisa da nota); o gestor revisa depois. Quem precisa de um conserto pode abrir uma "solicitação", que o gestor acompanha. O sistema calcula sozinho o consumo (km por litro) e o custo por km de cada veículo, avisa quando está chegando a hora da próxima manutenção (por quilometragem ou por data) e mostra tudo num painel único. Aparece só para quem a diretoria liberar na aba "Usuários", com o papel Administrador, Gestor, Motorista ou Visualizador.',
+    mudancas: [
+      {
+        app: 'Gestor de Frota',
+        o_que: 'Sistema novo para controlar a frota de veículos. Cadastro dos veículos (placa, modelo, tipo, KM atual e status). Lançamento de eventos por veículo — abastecimento, troca de óleo, alinhamento, balanceamento, lavagem, lubrificação, revisão, pneu e manutenção corretiva — cada um com data, quilometragem, custo, motorista, fornecedor/oficina, detalhe do serviço e fotos (nota, hodômetro e serviço). No abastecimento também entram litros, preço por litro e tipo de combustível. O KM atual do veículo é atualizado a cada lançamento. O gestor marca os lançamentos como "revisado". Há uma tela de "Solicitações" (pedidos de manutenção) que o gestor acompanha até concluir. O sistema calcula consumo (km/litro) e custo por km, e tem configuração de periodicidade da manutenção preventiva (a cada X km ou X dias), com alerta de "próxima manutenção a vencer". Um dashboard reúne o gasto do mês (abastecimento x manutenção), gasto e consumo por veículo, manutenções a vencer e pendências.',
+        como: 'No hub do ERP, abra o card "Gestor de Frota" no setor "Frota / Veículos" (só aparece se o seu acesso estiver liberado). Para lançar algo, vá em "Lançamentos" > "Novo lançamento", escolha o veículo e o tipo, informe a quilometragem (anexando a foto do hodômetro), o custo, o motorista e o fornecedor, e anexe a foto da nota; se for abastecimento, preencha também litros e preço. O gestor abre a lista de lançamentos e marca "revisado" no que conferir. Para pedir um conserto, use "Solicitações" > "Nova solicitação". O administrador cadastra veículos, motoristas e a periodicidade das preventivas. O painel inicial mostra o resumo de tudo. Para liberar o acesso a alguém, a diretoria abre "Usuários" no SMERP, clica na pessoa e marca, em "Gestor de Frota", o papel desejado.'
+      }
+    ]
+  },
+  {
     versao: '6.1',
     data: '09/06/2026',
     titulo: 'Compras: agora dá para registrar compra PARCIAL',

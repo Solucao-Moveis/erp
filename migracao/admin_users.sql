@@ -42,6 +42,7 @@ grant execute on function public.can_manage_users() to authenticated;
 --   gestao (escopos): diretoria | compras | producao | expedicao | projetos
 --   manutencao: admin | manutencao | producao
 --   planos_acao: admin | user
+--   frota: admin | gestor | motorista | visualizador
 -- Ex.: {"compras":["solicitante"], "bip":["user"], "planos_acao":["user"]}
 -- ------------------------------------------------------------
 create or replace function public.admin_create_user(
@@ -174,6 +175,15 @@ begin
         insert into planos_acao.user_roles (user_id, role)
           values (new_id, r::planos_acao.app_role) on conflict (user_id, role) do nothing;
       end loop;
+
+    elsif sys = 'frota' then
+      -- frota.profiles segue (id, email, full_name) como compras/sobras.
+      insert into frota.profiles (id, email, full_name)
+        values (new_id, v_email, v_name) on conflict (id) do nothing;
+      for r in select jsonb_array_elements_text(roles) loop
+        insert into frota.user_roles (user_id, role)
+          values (new_id, r::frota.app_role) on conflict (user_id, role) do nothing;
+      end loop;
     end if;
   end loop;
 
@@ -200,7 +210,7 @@ as $$
     u.id,
     u.email::text,
     coalesce(u.raw_user_meta_data->>'full_name',
-             cp.full_name, fp.full_name, bp.full_name, gp.full_name, sp.full_name, mp.nome, pap.nome) as full_name,
+             cp.full_name, fp.full_name, bp.full_name, gp.full_name, sp.full_name, mp.nome, pap.nome, frp.full_name) as full_name,
     u.created_at,
     jsonb_strip_nulls(jsonb_build_object(
       'compras', (select jsonb_agg(role) from compras.user_roles where user_id = u.id),
@@ -209,7 +219,8 @@ as $$
       'gestao',  (select jsonb_agg(scope) from gestao.user_scopes where user_id = u.id),
       'sobras',  (select jsonb_agg(role) from sobras.user_roles  where user_id = u.id),
       'manutencao', (select jsonb_agg(role) from manutencao.user_roles where user_id = u.id),
-      'planos_acao', (select jsonb_agg(role) from planos_acao.user_roles where user_id = u.id)
+      'planos_acao', (select jsonb_agg(role) from planos_acao.user_roles where user_id = u.id),
+      'frota',   (select jsonb_agg(role) from frota.user_roles   where user_id = u.id)
     )) as systems
   from auth.users u
   left join compras.profiles cp on cp.id = u.id
@@ -219,6 +230,7 @@ as $$
   left join sobras.profiles  sp on sp.id = u.id
   left join manutencao.profiles mp on mp.id = u.id
   left join planos_acao.profiles pap on pap.user_id = u.id   -- vínculo por user_id (≠ das outras)
+  left join frota.profiles   frp on frp.id = u.id
   where public.can_manage_users()   -- só o master recebe a lista
   order by u.created_at desc;
 $$;
@@ -437,6 +449,23 @@ begin
   else
     delete from planos_acao.user_roles where user_id = p_user_id;
     begin delete from planos_acao.profiles where user_id = p_user_id;
+    exception when foreign_key_violation then null; end;
+  end if;
+
+  -- FROTA (papéis reais: admin | gestor | motorista | visualizador)
+  -- profiles tem (id, email, full_name) → vínculo por id, como compras/sobras.
+  desired := coalesce(p_systems->'frota', '[]'::jsonb);
+  if jsonb_array_length(desired) > 0 then
+    insert into frota.profiles (id, email, full_name)
+      values (p_user_id, v_email, v_name) on conflict (id) do nothing;
+    delete from frota.user_roles
+      where user_id = p_user_id and role::text not in (select jsonb_array_elements_text(desired));
+    insert into frota.user_roles (user_id, role)
+      select p_user_id, x::frota.app_role from jsonb_array_elements_text(desired) as x
+      on conflict (user_id, role) do nothing;
+  else
+    delete from frota.user_roles where user_id = p_user_id;
+    begin delete from frota.profiles where id = p_user_id;
     exception when foreign_key_violation then null; end;
   end if;
 
