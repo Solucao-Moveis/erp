@@ -40,8 +40,8 @@ window.SMERP_CONFIG = {
         { system: 'manutencao', nome: 'Manutenção', desc: 'Ordens de serviço, preventivas e estoque de peças' }
       ] },
     { id: 'logistica',      nome: 'Expedição / Logística', icon: 'bars',  cor: '#1F9D55', modulos: [
-        { system: 'bip', nome: 'BIP — Apontamento (Celular)', desc: 'Modo enxuto: criar e bipar carregamentos no celular', path: 'apontar' },
-        { system: 'bip', nome: 'BIP — Gestão (Desktop)',      desc: 'Visão completa: pedidos, relatórios e administração',  path: '' }
+        { system: 'bip', nome: 'Gestor de Expedição — Apontamento (Celular)', desc: 'Modo enxuto: criar e bipar carregamentos no celular', path: 'apontar' },
+        { system: 'bip', nome: 'Gestor de Expedição — Gestão (Desktop)',      desc: 'Visão completa: carregamentos, registro de carregamento e relatórios',  path: '' }
       ] },
     { id: 'gerencial',      nome: 'Gerencial / Diretoria', icon: 'chart', cor: '#8B5CF6', modulos: [
         { system: 'gestao',      nome: 'Painel Executivo',   desc: 'KPIs consolidados + Quadro/Kanban de projetos' },
@@ -71,7 +71,7 @@ window.SMERP_CONFIG = {
           { value: 'lider',         label: 'Líder',         desc: 'Líder de turno: lança e acompanha a produção' },
           { value: 'qualidade',     label: 'Qualidade',     desc: 'Registra e acompanha desvios de qualidade' }
         ] },
-      { system: 'bip', nome: 'BIP (Expedição)', cor: '#1F9D55', icon: 'bars',
+      { system: 'bip', nome: 'Gestor de Expedição', cor: '#1F9D55', icon: 'bars',
         papeis: [
           { value: 'admin', label: 'Administrador', desc: 'Visão completa: pedidos, relatórios e administração' },
           { value: 'user',  label: 'Operador',      desc: 'Cria e bipa carregamentos (modo celular)' }
