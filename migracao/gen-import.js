@@ -62,11 +62,30 @@ const SCHEMAS = {
     postSql: "SELECT setval(pg_get_serial_sequence('manutencao.ordens_servico','numero'), " +
       "COALESCE((SELECT MAX(numero) FROM manutencao.ordens_servico), 1));",
   },
+  planos_acao: {
+    dir: "dados-planos_acao",
+    order: ["profiles", "user_roles", "projetos", "acoes", "subtarefas",
+      "registros_5w2h", "comentarios", "historico_status", "evidencias"],
+    generated: {},
+    liveUsersFile: "dados-planos_acao/live_users.json",
+    priorSystems: ["dados-fabrill", "dados-bip", "dados-compras", "dados-manutencao"],
+    // OBS: aqui profiles.id é um uuid PRÓPRIO (não é o auth.users.id, ≠ dos outros
+    // sistemas) — o vínculo com o usuário é profiles.user_id. NÃO remapear profiles.id.
+    userRefs: [["profiles", "user_id"], ["user_roles", "user_id"],
+      ["acoes", "responsavel_id"], ["subtarefas", "responsavel_id"],
+      ["comentarios", "user_id"], ["historico_status", "user_id"],
+      ["evidencias", "uploaded_by"]],
+    // avatar_url guarda a URL PÚBLICA do bucket 'avatars' do Lovable; reescreve p/ o
+    // SMERP + bucket renomeado 'planos-acao-avatars'. (evidencias usa file_path → não precisa.)
+    rewrites: [{ table: "profiles", col: "avatar_url",
+      from: "https://yeeckykuvnemweohixak.supabase.co/storage/v1/object/public/avatars/",
+      to: "https://supabase-supabase.h5xdag.easypanel.host/storage/v1/object/public/planos-acao-avatars/" }],
+  },
 };
 
 const schema = process.argv[2];
 const cfg = SCHEMAS[schema];
-if (!cfg) { console.error("Schema desconhecido. Use: fabrill | bip | compras"); process.exit(1); }
+if (!cfg) { console.error("Schema desconhecido. Use: " + Object.keys(SCHEMAS).join(" | ")); process.exit(1); }
 
 const DIR = path.join(__dirname, cfg.dir);
 const tables = JSON.parse(fs.readFileSync(path.join(DIR, "tables.json"), "utf8")).tables;
@@ -103,6 +122,14 @@ const userRefSet = new Set((cfg.userRefs || []).map(([t, c]) => `${t}.${c}`));
 const jsonbSet = new Set();
 for (const [t, cs] of Object.entries(cfg.jsonb || {})) for (const c of cs) jsonbSet.add(`${t}.${c}`);
 function valJsonb(v) { return v == null ? "NULL" : q(JSON.stringify(v)) + "::jsonb"; }
+// Reescritas de string por coluna (ex.: URL pública do storage Lovable -> SMERP).
+const rewriteMap = {}; // "tabela.coluna" -> [[from,to], ...]
+for (const r of (cfg.rewrites || [])) (rewriteMap[`${r.table}.${r.col}`] ||= []).push([r.from, r.to]);
+function applyRewrite(t, c, v) {
+  const subs = rewriteMap[`${t}.${c}`];
+  if (typeof v === "string" && subs) for (const [from, to] of subs) v = v.split(from).join(to);
+  return v;
+}
 
 function q(s) { return "'" + String(s).replace(/'/g, "''") + "'"; }
 function val(v) {
@@ -156,7 +183,7 @@ function tableSection(t) {
     const vs = cols.map((c) =>
       jsonbSet.has(`${t}.${c}`) ? valJsonb(r[c])
       : userRefSet.has(`${t}.${c}`) ? val(mapId(r[c]))
-      : val(r[c]));
+      : val(applyRewrite(t, c, r[c])));
     s += `INSERT INTO ${schema}.${t} (${cols.join(",")}) VALUES (${vs.join(",")}) ON CONFLICT DO NOTHING;\n`;
   }
   if (off) s += `ALTER TABLE ${schema}.${t} ENABLE TRIGGER USER;\n`;

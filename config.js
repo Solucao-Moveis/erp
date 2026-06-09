@@ -22,7 +22,8 @@ window.SMERP_CONFIG = {
     bip: 'https://solucaomoveis-bip.h5xdag.easypanel.host/',
     gestao: 'https://solucaomoveis-gerencial.h5xdag.easypanel.host/',
     sobras: 'https://solucaomoveis-sobras.h5xdag.easypanel.host/',
-    manutencao: 'https://solucaomoveis-manutencao.h5xdag.easypanel.host/'
+    manutencao: 'https://solucaomoveis-manutencao.h5xdag.easypanel.host/',
+    planos_acao: 'https://solucaomoveis-planos-acao.h5xdag.easypanel.host/'
   },
 
   // Cards por SETOR. Cada setor tem 1+ módulos; o card mostra o setor e,
@@ -42,7 +43,10 @@ window.SMERP_CONFIG = {
         { system: 'bip', nome: 'BIP — Apontamento (Celular)', desc: 'Modo enxuto: criar e bipar carregamentos no celular', path: 'apontar' },
         { system: 'bip', nome: 'BIP — Gestão (Desktop)',      desc: 'Visão completa: pedidos, relatórios e administração',  path: '' }
       ] },
-    { id: 'gerencial',      nome: 'Gerencial / Diretoria', icon: 'chart', cor: '#8B5CF6', modulos: [ { system: 'gestao',  nome: 'Painel Executivo', desc: 'KPIs consolidados dos sistemas' } ] }
+    { id: 'gerencial',      nome: 'Gerencial / Diretoria', icon: 'chart', cor: '#8B5CF6', modulos: [
+        { system: 'gestao',      nome: 'Painel Executivo',   desc: 'KPIs consolidados + Quadro/Kanban de projetos' },
+        { system: 'planos_acao', nome: 'Gestor de Projeto',  desc: 'Plano de ação 5W2H: projetos, ações e subtarefas' }
+      ] }
   ],
 
   // Tela de criar usuários (aba "Usuários", visível só p/ master/diretoria).
@@ -78,7 +82,7 @@ window.SMERP_CONFIG = {
           { value: 'compras',    label: 'Compras',             desc: 'Só os KPIs de Compras' },
           { value: 'producao',   label: 'Produção',            desc: 'Só os KPIs de Produção' },
           { value: 'expedicao',  label: 'Expedição',           desc: 'Só os KPIs de Expedição' },
-          { value: 'projetos',   label: 'Projetos (Gerenciador)', desc: 'Acessa a aba Gerenciador de Projetos (Kanban)' }
+          { value: 'projetos',   label: 'Quadro/Kanban (no Painel)', desc: 'Acessa a aba Quadro/Kanban de projetos dentro do Painel Executivo' }
         ] },
       { system: 'sobras', nome: 'Gestor de Sobras', cor: '#2E78D2', icon: 'clock',
         papeis: [
@@ -89,6 +93,11 @@ window.SMERP_CONFIG = {
           { value: 'admin',      label: 'Administrador', desc: 'Acesso total: máquinas, técnicos, estoque e usuários' },
           { value: 'manutencao', label: 'Manutenção',    desc: 'Abre/fecha OS, faz preventivas e mexe no estoque de peças' },
           { value: 'producao',   label: 'Produção',      desc: 'Abre chamados (OS) e consulta; não edita cadastros' }
+        ] },
+      { system: 'planos_acao', nome: 'Gestor de Projeto', cor: '#6366F1', icon: 'clipboard',
+        papeis: [
+          { value: 'admin', label: 'Administrador', desc: 'Acesso total: gerencia usuários/papéis e edita perfis' },
+          { value: 'user',  label: 'Usuário',       desc: 'Usa o app: cria/edita projetos, ações, subtarefas e comentários' }
         ] }
     ]
   },

@@ -10,6 +10,24 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '5.0',
+    data: '09/06/2026',
+    titulo: 'Novo sistema: Gestor de Projeto (Plano de Ação 5W2H)',
+    resumo: 'Entrou no SMERP o "Gestor de Projeto", dentro do setor "Gerencial / Diretoria" (ao lado do Painel Executivo). É um sistema para tocar projetos por plano de ação: cada projeto tem suas ações (o quê entregar, prazo, quem faz, com quem, evidência) detalhadas no formato 5W2H, e cada ação pode ter subtarefas, comentários e anexos de evidência. Tem ainda uma tela de relatórios. Aparece só para quem a diretoria liberar na aba "Usuários", com papel Administrador ou Usuário. Importante: ele é DIFERENTE do "Quadro/Kanban" que já existe dentro do Painel Executivo — para não confundir, aquela aba do Painel foi renomeada de "Gerenciador de Projetos" para "Quadro/Kanban".',
+    mudancas: [
+      {
+        app: 'Gestor de Projeto',
+        o_que: 'Sistema novo de gestão de projetos por plano de ação: cadastro de projetos (com objetivo, observações e status); dentro de cada projeto, uma lista de ações com entregável, prazo, responsável, equipe, início/fim, justificativa e o detalhamento 5W2H (o quê, por quê, onde, quando, quem, como, quanto); cada ação pode ter subtarefas, comentários e anexos de evidência (arquivos). Tem também tela de relatórios e perfil com foto. O acesso depende do papel: Administrador gerencia usuários e edita perfis; Usuário usa o app normalmente.',
+        como: 'No hub do ERP, abra o setor "Gerencial / Diretoria" e escolha "Gestor de Projeto" (só aparece se o seu acesso estiver liberado). Crie um projeto, abra-o e adicione as ações; em cada ação preencha o entregável, o prazo, quem faz e o 5W2H, e use as subtarefas para quebrar o trabalho. Anexe evidências e converse nos comentários. Para liberar o acesso a alguém, a diretoria abre "Usuários" no SMERP, clica na pessoa e marca, em "Gestor de Projeto", o papel (Administrador ou Usuário).'
+      },
+      {
+        app: 'Painel Executivo (Gerencial)',
+        o_que: 'A aba de quadros estilo Trello que ficava como "Gerenciador de Projetos" dentro do Painel Executivo passou a se chamar "Quadro/Kanban". Nada mudou no funcionamento — só o nome, para não confundir com o novo sistema "Gestor de Projeto".',
+        como: 'Abra o sistema Painel Executivo e clique em "Quadro/Kanban" na barra lateral (mesma aba de antes). Quem libera o acesso continua sendo a diretoria, na aba "Usuários", item "Quadro/Kanban (no Painel)" dentro de "Gerencial".'
+      }
+    ]
+  },
+  {
     versao: '4.0',
     data: '08/06/2026',
     titulo: 'Novo sistema: Manutenção',

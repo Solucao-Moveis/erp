@@ -54,6 +54,14 @@ as $$
               (select jsonb_agg(role) from manutencao.user_roles where user_id = auth.uid()),
               '[]'::jsonb)
           end
+        ),
+        'planos_acao', (
+          -- ATENÇÃO: aqui o vínculo é profiles.user_id (não .id, que é uuid próprio).
+          select case when exists (select 1 from planos_acao.profiles where user_id = auth.uid())
+            then coalesce(
+              (select jsonb_agg(role) from planos_acao.user_roles where user_id = auth.uid()),
+              '[]'::jsonb)
+          end
         )
       )
     ),

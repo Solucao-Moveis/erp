@@ -39,8 +39,10 @@ grant execute on function public.can_manage_users() to authenticated;
 --   compras: admin | aprovador | solicitante | comprador | visualizador
 --   fabrill: pcp | lider | qualidade | administrador
 --   bip:     admin | user
---   gestao (escopos): diretoria | compras | producao | expedicao
--- Ex.: {"compras":["solicitante"], "bip":["user"], "gestao":["compras"]}
+--   gestao (escopos): diretoria | compras | producao | expedicao | projetos
+--   manutencao: admin | manutencao | producao
+--   planos_acao: admin | user
+-- Ex.: {"compras":["solicitante"], "bip":["user"], "planos_acao":["user"]}
 -- ------------------------------------------------------------
 create or replace function public.admin_create_user(
   p_email     text,
@@ -161,6 +163,17 @@ begin
         insert into manutencao.user_roles (user_id, role)
           values (new_id, r::manutencao.app_role) on conflict (user_id, role) do nothing;
       end loop;
+
+    elsif sys = 'planos_acao' then
+      -- ATENÇÃO: planos_acao.profiles tem (id uuid PRÓPRIO, user_id UNIQUE, nome NOT NULL,
+      -- email) — o vínculo com o usuário é user_id (≠ das outras, que usam id). 'nome' é
+      -- NOT NULL default '' → setamos com o nome (ou e-mail).
+      insert into planos_acao.profiles (user_id, nome, email)
+        values (new_id, coalesce(v_name, v_email), v_email) on conflict (user_id) do nothing;
+      for r in select jsonb_array_elements_text(roles) loop
+        insert into planos_acao.user_roles (user_id, role)
+          values (new_id, r::planos_acao.app_role) on conflict (user_id, role) do nothing;
+      end loop;
     end if;
   end loop;
 
@@ -187,7 +200,7 @@ as $$
     u.id,
     u.email::text,
     coalesce(u.raw_user_meta_data->>'full_name',
-             cp.full_name, fp.full_name, bp.full_name, gp.full_name, sp.full_name, mp.nome) as full_name,
+             cp.full_name, fp.full_name, bp.full_name, gp.full_name, sp.full_name, mp.nome, pap.nome) as full_name,
     u.created_at,
     jsonb_strip_nulls(jsonb_build_object(
       'compras', (select jsonb_agg(role) from compras.user_roles where user_id = u.id),
@@ -195,7 +208,8 @@ as $$
       'bip',     (select jsonb_agg(role) from bip.user_roles     where user_id = u.id),
       'gestao',  (select jsonb_agg(scope) from gestao.user_scopes where user_id = u.id),
       'sobras',  (select jsonb_agg(role) from sobras.user_roles  where user_id = u.id),
-      'manutencao', (select jsonb_agg(role) from manutencao.user_roles where user_id = u.id)
+      'manutencao', (select jsonb_agg(role) from manutencao.user_roles where user_id = u.id),
+      'planos_acao', (select jsonb_agg(role) from planos_acao.user_roles where user_id = u.id)
     )) as systems
   from auth.users u
   left join compras.profiles cp on cp.id = u.id
@@ -204,6 +218,7 @@ as $$
   left join gestao.profiles  gp on gp.id = u.id
   left join sobras.profiles  sp on sp.id = u.id
   left join manutencao.profiles mp on mp.id = u.id
+  left join planos_acao.profiles pap on pap.user_id = u.id   -- vínculo por user_id (≠ das outras)
   where public.can_manage_users()   -- só o master recebe a lista
   order by u.created_at desc;
 $$;
@@ -405,6 +420,23 @@ begin
   else
     delete from manutencao.user_roles where user_id = p_user_id;
     begin delete from manutencao.profiles where id = p_user_id;
+    exception when foreign_key_violation then null; end;
+  end if;
+
+  -- PLANOS_ACAO (papéis reais: admin | user)
+  -- profiles tem (id uuid próprio, user_id UNIQUE, nome NOT NULL, email) → vínculo por user_id.
+  desired := coalesce(p_systems->'planos_acao', '[]'::jsonb);
+  if jsonb_array_length(desired) > 0 then
+    insert into planos_acao.profiles (user_id, nome, email)
+      values (p_user_id, coalesce(v_name, v_email), v_email) on conflict (user_id) do nothing;
+    delete from planos_acao.user_roles
+      where user_id = p_user_id and role::text not in (select jsonb_array_elements_text(desired));
+    insert into planos_acao.user_roles (user_id, role)
+      select p_user_id, x::planos_acao.app_role from jsonb_array_elements_text(desired) as x
+      on conflict (user_id, role) do nothing;
+  else
+    delete from planos_acao.user_roles where user_id = p_user_id;
+    begin delete from planos_acao.profiles where user_id = p_user_id;
     exception when foreign_key_violation then null; end;
   end if;
 
