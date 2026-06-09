@@ -11,15 +11,16 @@ declare
   r record;
   v_id uuid;
 begin
-  for r in (values
-    ('Evando',   'evando@solucaomoveis.ind.br'),
-    ('Valdei',   'valdei@solucaomoveis.ind.br'),
-    ('Expedito', 'expedito@solucaomoveis.ind.br'),
-    ('Rosa',     'rosa@solucaomoveis.ind.br'),
-    ('Vinicius', 'vinicius@solucaomoveis.ind.br'),
-    ('Fabricio', 'fabricio@solucaomoveis.ind.br'),
-    ('Rafael',   'rafael@solucaomoveis.ind.br')
-  ) as t(nome, email)
+  for r in
+    select * from (values
+      ('Evando',   'evando@solucaomoveis.ind.br'),
+      ('Valdei',   'valdei@solucaomoveis.ind.br'),
+      ('Expedito', 'expedito@solucaomoveis.ind.br'),
+      ('Rosa',     'rosa@solucaomoveis.ind.br'),
+      ('Vinicius', 'vinicius@solucaomoveis.ind.br'),
+      ('Fabricio', 'fabricio@solucaomoveis.ind.br'),
+      ('Rafael',   'rafael@solucaomoveis.ind.br')
+    ) as t(nome, email)
   loop
     -- já existe login com esse e-mail?
     select id into v_id from auth.users where lower(email) = lower(r.email);
