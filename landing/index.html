@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=7" />
+  <link rel="stylesheet" href="styles.css?v=8" />
 </head>
 <body>
   <!-- barra de progresso de scroll -->
@@ -49,9 +49,8 @@
   <section class="hero" id="top">
     <!-- fundo em crossfade (troque pelas fotos) -->
     <div class="hero__bgs" aria-hidden="true">
-      <!-- Hero com a foto do time (limpa). Quando tiver fotos de produto/sala em alta, adiciono mais slides aqui e o crossfade volta. -->
-      <!-- background-position controla o enquadramento: menor % sobe o foco (mostra as cabeças) -->
-      <div class="hero__bg is-on" style="background-image:url('assets/fotos/equipe.jpg'); background-position:center 18%"></div>
+      <!-- Hero: sala de aula montada (render). Troque a imagem aqui se quiser outra sala. -->
+      <div class="hero__bg is-on" style="background-image:url('assets/fotos/ambiente-sala-aula.png')"></div>
     </div>
     <div class="hero__scrim" aria-hidden="true"></div>
 
@@ -134,7 +133,6 @@
         <button class="filtro__btn" data-seg="infantil" role="tab">Educação Infantil</button>
         <button class="filtro__btn" data-seg="fundamental" role="tab">Fundamental</button>
         <button class="filtro__btn" data-seg="medio" role="tab">Médio e Superior</button>
-        <button class="filtro__btn" data-seg="biblioteca" role="tab">Biblioteca</button>
         <button class="filtro__btn" data-seg="refeitorio" role="tab">Refeitório</button>
       </div>
 
@@ -142,16 +140,25 @@
       <div class="car reveal" data-carousel>
         <div class="car__track" data-track id="produtosGrid">
           <article class="card" data-seg="infantil">
-            <div class="card__media ph" data-need="Foto: mesa e cadeiras de educação infantil (coloridas)"><span>Educação Infantil</span></div>
+            <div class="card__media" style="background-image:url('assets/fotos/produto-infantil.png')" role="img" aria-label="Mesa e cadeira infantil"></div>
             <div class="card__body">
               <span class="card__tag">Educação Infantil</span>
               <h3>Mesa &amp; Cadeira Infantil</h3>
-              <p>Mesas e cadeiras coloridas, em tamanhos menores, para creches e a educação infantil.</p>
+              <p>Mesa e cadeira individuais, em tamanhos menores e cores vivas, para creches e a educação infantil.</p>
+            </div>
+          </article>
+
+          <article class="card" data-seg="infantil">
+            <div class="card__media" style="background-image:url('assets/fotos/produto-coletiva.png')" role="img" aria-label="Mesa coletiva infantil"></div>
+            <div class="card__body">
+              <span class="card__tag">Educação Infantil</span>
+              <h3>Mesa Coletiva</h3>
+              <p>Mesa trapezoidal e cadeiras coloridas para atividades em grupo na educação infantil.</p>
             </div>
           </article>
 
           <article class="card" data-seg="fundamental medio">
-            <div class="card__media ph" data-need="Foto: Conjunto Aluno (mesa + cadeira individual)"><span>Conjunto Aluno</span></div>
+            <div class="card__media" style="background-image:url('assets/fotos/produto-aluno.png')" role="img" aria-label="Conjunto Aluno"></div>
             <div class="card__body">
               <span class="card__tag">Fundamental · Médio</span>
               <h3>Conjunto Aluno (CJA)</h3>
@@ -160,7 +167,7 @@
           </article>
 
           <article class="card" data-seg="infantil fundamental medio">
-            <div class="card__media ph" data-need="Foto: Conjunto Professor"><span>Conjunto Professor</span></div>
+            <div class="card__media" style="background-image:url('assets/fotos/produto-professor.png')" role="img" aria-label="Conjunto Professor"></div>
             <div class="card__body">
               <span class="card__tag">Todos os níveis</span>
               <h3>Conjunto Professor</h3>
@@ -169,7 +176,7 @@
           </article>
 
           <article class="card" data-seg="medio">
-            <div class="card__media ph" data-need="Foto: cadeira universitária com prancheta"><span>Universitária</span></div>
+            <div class="card__media" style="background-image:url('assets/fotos/produto-universitaria.png')" role="img" aria-label="Cadeira Universitária"></div>
             <div class="card__body">
               <span class="card__tag">Médio e Superior</span>
               <h3>Cadeira Universitária</h3>
@@ -177,22 +184,12 @@
             </div>
           </article>
 
-          <article class="card" data-seg="biblioteca">
-            <div class="card__media ph" data-need="Foto: mobiliário de biblioteca"><span>Biblioteca</span></div>
-            <div class="card__body">
-              <span class="card__tag">Biblioteca</span>
-              <h3>Biblioteca</h3>
-              <p>Estantes, mesas de leitura e balcões para organizar o acervo da escola.</p>
-            </div>
-          </article>
-
           <article class="card" data-seg="refeitorio">
-            <!-- Conjunto azul. Salve em: assets/fotos/conjunto-refeitorio.jpg -->
-            <div class="card__media" style="background-image:url('assets/fotos/conjunto-refeitorio.jpg')" role="img" aria-label="Conjunto de refeitório com cadeiras azuis"></div>
+            <div class="card__media" style="background-image:url('assets/fotos/produto-refeitorio.png')" role="img" aria-label="Conjunto de refeitório"></div>
             <div class="card__body">
               <span class="card__tag">Refeitório</span>
               <h3>Refeitório</h3>
-              <p>Mesas e bancos robustos, fáceis de limpar e dimensionados para grupos.</p>
+              <p>Mesa e bancos robustos, fáceis de limpar e dimensionados para grupos.</p>
             </div>
           </article>
         </div>
@@ -224,11 +221,9 @@
     <!-- carrossel de ambientes (full-bleed) -->
     <div class="car car--wide reveal" data-carousel>
       <div class="car__track" data-track>
-        <figure class="amb" style="background-image:url('assets/fotos/educacao.jpg')"><figcaption>Em sala de aula</figcaption></figure>
-        <figure class="amb ph" data-need="Foto: ambiente 2"><figcaption>Educação infantil</figcaption></figure>
-        <figure class="amb ph" data-need="Foto: ambiente 3"><figcaption>Refeitório</figcaption></figure>
-        <figure class="amb ph" data-need="Foto: ambiente 4"><figcaption>Biblioteca</figcaption></figure>
-        <figure class="amb ph" data-need="Foto: ambiente 5"><figcaption>Auditório</figcaption></figure>
+        <figure class="amb" style="background-image:url('assets/fotos/ambiente-sala-aula.png')"><figcaption>Sala de aula</figcaption></figure>
+        <figure class="amb" style="background-image:url('assets/fotos/ambiente-infantil.png')"><figcaption>Educação infantil</figcaption></figure>
+        <figure class="amb" style="background-image:url('assets/fotos/ambiente-biblioteca.png')"><figcaption>Biblioteca</figcaption></figure>
       </div>
       <div class="wrap car__nav car__nav--wide">
         <button class="car__btn" data-prev aria-label="Anterior"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
