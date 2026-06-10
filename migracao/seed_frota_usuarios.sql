@@ -14,7 +14,7 @@ begin
   for r in
     select * from (values
       ('Evando',   'evando@solucaomoveis.ind.br'),
-      ('Valdei',   'valdei@solucaomoveis.ind.br'),
+      ('Valdeci',  'valdeci@solucaomoveis.ind.br'),
       ('Expedito', 'expedito@solucaomoveis.ind.br'),
       ('Rosa',     'rosa@solucaomoveis.ind.br'),
       ('Vinicius', 'vinicius@solucaomoveis.ind.br'),
