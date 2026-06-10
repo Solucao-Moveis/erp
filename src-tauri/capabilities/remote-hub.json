@@ -1,0 +1,12 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "remote-hub",
+  "description": "Permite a API de notificação na origem do Hub hospedado (carregado de URL remota).",
+  "windows": ["main"],
+  "remote": {
+    "urls": ["https://solucaomoveis-erp.h5xdag.easypanel.host"]
+  },
+  "permissions": [
+    "notification:default"
+  ]
+}

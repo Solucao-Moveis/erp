@@ -1,0 +1,20 @@
+[package]
+name = "smerp"
+version = "0.1.0"
+description = "SMERP — Hub da Solução Móveis (app de PC)"
+authors = ["Solução Móveis"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-notification = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true

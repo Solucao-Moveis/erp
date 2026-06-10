@@ -5,3 +5,9 @@
 DEPLOY-EASYPANEL.md
 node_modules
 .DS_Store
+# App de PC (Tauri) e serviço de push — não entram na imagem nginx do Hub
+src-tauri
+dist
+push-service
+package.json
+package-lock.json

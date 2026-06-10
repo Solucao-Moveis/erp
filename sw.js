@@ -13,7 +13,7 @@
      (stale-while-revalidate): abre rápido e se mantém fresco.
    • Pra forçar atualização geral, suba o número do CACHE (v1 -> v2).
    ============================================================ */
-const CACHE = 'smerp-hub-v3';
+const CACHE = 'smerp-hub-v4';
 
 // Casca mínima pra abrir offline. URLs estáveis (sem ?v=) — o resto
 // é cacheado sozinho conforme o uso, então a lista fica curta e segura.
@@ -92,6 +92,43 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => cached);
       return cached || network;
+    })
+  );
+});
+
+/* ============================================================
+   WEB PUSH — avisos com o app FECHADO (Solicitações).
+   O serviço de push (push-service) manda um JSON: { title, body, url }.
+   Aqui só mostramos o aviso do Windows e, ao clicar, focamos/abrimos o Hub.
+   Tudo defensivo: payload faltando vira um aviso genérico.
+   ============================================================ */
+self.addEventListener('push', (event) => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; } catch (e) { data = {}; }
+  event.waitUntil((async () => {
+    // Se o Hub está aberto e visível, o "vigia" do app já avisa — não duplica.
+    const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    if (wins.some((c) => c.visibilityState === 'visible')) return;
+    await self.registration.showNotification(data.title || 'SMERP', {
+      body: data.body || '',
+      icon: 'assets/icon-192.png',
+      badge: 'assets/icon-192.png',
+      tag: data.tag || 'smerp-push',
+      renotify: true,
+      data: { url: data.url || '/' }
+    });
+  })());
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const target = (event.notification.data && event.notification.data.url) || '/';
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      for (const c of list) {
+        if ('focus' in c) { c.focus(); if ('navigate' in c && target !== '/') c.navigate(target).catch(() => {}); return; }
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(target);
     })
   );
 });

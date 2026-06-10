@@ -11,12 +11,16 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Copia os arquivos do site (inclui os 3 arquivos do PWA Android:
 # manifest.webmanifest, sw.js e pwa.js — sem eles o "instalar na tela
 # inicial" não aparece no Android).
-COPY index.html styles.css script.js config.js notas.js mobilenav.js manifest.webmanifest sw.js pwa.js /usr/share/nginx/html/
+COPY index.html styles.css script.js config.js notas.js notify.js mobilenav.js manifest.webmanifest sw.js pwa.js /usr/share/nginx/html/
 COPY assets/ /usr/share/nginx/html/assets/
 
 # Landing institucional pública (Solução Móveis) numa rota discreta: /institucional/
 # Site estático separado (HTML/CSS/JS próprios) — não interfere no hub.
 COPY landing/ /usr/share/nginx/html/institucional/
+
+# Instalador do app de PC (Windows) servido pelo Hub: /download/SMERP-setup.exe
+# É o que o botão de download da barra lateral baixa (mesma origem).
+COPY download/ /usr/share/nginx/html/download/
 
 # O proxy do EasyPanel deste app aponta para a porta 80 (solucaomoveis_erp:80)
 EXPOSE 80

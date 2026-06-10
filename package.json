@@ -1,0 +1,15 @@
+{
+  "name": "smerp-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "App de PC (Tauri) que empacota o Hub SMERP. NÃO afeta o deploy do Hub (nginx) — é só o build do .exe.",
+  "scripts": {
+    "tauri": "tauri",
+    "desktop:dev": "tauri dev",
+    "desktop:build": "tauri build",
+    "desktop:icons": "tauri icon assets/icon-512.png"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

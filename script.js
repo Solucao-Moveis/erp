@@ -437,7 +437,15 @@
     // libera (ou esconde) a aba "Usuários" conforme a permissão de quem entrou
     if (usersUI) usersUI.gate();
     // Solicitações: ajusta a visão (master vê "todas") e calcula o aviso (badge)
-    if (solUI) { solUI.gate(); solUI.refreshBadge(); }
+    if (solUI) { solUI.gate(); solUI.refreshBadge(); solUI.startWatch(); }
+    // Avisos no Windows: mostra o botão "Ativar avisos" se ainda não decidiram;
+    // se já está permitido, garante a inscrição do Web Push (app fechado).
+    if (window.SMERPNotify) {
+      refreshNotifButton();
+      if (window.SMERPNotify.permission() === 'granted') {
+        try { window.SMERPNotify.subscribePush(sb); } catch (e) {}
+      }
+    }
     // revela o hub: some a splash (se visível) e o login (se visível) em fade suave
     fadeOutLoading(function () {
       hideLogin(function () { document.body.classList.remove('smerp-booting'); });
@@ -877,6 +885,8 @@
     var cfg = CFG.SOLICITACOES || {};
     var TIPOS = cfg.TIPOS || [], URGS = cfg.URGENCIAS || [], STATUS = cfg.STATUS || {};
     var built = false, isMaster = false;
+    var lastBadge = null;   // último número conhecido (null = ainda não medido)
+    var watchTimer = null;  // timer do "vigia" (poll periódico p/ avisar)
 
     function setErr(msg) { if (!elErr) return; if (msg) { elErr.textContent = msg; elErr.hidden = false; } else { elErr.hidden = true; } }
     function setOk(msg)  { if (!elOk) return;  if (msg) { elOk.textContent = msg;  elOk.hidden = false; }  else { elOk.hidden = true; } }
@@ -1040,9 +1050,39 @@
       else { elBadge.hidden = true; navBtn.classList.remove('has-badge'); }
     }
     async function refreshBadge() {
-      try { var res = await client.rpc('solicitacoes_badge'); updateBadge(!res.error ? res.data : 0); }
-      catch (e) { updateBadge(0); }
+      var n = 0;
+      try { var res = await client.rpc('solicitacoes_badge'); n = !res.error ? (res.data || 0) : 0; }
+      catch (e) { n = 0; }
+      updateBadge(n);
+      // Aviso no Windows quando o número SOBE (e já havia uma medição anterior).
+      // master: chegou solicitação nova. comum: um chamado meu foi resolvido.
+      if (lastBadge !== null && n > lastBadge && window.SMERPNotify) {
+        var nova = n - lastBadge;
+        if (isMaster) {
+          window.SMERPNotify.notify(
+            nova > 1 ? ('🔔 ' + nova + ' novas solicitações') : '🔔 Nova solicitação',
+            'Abra o SMERP para ver e responder.',
+            { tag: 'sol-nova', url: (CFG.HUB_URL || '/') }
+          );
+        } else {
+          window.SMERPNotify.notify(
+            '✅ Sua solicitação foi respondida',
+            'O desenvolvedor atualizou um chamado seu.',
+            { tag: 'sol-resolvida', url: (CFG.HUB_URL || '/') }
+          );
+        }
+      }
+      lastBadge = n;
+      return n;
     }
+
+    // "Vigia": confere periodicamente se entrou/resolveu solicitação (app aberto).
+    function startWatch() {
+      stopWatch();
+      var ms = (CFG.NOTIFY_POLL_MS && CFG.NOTIFY_POLL_MS > 5000) ? CFG.NOTIFY_POLL_MS : 45000;
+      watchTimer = setInterval(function () { refreshBadge(); }, ms);
+    }
+    function stopWatch() { if (watchTimer) { clearInterval(watchTimer); watchTimer = null; } }
 
     async function open() {
       build();
@@ -1110,17 +1150,47 @@
     return {
       gate: gate,
       refreshBadge: refreshBadge,
-      hide: function () { close(); updateBadge(0); }
+      startWatch: startWatch,
+      stopWatch: stopWatch,
+      hide: function () { stopWatch(); lastBadge = null; close(); updateBadge(0); }
     };
   }
 
   solUI = initSolicitacoes(sb);
 
+  // --- Avisos no Windows: botão "Ativar avisos" + inscrição de Web Push ---
+  // Mostra o botão só quando dá pra decidir (permissão 'default'); some quando
+  // já concedido/negado ou sem suporte.
+  function refreshNotifButton() {
+    var btn = document.getElementById('btnNotif');
+    if (!btn) return;
+    var show = !!(window.SMERPNotify && window.SMERPNotify.supported() &&
+                  window.SMERPNotify.permission() === 'default');
+    btn.hidden = !show;
+  }
+  (function wireNotifButton() {
+    var btn = document.getElementById('btnNotif');
+    if (!btn || !window.SMERPNotify) return;
+    btn.addEventListener('click', async function () {
+      btn.disabled = true;
+      var granted = await window.SMERPNotify.ensurePermission();
+      btn.disabled = false;
+      if (granted) {
+        btn.hidden = true;
+        try { await window.SMERPNotify.subscribePush(sb); } catch (e) {}
+        window.SMERPNotify.notify('Avisos ativados ✅',
+          'Você vai receber as solicitações por aqui.', { url: (CFG.HUB_URL || '/') });
+      } else {
+        alert('Não foi possível ativar os avisos — confira a permissão de notificações do navegador.');
+      }
+    });
+  })();
+
   // Reage a expiração/refresh/troca de sessão
   sb.auth.onAuthStateChange(function (event, session) {
     if (event === 'SIGNED_OUT' || !session) {
       if (usersUI) usersUI.hide();
-      if (solUI) solUI.hide();
+      if (solUI) { solUI.stopWatch(); solUI.hide(); }
       if (!document.body.classList.contains('smerp-booting')) showLoginState();
     }
   });

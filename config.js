@@ -15,6 +15,22 @@ window.SMERP_CONFIG = {
   // chave do localStorage exclusiva do hub (não colide com os apps)
   STORAGE_KEY: 'smerp-hub-auth',
 
+  // URL pública do próprio Hub (usada pelo app de PC/Tauri e pelo clique da
+  // notificação pra trazer a janela certa). Ajuste se o domínio do Hub mudar.
+  HUB_URL: 'https://solucaomoveis-erp.h5xdag.easypanel.host/',
+
+  // ----- AVISOS NO COMPUTADOR (notificações do Windows) -----
+  // Chave VAPID PÚBLICA do Web Push (é pública por natureza — pode ficar aqui).
+  // A privada NÃO vai pro git: fica só no serviço de push (push-service/.env).
+  VAPID_PUBLIC_KEY:
+    'BPtoVpZVNWhG7bU7lU8z375Xv_tjmebZEvKfQNsyu8_hWeFEOLlQfAHztaquy7KubmDvX-FWVAvjcS_OnADxk08',
+  // Intervalo (ms) do "vigia" que checa solicitações novas/resolvidas (app aberto).
+  NOTIFY_POLL_MS: 45000,
+
+  // Instalador do app de PC (Windows), servido pelo próprio Hub (mesma origem,
+  // pra o atributo download funcionar). Atualize o nome se gerar uma versão nova.
+  WINDOWS_INSTALLER_URL: 'download/SMERP-setup.exe',
+
   // mapeia o sistema (igual ao retorno de my_systems) -> URL do app
   APPS: {
     compras: 'https://solucaomoveis-compras.h5xdag.easypanel.host/',

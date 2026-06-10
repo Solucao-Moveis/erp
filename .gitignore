@@ -22,6 +22,12 @@ migracao/baixar-manutencao.ps1
 node_modules/
 dist/
 
+# Serviço de push: segredos (VAPID privada, service role) — NÃO versionar
+push-service/.env
+# App de PC (Tauri): build pesado e schemas gerados — não versionar
+src-tauri/target/
+src-tauri/gen/
+
 # Sistema
 .DS_Store
 Thumbs.db

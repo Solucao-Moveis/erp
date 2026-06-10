@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=17" />
+  <link rel="stylesheet" href="styles.css?v=18" />
 </head>
 <body class="smerp-booting">
   <!-- ===================== TELA DE CARREGAMENTO ===================== -->
@@ -283,6 +283,11 @@
         Solicitações
         <span class="nav__badge" id="solBadge" hidden></span>
       </button>
+      <!-- Avisos do Windows (notificações). Aparece só quando dá pra ativar. -->
+      <button class="nav nav--home" id="btnNotif" type="button" title="Receber avisos no computador" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Ativar avisos
+      </button>
 
       <div class="side__lbl">Sistemas</div>
       <nav class="side__sys" id="sideSystems" aria-label="Sistemas liberados"></nav>
@@ -301,7 +306,24 @@
           <b>Solução Móveis</b>
           <small class="user-email" id="userEmail" hidden></small>
         </div>
+        <!-- Baixar / instalar o app (estilo do botãozinho do Claude) -->
+        <button class="side__dl" id="btnDownload" type="button" aria-haspopup="true" aria-expanded="false" title="Instalar / baixar o app">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+        </button>
         <button class="btn-logout" id="btnLogout" type="button" hidden>Sair</button>
+
+        <!-- Menu do download (abre acima do botão) -->
+        <div class="dlmenu" id="dlMenu" hidden role="menu" aria-label="Instalar o SMERP">
+          <div class="dlmenu__hd">Instalar o SMERP</div>
+          <button class="dlmenu__item" id="dlInstallPwa" type="button" role="menuitem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18M8 21h8"/></svg>
+            <span><b>Instalar no navegador</b><i>Vira app nesta máquina, na hora</i></span>
+          </button>
+          <a class="dlmenu__item" id="dlWindows" role="menuitem" download>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+            <span><b>Baixar para Windows</b><i>Instalador .exe (1,9 MB)</i></span>
+          </a>
+        </div>
       </div>
     </aside>
 
@@ -327,10 +349,11 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js?v=8"></script>
-  <script src="notas.js?v=19"></script>
-  <script src="script.js?v=15"></script>
+  <script src="config.js?v=9"></script>
+  <script src="notas.js?v=20"></script>
+  <script src="notify.js?v=1"></script>
+  <script src="script.js?v=16"></script>
   <script src="mobilenav.js?v=1"></script>
-  <script src="pwa.js?v=1"></script>
+  <script src="pwa.js?v=3"></script>
 </body>
 </html>

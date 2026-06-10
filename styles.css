@@ -132,6 +132,38 @@ body.smerp-booting .app { visibility: hidden; }
 }
 .btn-logout:hover { background: var(--orange); color: #fff; }
 
+/* Botão de download/instalar do app (rodapé da barra lateral) + menu */
+.side__user { position: relative; }
+.side__dl {
+  display: grid; place-items: center; width: 32px; height: 32px; flex-shrink: 0;
+  cursor: pointer; color: var(--orange); background: var(--orange-soft);
+  border: 1px solid rgba(232,114,42,0.22); border-radius: 9px;
+  transition: background .2s ease, color .2s ease;
+}
+.side__dl:hover { background: var(--orange); color: #fff; }
+.side__dl svg { width: 17px; height: 17px; }
+.dlmenu {
+  position: absolute; bottom: 54px; right: 8px; z-index: 70; min-width: 232px;
+  background: #fff; border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 14px 34px rgba(0,0,0,.16); padding: 6px;
+  display: grid; gap: 2px;
+}
+.dlmenu__hd {
+  font-size: 11px; font-weight: 800; letter-spacing: .3px; text-transform: uppercase;
+  color: var(--ink-soft); padding: 6px 10px 4px;
+}
+.dlmenu__item {
+  display: flex; align-items: center; gap: 11px; width: 100%; text-align: left;
+  font: inherit; color: var(--ink); background: transparent; border: 0; cursor: pointer;
+  padding: 9px 10px; border-radius: 9px; text-decoration: none;
+}
+.dlmenu__item:hover { background: var(--orange-soft); }
+.dlmenu__item svg { width: 18px; height: 18px; flex-shrink: 0; color: var(--orange); }
+.dlmenu__item span { display: grid; line-height: 1.25; }
+.dlmenu__item span b { font-size: 13px; font-weight: 700; }
+.dlmenu__item span i { font-size: 11px; font-style: normal; color: var(--ink-soft); }
+.dlmenu__item.is-disabled { opacity: .45; pointer-events: none; }
+
 /* ----- MAIN ----- */
 .main { padding: 38px 46px 60px; max-width: 1120px; }
 .main__top { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
