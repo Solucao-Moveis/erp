@@ -8,17 +8,18 @@
    ============================================================ */
 (function () {
   var KEY = 'smerp-theme';
-  function system() {
-    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
-  }
+  // Padrão = CLARO. A pessoa troca no botão sol/lua e fica salvo no aparelho.
   function stored() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
-  function current() { return stored() || system(); }
+  function current() { return stored() || 'light'; }
   function apply(t) {
     var d = document.documentElement;
     if (t === 'dark') d.classList.add('dark'); else d.classList.remove('dark');
   }
 
   apply(current());   // aplica já (antes do body renderizar)
+
+  // Estado recolhido da barra lateral (desktop) — aplica cedo no <html> p/ não dar flash.
+  try { if (localStorage.getItem('smerp-side') === 'collapsed') document.documentElement.classList.add('side-collapsed'); } catch (e) {}
 
   function set(t) {
     t = (t === 'dark') ? 'dark' : 'light';
@@ -29,12 +30,6 @@
   function toggle() { return set(current() === 'dark' ? 'light' : 'dark'); }
 
   window.SMERPTheme = { get: current, set: set, toggle: toggle };
-
-  // Se a pessoa ainda não escolheu manualmente, acompanha o tema do sistema ao vivo.
-  try {
-    var mq = window.matchMedia('(prefers-color-scheme: dark)');
-    if (mq.addEventListener) mq.addEventListener('change', function () { if (!stored()) apply(system()); });
-  } catch (e) {}
 
   // Liga o botão sol/lua quando o DOM existir.
   function wire() {

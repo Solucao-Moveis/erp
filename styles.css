@@ -845,3 +845,41 @@ html.dark .smerp-loading {
 html.dark .theme-toggle .ico-sun { display: block; }
 html.dark .theme-toggle .ico-moon { display: none; }
 @media (max-width: 760px) { .theme-toggle { top: 9px; right: 12px; width: 34px; height: 34px; } }
+
+/* ============================================================
+   BARRA LATERAL RECOLHÍVEL (só no desktop). Estado em html.side-collapsed
+   (aplicado cedo no theme.js pra não dar flash). No celular usa a gaveta.
+   ============================================================ */
+.side__collapse {
+  display: flex; align-items: center; justify-content: center; align-self: flex-end;
+  width: 26px; height: 26px; margin: -4px 0 6px; flex-shrink: 0;
+  border-radius: 8px; border: 1px solid var(--border); background: var(--panel);
+  color: var(--ink-soft); cursor: pointer;
+  transition: color .2s ease, border-color .2s ease;
+}
+.side__collapse:hover { color: var(--orange); border-color: var(--orange-glow); }
+.side__collapse svg { width: 16px; height: 16px; transition: transform .25s ease; }
+@media (max-width: 760px) { .side__collapse { display: none; } }
+
+@media (min-width: 761px) {
+  html.side-collapsed .app { grid-template-columns: 74px 1fr; }
+  html.side-collapsed .side { padding: 18px 12px; }
+  html.side-collapsed .side__brand { justify-content: center; padding: 6px 0 10px; }
+  html.side-collapsed .side__brand img { width: 30px; }
+  html.side-collapsed .side__collapse { align-self: center; margin: 0 auto 8px; }
+  html.side-collapsed .side__collapse svg { transform: rotate(180deg); }
+  /* esconde tudo que é texto/controle largo */
+  html.side-collapsed .side__brand-txt,
+  html.side-collapsed .side__lbl,
+  html.side-collapsed .side__simple-txt,
+  html.side-collapsed .side__simple-sw,
+  html.side-collapsed .side__userinfo,
+  html.side-collapsed .btn-logout,
+  html.side-collapsed .side__dl,
+  html.side-collapsed .nav__badge { display: none; }
+  /* nav/sistema/simplificado viram só ícone, centrado (font-size:0 some com o texto solto) */
+  html.side-collapsed .nav,
+  html.side-collapsed .side__simple,
+  html.side-collapsed .nav--sys { justify-content: center; gap: 0; font-size: 0; padding: 11px 0; }
+  html.side-collapsed .side__user { justify-content: center; padding: 12px 0 2px; }
+}

@@ -10,7 +10,7 @@
   <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#E8722A" />
   <!-- Tema claro/escuro: aplica .dark no <html> ANTES da pintura (sem flash) -->
-  <script src="theme.js?v=1"></script>
+  <script src="theme.js?v=2"></script>
   <meta name="mobile-web-app-capable" content="yes" />
   <link rel="apple-touch-icon" href="assets/icon-192.png" />
   <!-- iPhone (Safari): abrir em tela cheia, barra de status clara e nome curto do ícone -->
@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=21" />
+  <link rel="stylesheet" href="styles.css?v=22" />
 </head>
 <body class="smerp-booting">
   <!-- Botão de tema (sol/lua) — canto superior direito, fixo -->
@@ -274,6 +274,10 @@
         <img src="assets/logo-solucao-moveis.png" alt="Solução Móveis" />
         <span class="side__brand-txt"><b>SMERP</b><span>Solução Móveis</span></span>
       </a>
+      <!-- Recolher/expandir a barra lateral (só no desktop) -->
+      <button class="side__collapse" id="sideCollapse" type="button" title="Recolher menu" aria-label="Recolher menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
 
       <div class="side__lbl">Geral</div>
       <button class="nav nav--home is-active" id="navInicio" type="button">
@@ -363,7 +367,7 @@
   <script src="notas.js?v=21"></script>
   <script src="notify.js?v=1"></script>
   <script src="script.js?v=16"></script>
-  <script src="mobilenav.js?v=1"></script>
+  <script src="mobilenav.js?v=2"></script>
   <script src="pwa.js?v=3"></script>
 </body>
 </html>

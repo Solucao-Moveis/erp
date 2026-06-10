@@ -31,6 +31,23 @@
     if (e.target.closest('.nav, .sys, .nav--sys, .side__brand')) close();
   });
 
+  // Recolher/expandir a barra lateral no DESKTOP (persistente em smerp-side).
+  // O estado já é aplicado cedo pelo theme.js (html.side-collapsed) — aqui só o clique.
+  var collapseBtn = document.getElementById('sideCollapse');
+  if (collapseBtn) {
+    var syncTitle = function () {
+      var c = document.documentElement.classList.contains('side-collapsed');
+      collapseBtn.setAttribute('title', c ? 'Expandir menu' : 'Recolher menu');
+      collapseBtn.setAttribute('aria-label', c ? 'Expandir menu' : 'Recolher menu');
+    };
+    syncTitle();
+    collapseBtn.addEventListener('click', function () {
+      var c = document.documentElement.classList.toggle('side-collapsed');
+      try { localStorage.setItem('smerp-side', c ? 'collapsed' : 'expanded'); } catch (e) {}
+      syncTitle();
+    });
+  }
+
   // Espelha o aviso de "Solicitações" (#solBadge) num pontinho vermelho
   // no hambúrguer, pra a pessoa ver que há novidade sem abrir a gaveta.
   var solBadge = document.getElementById('solBadge');
