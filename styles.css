@@ -362,7 +362,7 @@ body.smerp-booting .side { visibility: hidden; }
   animation: smerp-aura 3.2s ease-in-out infinite;
 }
 .smerp-loading__logo {
-  width: min(340px, 72vw); height: auto;
+  width: min(150px, 42vw); height: auto;
   animation: smerp-pop .7s cubic-bezier(.2,.8,.2,1) both, smerp-breathe 3.2s ease-in-out .7s infinite;
 }
 
