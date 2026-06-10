@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.6',
+    data: '10/06/2026',
+    titulo: 'Modo escuro (tema claro/escuro)',
+    resumo: 'O SMERP ganhou MODO ESCURO. No canto superior direito da tela tem um botão com um ícone de lua (quando está claro) ou de sol (quando está escuro): clique para alternar. A sua escolha fica salva e vale nas próximas vezes que abrir. Na primeira vez, o sistema já entra no tema que o seu computador/celular estiver usando. E quando você abre um sistema a partir do Hub, ele já abre no mesmo tema. Por enquanto o tema escuro está no Hub; os outros módulos vão recebendo o ajuste em seguida.',
+    mudancas: [
+      {
+        app: 'SMERP (hub)',
+        o_que: 'Adicionado um botão de alternância de tema (sol/lua) fixo no canto superior direito. Ao clicar, todo o visual troca entre claro e escuro. A preferência é lembrada (fica guardada no aparelho) e, na primeira visita, segue automaticamente o tema do sistema operacional. Ao abrir um módulo pelo Hub, a escolha de tema viaja junto, para o módulo abrir igual.',
+        como: 'Procure o botão redondo com a lua (tema claro) ou o sol (tema escuro) no topo, à direita. Clique para alternar entre claro e escuro quando quiser — pronto, fica salvo. Para voltar, é só clicar de novo.'
+      }
+    ]
+  },
+  {
     versao: '6.5',
     data: '10/06/2026',
     titulo: 'Gestor de Projeto: dá para remover uma evidência enviada',

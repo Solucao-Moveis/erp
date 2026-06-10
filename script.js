@@ -468,6 +468,11 @@
           + '&at=' + encodeURIComponent(s.access_token)
           + '&rt=' + encodeURIComponent(s.refresh_token);
       }
+      // leva o tema (claro/escuro) escolhido no Hub pro app abrir igual
+      if (window.SMERPTheme) {
+        var sep2 = url.indexOf('#') === -1 ? '#' : '&';
+        url = url + sep2 + 'smerp_theme=' + window.SMERPTheme.get();
+      }
     } catch (e) {
       console.warn('[SMERP] sem sessão para SSO, abrindo direto:', e);
     }
