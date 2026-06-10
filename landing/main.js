@@ -153,7 +153,7 @@ if (filtro) {
 
 /* ---- formulário -> WhatsApp ---- */
 const form = document.getElementById('form');
-form.addEventListener('submit', (ev) => {
+if (form) form.addEventListener('submit', (ev) => {
   ev.preventDefault();
   const d = new FormData(form);
   const txt =
