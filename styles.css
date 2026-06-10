@@ -148,6 +148,7 @@ body.smerp-booting .app { visibility: hidden; }
   box-shadow: 0 14px 34px rgba(0,0,0,.16); padding: 6px;
   display: grid; gap: 2px;
 }
+.dlmenu[hidden] { display: none; }  /* sem isto, o display:grid acima ignora o hidden */
 .dlmenu__hd {
   font-size: 11px; font-weight: 800; letter-spacing: .3px; text-transform: uppercase;
   color: var(--ink-soft); padding: 6px 10px 4px;
@@ -317,7 +318,9 @@ body.simple .sys__desc { display: none; }
 /* Acessibilidade: respeita preferência de movimento reduzido */
 @media (prefers-reduced-motion: reduce) {
   * { transition-duration: .01ms !important; }
-  .smerp-loading__logo { animation: none; }
+  .smerp-loading__logo,
+  .smerp-loading__box::before { animation: none; }
+  .smerp-loading__bar span { animation-duration: 2s; } /* mantém só o indicador de progresso, mais lento */
 }
 
 /* ============================================================
@@ -336,19 +339,44 @@ body.smerp-booting .side { visibility: hidden; }
 
 /* --- Loading (splash "fade suave") --- */
 .smerp-loading {
-  background: var(--bg);
+  /* Fundo com profundidade: leve aura quente atrás do logo + degradê suave. */
+  background:
+    radial-gradient(1100px 560px at 50% 40%, rgba(232,114,42,0.07), transparent 62%),
+    linear-gradient(180deg, #FFFFFF 0%, var(--bg) 100%);
   opacity: 1;
   transition: opacity .6s ease;
 }
 .smerp-loading.is-leaving { opacity: 0; pointer-events: none; }
 
 .smerp-loading__box {
+  position: relative;
   display: flex; flex-direction: column; align-items: center;
-  text-align: center; gap: 18px;
+  text-align: center; gap: 22px;
+}
+/* halo difuso pulsando atrás do logo (dá "vida" sem pesar) */
+.smerp-loading__box::before {
+  content: ''; position: absolute; z-index: -1;
+  width: 460px; height: 460px; max-width: 86vw; max-height: 86vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232,114,42,0.16), transparent 60%);
+  animation: smerp-aura 3.2s ease-in-out infinite;
 }
 .smerp-loading__logo {
   width: min(340px, 72vw); height: auto;
-  animation: smerp-pop .7s cubic-bezier(.2,.8,.2,1) both, smerp-glow 2.6s ease-in-out .7s infinite;
+  animation: smerp-pop .7s cubic-bezier(.2,.8,.2,1) both, smerp-breathe 3.2s ease-in-out .7s infinite;
+}
+
+/* Barra de progresso indeterminada (sensação real de "trabalhando") */
+.smerp-loading__bar {
+  position: relative; width: min(220px, 60vw); height: 4px;
+  border-radius: 99px; overflow: hidden;
+  background: rgba(232,114,42,0.14);
+}
+.smerp-loading__bar span {
+  position: absolute; inset: 0; display: block; width: 42%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, transparent, var(--orange), var(--orange-dark));
+  animation: smerp-bar 1.25s cubic-bezier(.5,0,.2,1) infinite;
 }
 .smerp-loading__txt {
   font-size: 13px; font-weight: 600; letter-spacing: .3px;
@@ -358,14 +386,29 @@ body.smerp-booting .side { visibility: hidden; }
   content: ''; display: inline-block; width: 1.4em; text-align: left;
   animation: smerp-dots 1.4s steps(4, end) infinite;
 }
+/* assinatura discreta no rodapé da splash */
+.smerp-loading__brand {
+  position: absolute; bottom: 28px; left: 0; right: 0;
+  text-align: center; font-size: 11px; font-weight: 700;
+  letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-soft);
+  opacity: .55;
+}
 
 @keyframes smerp-pop {
   from { opacity: 0; transform: scale(.92) translateY(6px); }
   to   { opacity: 1; transform: scale(1)   translateY(0); }
 }
-@keyframes smerp-glow {
-  0%, 100% { filter: drop-shadow(0 6px 16px rgba(232,114,42,0.18)); }
-  50%      { filter: drop-shadow(0 8px 30px rgba(232,114,42,0.40)); }
+@keyframes smerp-breathe {
+  0%, 100% { transform: translateY(0)    scale(1);    filter: drop-shadow(0 6px 16px rgba(232,114,42,0.18)); }
+  50%      { transform: translateY(-3px) scale(1.015); filter: drop-shadow(0 10px 30px rgba(232,114,42,0.34)); }
+}
+@keyframes smerp-aura {
+  0%, 100% { opacity: .55; transform: scale(.92); }
+  50%      { opacity: 1;   transform: scale(1.06); }
+}
+@keyframes smerp-bar {
+  0%   { left: -45%; }
+  100% { left: 100%; }
 }
 @keyframes smerp-dots {
   0%   { content: ''; }
