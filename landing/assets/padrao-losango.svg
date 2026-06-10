@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="100" viewBox="0 0 400 100">
+  <!-- Padrão de losangos ESCURO com losango branco: espresso/grafite + laranja + branco -->
+  <rect width="400" height="100" fill="#2A2620"/>
+  <g stroke="#1A1714" stroke-width="1.5">
+    <polygon points="50,0 100,50 50,100 0,50"     fill="#C45A18"/>
+    <polygon points="150,0 200,50 150,100 100,50" fill="#ECE6D9"/>
+    <polygon points="250,0 300,50 250,100 200,50" fill="#3C372F"/>
+    <polygon points="350,0 400,50 350,100 300,50" fill="#8A4E2A"/>
+  </g>
+</svg>

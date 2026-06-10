@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=8" />
+  <link rel="stylesheet" href="styles.css?v=14" />
 </head>
 <body>
   <!-- barra de progresso de scroll -->
@@ -49,8 +49,13 @@
   <section class="hero" id="top">
     <!-- fundo em crossfade (troque pelas fotos) -->
     <div class="hero__bgs" aria-hidden="true">
-      <!-- Hero: sala de aula montada (render). Troque a imagem aqui se quiser outra sala. -->
-      <div class="hero__bg is-on" style="background-image:url('assets/fotos/ambiente-sala-aula.png')"></div>
+      <!-- Hero: padrão de losangos da marca (inspirado no estande) + móveis recortados em losango -->
+      <div class="hero__bg is-on" style="background-image:url('assets/padrao-losango.svg?v=4'); background-size:1120px 280px; background-repeat:repeat; background-position:right top"></div>
+      <img class="hero__gem hero__gem--1" src="assets/fotos/produto-coletiva.png" alt="" />
+      <img class="hero__gem hero__gem--2" src="assets/fotos/produto-aluno.png" alt="" />
+      <img class="hero__gem hero__gem--3" src="assets/fotos/produto-universitaria.png" alt="" />
+      <img class="hero__gem hero__gem--4" src="assets/fotos/produto-professor.png" alt="" />
+      <img class="hero__gem hero__gem--5" src="assets/fotos/produto-infantil.png" alt="" />
     </div>
     <div class="hero__scrim" aria-hidden="true"></div>
 
@@ -91,8 +96,8 @@
   <section class="sec empresa" id="empresa">
     <div class="wrap empresa__grid">
       <div class="empresa__media reveal">
-        <!-- SUBSTITUIR: foto da fábrica, fachada ou equipe trabalhando (salvar em assets/fotos/fabrica.jpg) -->
-        <div class="photo photo--portrait ph" data-need="Foto da fábrica, fachada ou equipe trabalhando"><span>Foto da fábrica</span></div>
+        <!-- Foto da fábrica (galpão de produção). -->
+        <div class="photo photo--portrait" style="background-image:url('assets/fotos/fabrica.png?v=2')" role="img" aria-label="Galpão de produção da Solução Móveis"></div>
         <div class="empresa__tagcard">
           <strong>Desde 2016</strong>
           <span>metalúrgica em Santana do Paraíso/MG</span>
@@ -106,13 +111,18 @@
         </div>
         <h2 class="display">Metalurgia, projeto e montagem<br>sob o mesmo teto</h2>
         <p class="lead">
-          Somos uma metalúrgica de mobiliário escolar em Santana do Paraíso (MG). Projetamos,
-          cortamos, soldamos e montamos cada peça na nossa própria fábrica.
+          A Solução Móveis (Solução Indústria e Comércio de Móveis Ltda.) fabrica mobiliário escolar
+          tubular de aço desde 2016, em Santana do Paraíso (MG).
         </p>
         <p class="muted">
-          Fornecemos para prefeituras, redes de ensino e escolas em todo o Brasil — com produtos
-          certificados pelo INMETRO, dentro das normas ABNT e do padrão FNDE. Aço tubular, tampo em
-          MDF de 18 mm e assento em polipropileno, feitos para o uso intenso da sala de aula.
+          Somos fornecedores de referência nacional: atendemos prefeituras e secretarias estaduais
+          de ensino em todo o Brasil. Nosso portfólio cobre todas as idades — do infantil ao adulto —
+          com foco em ergonomia, durabilidade e qualidade industrial.
+        </p>
+        <p class="muted">
+          Produzimos tudo sob o mesmo teto: corte a laser, dobra robotizada, soldagem, marcenaria,
+          pintura e montagem — integrando estrutura metálica e polipropileno injetado, com células
+          robotizadas rumo à Indústria 4.0.
         </p>
         <a href="#estrutura" class="btn btn--link">Conheça nosso parque fabril</a>
       </div>
@@ -313,14 +323,14 @@
         <span class="sechead__idx">05</span>
         <span class="kicker">Nosso parque fabril</span>
         <h2 class="display">Tecnologia para produzir<br>com qualidade e escala</h2>
-        <p class="lead">Maquinário próprio e processos controlados — do corte e solda à pintura de cada peça.</p>
+        <p class="lead">Corte a laser, dobra robotizada, soldagem, pintura e montagem — com células robotizadas e automação rumo à Indústria 4.0.</p>
       </div>
 
       <!-- SUBSTITUIR cada .ph por foto de máquina/equipamento -->
       <div class="maq">
         <figure class="maq__cell maq__cell--big ph reveal" data-need="Foto: linha de produção / galpão (ampla)"><figcaption>Linha de produção</figcaption></figure>
-        <figure class="maq__cell ph reveal" data-need="Foto: corte / dobra / solda do aço"><figcaption>Corte, dobra & solda</figcaption></figure>
-        <figure class="maq__cell ph reveal" data-need="Foto: cabine de pintura / acabamento"><figcaption>Pintura & acabamento</figcaption></figure>
+        <figure class="maq__cell ph reveal" data-need="Foto: corte a laser / dobra robotizada"><figcaption>Corte a laser &amp; dobra robotizada</figcaption></figure>
+        <figure class="maq__cell ph reveal" data-need="Foto: soldagem / pintura / montagem"><figcaption>Soldagem, pintura &amp; montagem</figcaption></figure>
       </div>
     </div>
   </section>
@@ -389,7 +399,7 @@
       </nav>
     </div>
     <div class="wrap foot__bar">
-      <span>© <span id="year"></span> Solução Móveis. Todos os direitos reservados.</span>
+      <span>© <span id="year"></span> Solução Indústria e Comércio de Móveis Ltda. Todos os direitos reservados.</span>
       <a href="https://supabase-supabase.h5xdag.easypanel.host/" class="foot__sys" title="Acesso restrito à equipe">Área do colaborador</a>
     </div>
   </footer>
