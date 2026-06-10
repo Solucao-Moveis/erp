@@ -13,7 +13,7 @@
      (stale-while-revalidate): abre rápido e se mantém fresco.
    • Pra forçar atualização geral, suba o número do CACHE (v1 -> v2).
    ============================================================ */
-const CACHE = 'smerp-hub-v2';
+const CACHE = 'smerp-hub-v3';
 
 // Casca mínima pra abrir offline. URLs estáveis (sem ?v=) — o resto
 // é cacheado sozinho conforme o uso, então a lista fica curta e segura.
@@ -57,6 +57,24 @@ self.addEventListener('fetch', (event) => {
           return res;
         })
         .catch(() => caches.match(req).then((r) => r || caches.match('/index.html')))
+    );
+    return;
+  }
+
+  // Config que muda a cada deploy (cards, papéis, ícones, notas): REDE PRIMEIRO,
+  // pra o card novo aparecer na hora — inclusive no celular (PWA). Cai no cache
+  // só se estiver offline.
+  if (/\/(config|script|notas)\.js$/.test(url.pathname)) {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          if (res && res.status === 200 && res.type === 'basic') {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put(req, copy));
+          }
+          return res;
+        })
+        .catch(() => caches.match(req))
     );
     return;
   }
