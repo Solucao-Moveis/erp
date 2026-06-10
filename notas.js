@@ -10,6 +10,32 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.5',
+    data: '10/06/2026',
+    titulo: 'Gestor de Projeto: dá para remover uma evidência enviada',
+    resumo: 'No Gestor de Projeto, dentro de uma ação, na aba "Evidências", agora qualquer pessoa que usa o sistema pode REMOVER um arquivo de evidência que foi enviado (por exemplo, quando subiu o arquivo errado). Ao clicar no botão da lixeira, o sistema pede uma confirmação e, ao confirmar, apaga o arquivo de vez e avisa que removeu.',
+    mudancas: [
+      {
+        app: 'Gestor de Projeto',
+        o_que: 'Na aba "Evidências" de uma ação, cada arquivo enviado ganhou um botão de lixeira para removê-lo. Antes só aparecia para quem tinha enviado o arquivo; agora aparece para qualquer usuário do sistema. Ao clicar, aparece uma confirmação ("Remover a evidência ...?") e, se confirmar, o arquivo é apagado tanto da lista quanto do armazenamento, com um aviso de "Evidência removida". Se algo der errado, o sistema mostra a mensagem de erro em vez de falhar em silêncio.',
+        como: 'No Gestor de Projeto, abra um projeto e depois a ação desejada. Vá na aba "Evidências", encontre o arquivo na lista e clique no botão da lixeira (vermelho) ao lado dele. Confirme na janela que aparece — pronto, a evidência é removida.'
+      }
+    ]
+  },
+  {
+    versao: '6.4',
+    data: '10/06/2026',
+    titulo: 'SMERP vira app no computador + avisos do Windows',
+    resumo: 'Agora dá para INSTALAR o SMERP como um aplicativo no computador (e também no celular) — ele abre numa janela própria, com ícone na área de trabalho e na barra de tarefas, sem a barra do navegador, e continua se atualizando sozinho. E o melhor: o sistema passou a mandar AVISOS DO WINDOWS quando entra ou é respondida uma solicitação. Com o app aberto, o aviso aparece na hora; e, se você ativar os avisos, eles chegam até com o programa fechado. Tudo é opcional: aparece um botão "Instalar app" e um botão "Ativar avisos" no menu lateral.',
+    mudancas: [
+      {
+        app: 'SMERP (hub)',
+        o_que: 'Dá para instalar o SMERP como aplicativo (no PC pelo navegador Edge/Chrome, no Android pelo "adicionar à tela inicial", e existe também um instalador .exe para Windows). Instalado, ele abre como um programa de verdade, em janela própria. Além disso, o sistema agora dispara notificações do Windows nas Solicitações: para o desenvolvedor (master), quando entra uma solicitação nova; e para quem abriu um chamado, quando ele é concluído ou recusado. Com o programa aberto, o aviso é imediato; com a permissão de avisos ativada, a notificação chega mesmo com o programa fechado.',
+        como: 'No menu lateral, quando o navegador permitir, aparece o botão "Instalar app" — clique nele e confirme para colocar o SMERP no computador (ou use o instalador do Windows, quando disponível). Para receber as notificações, clique em "Ativar avisos" e aceite a permissão; pronto, você passa a receber os avisos das solicitações na barra de notificações do Windows. Para desligar, é só revogar a permissão de notificações do site no navegador.'
+      }
+    ]
+  },
+  {
     versao: '6.3',
     data: '10/06/2026',
     titulo: 'Menu lateral: lista de sistemas com rolagem',
