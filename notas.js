@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.3',
+    data: '10/06/2026',
+    titulo: 'Menu lateral: lista de sistemas com rolagem',
+    resumo: 'Com a chegada de tantos sistemas (Compras, Hora a Hora, Sobras, Manutenção, Expedição, Painel Executivo, Gestor de Projeto, Frota...), a lista do menu lateral ficou maior que a tela e estava "comendo" o rodapé — o botão "Simplificado" e o seu nome com o "Sair" sumiam embaixo. Agora só a lista de sistemas rola; o topo (logo e atalhos Gerais) e o rodapé (Simplificado e Sair) ficam sempre fixos e visíveis, não importa quantos sistemas você tenha liberados.',
+    mudancas: [
+      {
+        app: 'SMERP (hub)',
+        o_que: 'A barra lateral foi ajustada para que apenas a lista de SISTEMAS role quando ela é maior que a altura da tela. Antes, ao adicionar mais sistemas, a lista empurrava o botão "Simplificado" e o bloco do usuário/"Sair" para fora da tela. Agora o topo e o rodapé do menu ficam travados no lugar e a lista de sistemas ganha rolagem própria.',
+        como: 'Não precisa fazer nada — é automático. Quando você tiver muitos sistemas liberados, role com o dedo (ou a roda do mouse) dentro da lista de sistemas no menu lateral; os atalhos de cima e o "Sair" embaixo continuam sempre à vista.'
+      }
+    ]
+  },
+  {
     versao: '6.2',
     data: '09/06/2026',
     titulo: 'Novo sistema: Gestor de Frota (veículos)',

@@ -47,6 +47,7 @@ body.smerp-booting .app { visibility: hidden; }
   padding: 22px 16px;
   display: flex; flex-direction: column; gap: 4px;
   position: sticky; top: 0; height: 100vh;
+  overflow: hidden;
 }
 .side__brand { display: flex; align-items: center; gap: 11px; padding: 6px 8px 18px; text-decoration: none; }
 .side__brand img { width: 34px; height: auto; }
@@ -72,7 +73,12 @@ body.smerp-booting .app { visibility: hidden; }
 .nav--home svg { width: 18px; height: 18px; flex-shrink: 0; }
 
 /* atalho de sistema (com quadradinho colorido por setor) */
-.side__sys { display: flex; flex-direction: column; gap: 4px; }
+/* rola só a lista de sistemas: topo (marca/Geral) e rodapé (Sair) ficam fixos */
+.side__sys {
+  display: flex; flex-direction: column; gap: 4px;
+  flex: 1 1 auto; min-height: 0; overflow-y: auto;
+  margin: 0 -6px; padding: 0 6px;
+}
 .nav--sys .nav__dot {
   width: 22px; height: 22px; border-radius: 7px; flex-shrink: 0;
   display: grid; place-items: center; color: #fff;
@@ -82,7 +88,6 @@ body.smerp-booting .app { visibility: hidden; }
 
 /* botão "Simplificado" (abre todos os setores de uma vez) — fica no rodapé da barra */
 .side__simple {
-  margin-top: auto;
   display: flex; align-items: center; gap: 10px; width: 100%;
   padding: 10px 11px; border-radius: 11px;
   border: none; background: none; cursor: pointer;
