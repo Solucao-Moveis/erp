@@ -31,6 +31,11 @@ window.SMERP_CONFIG = {
   // pra o atributo download funcionar). Atualize o nome se gerar uma versão nova.
   WINDOWS_INSTALLER_URL: 'download/SMERP-setup.exe',
 
+  // ----- ASSISTENTE DE IA -----
+  // URL do serviço ai-service (criado no EasyPanel, molde do push-service).
+  // Ajuste para o domínio que o EasyPanel gerar quando você publicar o serviço.
+  AI_SERVICE_URL: 'https://solucaomoveis-ai.h5xdag.easypanel.host',
+
   // mapeia o sistema (igual ao retorno de my_systems) -> URL do app
   APPS: {
     compras: 'https://solucaomoveis-compras.h5xdag.easypanel.host/',

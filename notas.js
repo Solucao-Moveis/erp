@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.8',
+    data: '11/06/2026',
+    titulo: 'Assistente de IA no Hub (abre solicitação de compra conversando)',
+    resumo: 'O SMERP ganhou um ASSISTENTE DE INTELIGÊNCIA ARTIFICIAL. No canto inferior direito aparece um botão redondo laranja: ao clicar, abre um chat onde você pode CONVERSAR (ou FALAR, pelo microfone) e pedir para ele abrir uma solicitação de compra pra você — ele pergunta o que faltar, faz um resumo e só cria depois que você confirmar. O assistente só enxerga e faz o que VOCÊ já poderia fazer (respeita o seu acesso), e o botão aparece apenas para as pessoas que o responsável (master) liberar. Esta é a primeira versão: por enquanto ele abre solicitação de compra; em breve vai responder perguntas de dados e fazer outras ações.',
+    mudancas: [
+      {
+        app: 'SMERP (hub)',
+        o_que: 'Adicionado um assistente de IA (botão laranja no canto inferior direito) que conversa por texto ou voz. Nesta primeira fase ele sabe abrir uma solicitação de compra: coleta os itens, o setor, o prazo e a justificativa, mostra um resumo e pede confirmação antes de criar; ao confirmar, devolve o número da solicitação (ex.: SC-0001/2026). Ele age sempre em nome da própria pessoa logada — ou seja, só consegue ver/fazer aquilo a que ela já tem acesso. O botão só aparece para quem o master liberar no acesso ao assistente.',
+        como: 'No Hub, clique no botão redondo laranja no canto inferior direito. Escreva o que precisa (ex.: "abre uma solicitação de 10 cadeiras pro setor Produção, pra sexta, porque furou o estoque") — ou clique no microfone e fale. O assistente vai perguntar o que faltar e mostrar um resumo; responda "pode" para ele criar. Se você não estiver vendo o botão, peça ao responsável (master) para liberar o seu acesso ao assistente.'
+      }
+    ]
+  },
+  {
     versao: '6.7',
     data: '11/06/2026',
     titulo: 'Compras: anexar foto/arquivo a qualquer momento na solicitação',
