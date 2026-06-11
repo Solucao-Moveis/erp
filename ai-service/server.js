@@ -61,7 +61,22 @@ COMO AGIR:
 3. Para AÇÕES que criam ou mudam dados (como abrir uma solicitação de compra), faça um RESUMO do que vai fazer e PEÇA CONFIRMAÇÃO ("posso criar?"). Só chame a ferramenta depois que a pessoa confirmar claramente (ex.: "pode", "sim", "confirma").
 4. Seja direto no resultado: depois de criar algo, diga o número/identificador gerado.
 
-Hoje você sabe fazer: abrir solicitação de compra (ferramenta criar_solicitacao_compra) e listar os setores de Compras (listar_setores). Se pedirem algo que você ainda não sabe fazer, explique que essa habilidade ainda será adicionada.`;
+CONSULTAR DADOS (relatórios, números, status):
+Você pode responder perguntas sobre QUALQUER dado do sistema consultando o banco — sempre de forma SEGURA e SOMENTE LEITURA. Use estas ferramentas:
+- descrever_banco(schema): devolve as tabelas e colunas de um schema. Use ANTES de consultar quando não tiver certeza dos nomes de tabelas/colunas.
+- consultar_dados(sql): roda UMA consulta SELECT e devolve o resultado. Regras: só SELECT; sempre use nomes de tabela QUALIFICADOS com o schema (ex.: compras.purchase_requests); nunca tente escrever/alterar nada.
+
+Os dados estão separados por schema (app):
+- compras: solicitações de compra (purchase_requests), itens (request_items), setores (sectors), catálogo (items).
+- fabrill: produção Hora a Hora — metas (production_goals), máquinas (machines), áreas (areas), apontamentos.
+- bip: expedição — carregamentos (loading_orders), itens, produtos.
+- manutencao: ordens de serviço (ordens_servico), máquinas, técnicos, preventivas, estoque.
+- planos_acao: planos de ação 5W2H (projetos, ações).
+- gestao, sobras, frota, expedicao: diretoria/BI, sobras, veículos, cargas.
+
+Fluxo recomendado: se não souber a estrutura, chame descrever_banco(schema) do app certo; depois monte um SELECT objetivo (com agregações tipo count/sum quando fizer sentido) e chame consultar_dados. Apresente o resultado em português claro (não mostre o SQL, a menos que peçam). Se a consulta voltar vazia ou com "erro", explique gentilmente — pode ser que a pessoa não tenha acesso àqueles dados (o sistema filtra pelo acesso dela) ou que não exista o registro.
+
+Se pedirem algo que envolva CRIAR/ALTERAR e você ainda não tem ferramenta pra isso, explique que por enquanto você só consegue consultar (ler) e abrir solicitação de compra; outras ações serão adicionadas.`;
 
 // ------------------------------------------------------------
 // FERRAMENTAS que o Gemini pode chamar (function calling).
@@ -72,6 +87,24 @@ const TOOLS = [{
       name: 'listar_setores',
       description: 'Lista os setores disponíveis em Compras (para escolher o setor de uma solicitação). Use quando precisar saber os setores válidos ou quando a pessoa não souber o nome exato.',
       parameters: { type: 'object', properties: {} },
+    },
+    {
+      name: 'descrever_banco',
+      description: 'Lista as tabelas e colunas de um schema (app) do banco, pra você saber o que consultar. Schemas: compras, fabrill, bip, manutencao, planos_acao, gestao, sobras, frota, expedicao, public.',
+      parameters: {
+        type: 'object',
+        properties: { schema: { type: 'string', description: 'Nome do schema/app (ex.: compras)' } },
+        required: ['schema'],
+      },
+    },
+    {
+      name: 'consultar_dados',
+      description: 'Roda UMA consulta SELECT (somente leitura) e devolve o resultado. Use nomes de tabela qualificados com o schema (ex.: compras.purchase_requests). Respeita o acesso da pessoa (RLS).',
+      parameters: {
+        type: 'object',
+        properties: { sql: { type: 'string', description: 'A consulta SELECT (uma só, sem ponto-e-vírgula)' } },
+        required: ['sql'],
+      },
     },
     {
       name: 'criar_solicitacao_compra',
@@ -109,6 +142,21 @@ const TOOLS = [{
 // Retorna um objeto que volta pro Gemini como "functionResponse".
 // ------------------------------------------------------------
 async function runTool(name, args, accessToken) {
+  // Consultas gerais usam o schema public (onde vivem as funções sila_*).
+  if (name === 'descrever_banco') {
+    const pub = sbAsUser(accessToken);
+    const { data, error } = await pub.rpc('sila_schema', { p_schema: String(args.schema || '').trim() });
+    if (error) return { erro: 'Não consegui descrever o banco: ' + error.message };
+    return { schema: args.schema, tabelas: data };
+  }
+
+  if (name === 'consultar_dados') {
+    const pub = sbAsUser(accessToken);
+    const { data, error } = await pub.rpc('sila_consultar', { p_sql: String(args.sql || '') });
+    if (error) return { erro: 'Consulta falhou: ' + error.message };
+    return { resultado: data };
+  }
+
   const sb = sbAsUser(accessToken, 'compras');
 
   if (name === 'listar_setores') {
