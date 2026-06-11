@@ -204,8 +204,15 @@
     }
   }
 
-  function stripEmoji(text) {
-    return String(text).replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE0F}]/gu, '').trim();
+  var serverTtsDown = false; // se o /tts falhar, não insiste (usa o navegador)
+  // Limpa pra fala: tira emojis E markdown (asteriscos/#/`/bullets) que ficam ruins falados.
+  function stripForSpeech(text) {
+    return String(text)
+      .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE0F}]/gu, '')
+      .replace(/[*_`#]+/g, '')
+      .replace(/^\s*[-•]\s+/gm, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
   }
 
   // Busca o MP3 da voz no servidor (Edge TTS). null se falhar -> usa plano B.
@@ -214,7 +221,7 @@
       var r = await fetch(CFG.AI_SERVICE_URL.replace(/\/$/, '') + '/tts', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: text })
       });
-      if (!r.ok) return null;
+      if (!r.ok) { serverTtsDown = true; return null; } // voz do servidor indisponível: não insiste mais
       var blob = await r.blob();
       if (!blob || !blob.size) return null;
       return URL.createObjectURL(blob);
@@ -224,8 +231,9 @@
   // Fala: tenta a voz do servidor (MP3, funciona no iPhone); se falhar, usa a voz do navegador.
   function speak(text, onend) {
     if (!text || (!voiceOn && !callMode)) { if (onend) onend(); return; }
-    var clean = stripEmoji(text);
+    var clean = stripForSpeech(text);
     if (!clean) { if (onend) onend(); return; }
+    if (serverTtsDown) { speakBrowser(clean, onend); return; } // já sabemos que o servidor não fala
     ttsFetch(clean).then(function (url) {
       if (!url || !els.audio) { speakBrowser(clean, onend); return; }
       try {
@@ -283,7 +291,7 @@
       var r = await fetch(CFG.AI_SERVICE_URL.replace(/\/$/, '') + '/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ access_token: ses.access_token, messages: messages })
+        body: JSON.stringify({ access_token: ses.access_token, messages: messages, voice: callMode })
       });
       var data = await r.json().catch(function () { return {}; });
       if (typing) typing.remove();

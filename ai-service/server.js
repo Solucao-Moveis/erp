@@ -60,6 +60,8 @@ const SYSTEM_PROMPT = `Você é a Sila, assistente do SMERP (sistema de gestão 
 
 ⚠️ REGRA DE OURO: o trabalho técnico é SEU, não da pessoa. NUNCA pergunte sobre "schema", "tabela", "coluna", "banco de dados", nem peça nomes técnicos. A pessoa não sabe e não precisa saber — VOCÊ descobre sozinha. Pense num gerente ocupado: ele pede, você resolve e entrega. Sem enrolação, sem fazer ele explicar o sistema pra você.
 
+FORMATO: escreva em TEXTO SIMPLES. NÃO use markdown nem símbolos de formatação (nada de *, **, #, -, _, backticks). O texto é mostrado no chat E LIDO EM VOZ ALTA — asteriscos e marcações ficam horríveis falados. Para enumerar, use frases curtas ou quebras de linha simples (ex.: "A OMP fez 2448 peças, 122% da meta." em uma linha; a próxima em outra). Nada de "1. **Nome**".
+
 QUANDO PEDIREM UM DADO / NÚMERO / RELATÓRIO / STATUS:
 - Resolva SOZINHA. Use as ferramentas descrever_banco (pra VOCÊ ver a estrutura) e consultar_dados (pra buscar) por conta própria, EM SILÊNCIO. Não narre "vou consultar o schema X" — só trabalhe e traga o resultado.
 - Faça suposições razoáveis. "hoje" = a data de hoje. Setor/área/máquina que a pessoa citar (ex.: "metalurgia"), procure você no banco. Não peça confirmação de coisa óbvia.
@@ -80,6 +82,13 @@ COMO BUSCAR BEM (faça sozinha, rápido):
 AÇÕES (criar/abrir coisas):
 - Você sabe abrir solicitação de compra (criar_solicitacao_compra): junte itens, setor, prazo e motivo, faça um resumo curto e peça confirmação ("posso criar?"). Só crie após o "pode". Devolva o número gerado (ex.: SC-0001/2026).
 - Ações que você ainda não tem ferramenta: diga que por enquanto só consegue consultar e abrir solicitação de compra.`;
+
+// Adendo quando a conversa é por VOZ (modo ligação): estilo falado, natural.
+const VOICE_STYLE = `IMPORTANTE: ESTA CONVERSA É POR VOZ (a pessoa vai OUVIR sua resposta, como num telefone). Então:
+- Fale curto e natural, do jeito que se fala em voz alta. No máximo 2 ou 3 frases.
+- NADA de listas, tópicos, números de item, tabelas ou símbolos. Só frases.
+- Diga os números de forma natural e arredondada quando der (ex.: "a OMP bateu 122% da meta, com cerca de 2.450 peças"). Não despeje uma lista enorme de números — destaque o essencial e ofereça detalhar se quiserem.
+- Soe como uma colega conversando, não como um relatório lido.`;
 
 // ------------------------------------------------------------
 // FERRAMENTAS que o Gemini pode chamar (function calling).
@@ -257,13 +266,14 @@ function toGeminiContents(messages, audio) {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // Chama UM modelo. Re-tenta só 503 (sobrecarga passageira) no mesmo modelo.
-async function callModel(model, contents, attempt = 0) {
+async function callModel(model, contents, sysExtra, attempt = 0) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+  const sysText = sysExtra ? `${SYSTEM_PROMPT}\n\n${sysExtra}` : SYSTEM_PROMPT;
   const resp = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      systemInstruction: { parts: [{ text: sysText }] },
       contents,
       tools: TOOLS,
       generationConfig: { temperature: 0.3 },
@@ -273,7 +283,7 @@ async function callModel(model, contents, attempt = 0) {
     const t = await resp.text();
     if (resp.status === 503 && attempt < 2) {
       await sleep(700 * (attempt + 1));
-      return callModel(model, contents, attempt + 1);
+      return callModel(model, contents, sysExtra, attempt + 1);
     }
     const err = new Error(`Gemini ${resp.status}: ${t.slice(0, 300)}`);
     err.status = resp.status;
@@ -285,11 +295,11 @@ async function callModel(model, contents, attempt = 0) {
 
 // Cascata: tenta cada modelo da lista; se um estourar a cota (429) ou cair
 // (503/500), passa pro próximo. Só desiste quando TODOS falharem.
-async function callGemini(contents) {
+async function callGemini(contents, sysExtra) {
   let lastErr;
   for (const model of MODEL_LIST) {
     try {
-      return await callModel(model, contents);
+      return await callModel(model, contents, sysExtra);
     } catch (e) {
       lastErr = e;
       if (e.status === 429 || e.status === 503 || e.status === 500) {
@@ -389,7 +399,8 @@ app.post('/tts', async (req, res) => {
 });
 
 app.post('/chat', async (req, res) => {
-  const { access_token, messages, audio } = req.body || {};
+  const { access_token, messages, audio, voice } = req.body || {};
+  const sysExtra = voice ? VOICE_STYLE : '';
   if (!access_token) return res.status(401).json({ error: 'sem_token' });
 
   try {
@@ -411,7 +422,7 @@ app.post('/chat', async (req, res) => {
     let reply = 'Desculpe, não consegui responder agora.';
 
     for (let i = 0; i < 6; i++) {
-      const content = await callGemini(contents);
+      const content = await callGemini(contents, sysExtra);
       if (!content) break;
       contents.push(content); // guarda a vez do modelo
 
