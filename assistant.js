@@ -22,6 +22,7 @@
   var built = false;
   var voiceOn = false; // Sila falar as respostas (TTS)
   var ttsVoice = null; // voz pt-BR escolhida
+  var ttsPrimed = false; // iOS: fala só destrava após um toque do usuário
   var rec = null;            // reconhecimento de fala (STT)
   var callMode = false;      // tela de "ligação" (conversa por voz) ativa
   var callProcessing = false; // aguardando resposta/falando -> não re-ouvir agora
@@ -37,17 +38,17 @@
       + '.ai-panel{position:fixed;right:20px;bottom:90px;z-index:9001;width:380px;max-width:calc(100vw - 32px);height:560px;max-height:calc(100vh - 130px);'
       + 'background:#fff;border-radius:18px;box-shadow:0 16px 50px rgba(0,0,0,.22);display:none;flex-direction:column;overflow:hidden;font-family:Inter,system-ui,sans-serif}'
       + '.ai-panel.is-open{display:flex}'
-      + '.ai-hd{background:linear-gradient(135deg,#E8722A,#f0913f);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px}'
+      + '.ai-hd{flex:0 0 auto;background:linear-gradient(135deg,#E8722A,#f0913f);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px}'
       + '.ai-hd b{font-size:15px;font-weight:700}.ai-hd small{display:block;font-size:11px;opacity:.9;font-weight:500}'
       + '.ai-hd .ai-voice{margin-left:auto;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center}'
       + '.ai-hd .ai-voice.on{background:#fff;color:#E8722A}.ai-hd .ai-voice svg{width:16px;height:16px}'
       + '.ai-hd .ai-x{margin-left:6px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:18px;line-height:1}'
-      + '.ai-body{flex:1;overflow-y:auto;padding:16px;background:#f7f7f8;display:flex;flex-direction:column;gap:10px}'
+      + '.ai-body{flex:1 1 auto;min-height:0;overflow-y:auto;padding:16px;background:#f7f7f8;display:flex;flex-direction:column;gap:10px}'
       + '.ai-msg{max-width:85%;padding:10px 13px;border-radius:14px;font-size:14px;line-height:1.45;white-space:pre-wrap;word-wrap:break-word}'
       + '.ai-msg.user{align-self:flex-end;background:#E8722A;color:#fff;border-bottom-right-radius:4px}'
       + '.ai-msg.bot{align-self:flex-start;background:#fff;color:#222;border:1px solid #ececec;border-bottom-left-radius:4px}'
       + '.ai-msg.typing{color:#999;font-style:italic}'
-      + '.ai-foot{padding:10px;border-top:1px solid #eee;background:#fff;display:flex;gap:8px;align-items:flex-end}'
+      + '.ai-foot{flex:0 0 auto;padding:10px;border-top:1px solid #eee;background:#fff;display:flex;gap:8px;align-items:flex-end}'
       + '.ai-foot textarea{flex:1;resize:none;border:1px solid #ddd;border-radius:12px;padding:10px 12px;font-size:14px;font-family:inherit;max-height:90px;outline:none}'
       + '.ai-foot textarea:focus{border-color:#E8722A}'
       + '.ai-btn{border:none;border-radius:12px;cursor:pointer;width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}'
@@ -57,7 +58,7 @@
       + '@keyframes aipulse{0%,100%{opacity:1}50%{opacity:.55}}'
       // ---- tela de "ligação" (modo voz) ----
       + '.ai-call{position:fixed;inset:0;z-index:9100;display:none;flex-direction:column;align-items:center;justify-content:space-between;'
-      + 'background:linear-gradient(160deg,#E8722A 0%,#c75416 100%);color:#fff;padding:54px 24px 44px;font-family:Inter,system-ui,sans-serif}'
+      + 'background:linear-gradient(160deg,#E8722A 0%,#c75416 100%);color:#fff;padding:calc(40px + env(safe-area-inset-top)) 24px calc(40px + env(safe-area-inset-bottom));font-family:Inter,system-ui,sans-serif}'
       + '.ai-call.is-open{display:flex}'
       + '.ai-call__top{font-size:13px;letter-spacing:1.5px;opacity:.8;text-transform:uppercase}'
       + '.ai-call__center{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:4vh}'
@@ -70,8 +71,9 @@
       + '.ai-call__end{width:70px;height:70px;border-radius:50%;border:none;background:#DC2626;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 26px rgba(0,0,0,.35)}'
       + '.ai-call__end:active{transform:scale(.94)}.ai-call__end svg{width:32px;height:32px}'
       // ---- celular: chat em tela cheia (corrige a UX quebrada) ----
-      + '@media(max-width:480px){.ai-panel{right:0;left:0;top:0;bottom:0;width:auto;height:auto;max-width:none;max-height:none;border-radius:0}'
-      + '.ai-hd{padding-top:18px}.ai-fab{width:56px;height:56px;right:16px;bottom:16px}}';
+      + '@media(max-width:480px){.ai-panel{right:0;left:0;top:0;bottom:0;width:100%;height:100dvh;max-width:none;max-height:none;border-radius:0}'
+      + '.ai-hd{padding-top:calc(14px + env(safe-area-inset-top))}.ai-foot{padding-bottom:calc(10px + env(safe-area-inset-bottom))}'
+      + '.ai-fab{width:56px;height:56px;right:16px;bottom:16px}}';
     var s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
   }
 
@@ -135,7 +137,8 @@
       voiceOn = !voiceOn;
       els.voice.classList.toggle('on', voiceOn);
       localStorage.setItem('sila-voz', voiceOn ? '1' : '0');
-      if (!voiceOn && window.speechSynthesis) window.speechSynthesis.cancel();
+      if (voiceOn) primeTTS(); // destrava a fala no iPhone (gesto do usuário)
+      else if (window.speechSynthesis) window.speechSynthesis.cancel();
     });
     els.input.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
@@ -180,6 +183,19 @@
     }
     return br[0] || null;
   }
+  // iOS/Safari só "destrava" a fala dentro de um toque do usuário. Chamamos
+  // isto no 1º toque (microfone / alto-falante) com uma fala muda, pra liberar.
+  function primeTTS() {
+    if (ttsPrimed || !window.speechSynthesis) return;
+    ttsPrimed = true;
+    try {
+      var u = new SpeechSynthesisUtterance(' ');
+      u.volume = 0; u.lang = 'pt-BR';
+      window.speechSynthesis.speak(u);
+      window.speechSynthesis.resume();
+    } catch (e) { /* ignora */ }
+  }
+
   function speak(text, onend) {
     // fala se a voz estiver ligada OU se estiver numa ligação
     if (!window.speechSynthesis || !text || (!voiceOn && !callMode)) { if (onend) onend(); return; }
@@ -194,6 +210,7 @@
     u.rate = 1.0; u.pitch = 1.05;
     if (onend) { u.onend = onend; u.onerror = onend; }
     window.speechSynthesis.speak(u);
+    try { window.speechSynthesis.resume(); } catch (e) { /* iOS às vezes pausa */ }
   }
   // as vozes carregam de forma assíncrona em alguns navegadores
   if (window.speechSynthesis) {
@@ -310,6 +327,7 @@
 
   function startCall() {
     if (!rec) return;
+    primeTTS(); // destrava a fala no iPhone (este clique é um gesto do usuário)
     callMode = true; callProcessing = false;
     voiceOn = true; if (els.voice) els.voice.classList.add('on'); localStorage.setItem('sila-voz', '1');
     els.call.classList.add('is-open');
