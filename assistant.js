@@ -23,6 +23,8 @@
   var voiceOn = false; // Sila falar as respostas (TTS)
   var ttsVoice = null; // voz pt-BR escolhida
   var ttsPrimed = false; // iOS: fala só destrava após um toque do usuário
+  var audioPrimed = false; // iOS: tocar áudio também precisa de um toque pra liberar
+  var SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
   var rec = null;            // reconhecimento de fala (STT)
   var callMode = false;      // tela de "ligação" (conversa por voz) ativa
   var callProcessing = false; // aguardando resposta/falando -> não re-ouvir agora
@@ -122,6 +124,12 @@
     els.callStatus = call.querySelector('#aiCallStatus');
     call.querySelector('#aiCallEnd').addEventListener('click', endCall);
 
+    // elemento de áudio (toca o MP3 da voz da Sila — funciona no iPhone)
+    var audio = document.createElement('audio');
+    audio.setAttribute('playsinline', ''); audio.preload = 'auto';
+    document.body.appendChild(audio);
+    els.audio = audio;
+
     els.fab = fab; els.panel = panel;
     els.body = panel.querySelector('#aiBody');
     els.input = panel.querySelector('#aiInput');
@@ -183,34 +191,67 @@
     }
     return br[0] || null;
   }
-  // iOS/Safari só "destrava" a fala dentro de um toque do usuário. Chamamos
-  // isto no 1º toque (microfone / alto-falante) com uma fala muda, pra liberar.
+  // iOS/Safari só "destrava" a fala/áudio dentro de um toque do usuário.
+  // Chamamos isto no 1º toque (microfone / alto-falante) pra liberar os dois.
   function primeTTS() {
-    if (ttsPrimed || !window.speechSynthesis) return;
-    ttsPrimed = true;
-    try {
-      var u = new SpeechSynthesisUtterance(' ');
-      u.volume = 0; u.lang = 'pt-BR';
-      window.speechSynthesis.speak(u);
-      window.speechSynthesis.resume();
-    } catch (e) { /* ignora */ }
+    if (!ttsPrimed && window.speechSynthesis) {
+      ttsPrimed = true;
+      try { var u = new SpeechSynthesisUtterance(' '); u.volume = 0; u.lang = 'pt-BR'; window.speechSynthesis.speak(u); window.speechSynthesis.resume(); } catch (e) {}
+    }
+    if (!audioPrimed && els.audio) {
+      audioPrimed = true;
+      try { els.audio.src = SILENT_WAV; var p = els.audio.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {}
+    }
   }
 
+  function stripEmoji(text) {
+    return String(text).replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE0F}]/gu, '').trim();
+  }
+
+  // Busca o MP3 da voz no servidor (Edge TTS). null se falhar -> usa plano B.
+  async function ttsFetch(text) {
+    try {
+      var r = await fetch(CFG.AI_SERVICE_URL.replace(/\/$/, '') + '/tts', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: text })
+      });
+      if (!r.ok) return null;
+      var blob = await r.blob();
+      if (!blob || !blob.size) return null;
+      return URL.createObjectURL(blob);
+    } catch (e) { return null; }
+  }
+
+  // Fala: tenta a voz do servidor (MP3, funciona no iPhone); se falhar, usa a voz do navegador.
   function speak(text, onend) {
-    // fala se a voz estiver ligada OU se estiver numa ligação
-    if (!window.speechSynthesis || !text || (!voiceOn && !callMode)) { if (onend) onend(); return; }
+    if (!text || (!voiceOn && !callMode)) { if (onend) onend(); return; }
+    var clean = stripEmoji(text);
+    if (!clean) { if (onend) onend(); return; }
+    ttsFetch(clean).then(function (url) {
+      if (!url || !els.audio) { speakBrowser(clean, onend); return; }
+      try {
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+        els.audio.pause();
+        els.audio.src = url;
+        els.audio.onended = function () { if (onend) onend(); };
+        els.audio.onerror = function () { speakBrowser(clean, onend); };
+        var p = els.audio.play();
+        if (p && p.catch) p.catch(function () { speakBrowser(clean, onend); });
+      } catch (e) { speakBrowser(clean, onend); }
+    });
+  }
+
+  // Plano B: voz do próprio navegador (Android/PC). No iPhone costuma falhar.
+  function speakBrowser(clean, onend) {
+    if (!window.speechSynthesis || !clean) { if (onend) onend(); return; }
     window.speechSynthesis.cancel();
     if (!ttsVoice) ttsVoice = pickVoice();
-    // tira emojis/símbolos pra não "ler" caracteres estranhos
-    var clean = text.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE0F}]/gu, '').trim();
-    if (!clean) { if (onend) onend(); return; }
     var u = new SpeechSynthesisUtterance(clean);
     u.lang = 'pt-BR';
     if (ttsVoice) u.voice = ttsVoice;
     u.rate = 1.0; u.pitch = 1.05;
     if (onend) { u.onend = onend; u.onerror = onend; }
     window.speechSynthesis.speak(u);
-    try { window.speechSynthesis.resume(); } catch (e) { /* iOS às vezes pausa */ }
+    try { window.speechSynthesis.resume(); } catch (e) {}
   }
   // as vozes carregam de forma assíncrona em alguns navegadores
   if (window.speechSynthesis) {
@@ -339,6 +380,7 @@
     callMode = false; callProcessing = false;
     if (rec) { try { rec.abort(); } catch (e) {} }
     if (window.speechSynthesis) window.speechSynthesis.cancel();
+    if (els.audio) { try { els.audio.pause(); } catch (e) {} }
     if (els.call) els.call.classList.remove('is-open', 'listening', 'thinking', 'speaking');
   }
 
