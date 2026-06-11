@@ -17,7 +17,7 @@ import { createClient } from '@supabase/supabase-js';
 const {
   PORT = '3000',
   GEMINI_API_KEY,
-  GEMINI_MODEL = 'gemini-2.5-flash',
+  GEMINI_MODEL = 'gemini-2.5-flash-lite',
   SUPABASE_URL,
   SUPABASE_ANON_KEY,
   ALLOWED_ORIGIN = '*',
@@ -27,7 +27,15 @@ for (const [k, v] of Object.entries({ GEMINI_API_KEY, SUPABASE_URL, SUPABASE_ANO
   if (!v) { console.error(`[ai] Falta a variável de ambiente ${k}`); process.exit(1); }
 }
 
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+// Lista de modelos GRÁTIS em cascata: se um estourar a cota (429) ou estiver
+// sobrecarregado (503), a Sila tenta o próximo, e o próximo... até um funcionar
+// (ou acabarem todos). Cada modelo tem cota grátis SEPARADA, então isso
+// multiplica bastante o quanto dá pra usar de graça.
+// Dá pra customizar pelo env GEMINI_MODELS (lista separada por vírgula).
+const MODEL_LIST = [...new Set(
+  (process.env.GEMINI_MODELS || 'gemini-2.5-flash-lite,gemini-2.0-flash,gemini-flash-latest,gemini-2.5-flash,gemini-2.0-flash-lite')
+    .split(',').map((s) => s.trim()).filter(Boolean)
+)];
 
 // ------------------------------------------------------------
 // Cliente Supabase "como a pessoa": o token dela vai no Authorization,
@@ -253,8 +261,10 @@ function toGeminiContents(messages, audio) {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-async function callGemini(contents, attempt = 0) {
-  const resp = await fetch(GEMINI_URL, {
+// Chama UM modelo. Re-tenta só 503 (sobrecarga passageira) no mesmo modelo.
+async function callModel(model, contents, attempt = 0) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+  const resp = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -266,15 +276,35 @@ async function callGemini(contents, attempt = 0) {
   });
   if (!resp.ok) {
     const t = await resp.text();
-    // Engasgo temporário do Gemini (sobrecarga / limite): tenta de novo.
-    if ((resp.status === 503 || resp.status === 429 || resp.status === 500) && attempt < 6) {
-      await sleep(600 * (attempt + 1));
-      return callGemini(contents, attempt + 1);
+    if (resp.status === 503 && attempt < 2) {
+      await sleep(700 * (attempt + 1));
+      return callModel(model, contents, attempt + 1);
     }
-    throw new Error(`Gemini ${resp.status}: ${t.slice(0, 400)}`);
+    const err = new Error(`Gemini ${resp.status}: ${t.slice(0, 300)}`);
+    err.status = resp.status;
+    throw err;
   }
   const json = await resp.json();
   return json?.candidates?.[0]?.content || null;
+}
+
+// Cascata: tenta cada modelo da lista; se um estourar a cota (429) ou cair
+// (503/500), passa pro próximo. Só desiste quando TODOS falharem.
+async function callGemini(contents) {
+  let lastErr;
+  for (const model of MODEL_LIST) {
+    try {
+      return await callModel(model, contents);
+    } catch (e) {
+      lastErr = e;
+      if (e.status === 429 || e.status === 503 || e.status === 500) {
+        console.warn(`[ai] modelo ${model} indisponível (${e.status}) — tentando o próximo`);
+        continue; // próximo modelo da lista
+      }
+      throw e; // erro que não é de cota/disponibilidade (ex.: 400): trocar não ajuda
+    }
+  }
+  throw lastErr || new Error('Nenhum modelo disponível');
 }
 
 // ============================================================
@@ -298,16 +328,6 @@ app.use((req, res, next) => {
 });
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
-
-// Autoteste temporário (sem segredo) — confirma Gemini de dentro do container.
-app.get('/selftest', async (_req, res) => {
-  try {
-    const c = await callGemini([{ role: 'user', parts: [{ text: 'ping' }] }]);
-    res.json({ gemini: 'ok', text: (c?.parts || []).map((p) => p.text || '').join('') });
-  } catch (e) {
-    res.status(500).json({ gemini: 'falhou', erro: e && e.message });
-  }
-});
 
 app.post('/chat', async (req, res) => {
   const { access_token, messages, audio } = req.body || {};
@@ -353,9 +373,13 @@ app.post('/chat', async (req, res) => {
 
     res.json({ reply });
   } catch (e) {
-    console.error('[ai] erro:', e && e.message);
-    res.status(500).json({ error: 'erro_interno', reply: '[diag] ' + (e && e.message ? e.message : 'erro desconhecido') });
+    const msg = (e && e.message) || '';
+    console.error('[ai] erro:', msg);
+    const amigavel = /429|quota|rate limit/i.test(msg)
+      ? 'Estou recebendo muitas perguntas agora e bati o limite de uso da IA. Tente de novo daqui a pouco. 🙏'
+      : 'Tive um problema técnico agora. Tente de novo em instantes.';
+    res.status(500).json({ error: 'erro_interno', reply: amigavel });
   }
 });
 
-app.listen(Number(PORT), () => console.log(`[ai] assistente ouvindo na porta ${PORT} (modelo ${GEMINI_MODEL})`));
+app.listen(Number(PORT), () => console.log(`[ai] assistente ouvindo na porta ${PORT} (modelos em cascata: ${MODEL_LIST.join(' › ')})`));
