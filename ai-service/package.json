@@ -1,0 +1,18 @@
+{
+  "name": "smerp-ai-service",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Assistente de IA do SMERP — recebe { access_token, messages } do Hub, conversa com o Gemini (Flash) e executa ações no Supabase usando o token da própria pessoa (RLS aplica).",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "express": "^4.19.2"
+  }
+}
