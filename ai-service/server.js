@@ -13,8 +13,6 @@
    ============================================================ */
 import express from 'express';
 import { createClient } from '@supabase/supabase-js';
-import WebSocket from 'ws';
-import { createHash, randomUUID } from 'crypto';
 
 const {
   PORT = '3000',
@@ -23,7 +21,11 @@ const {
   SUPABASE_URL,
   SUPABASE_ANON_KEY,
   ALLOWED_ORIGIN = '*',
-  TTS_VOICE = 'pt-BR-FranciscaNeural',
+  // Voz neural (ElevenLabs). Opcional: sem a chave, a Sila usa a voz do navegador.
+  ELEVEN_API_KEY,
+  ELEVEN_VOICE_ID = 'EXAVITQu4vr4xnSDxMaL', // Sarah (feminina). Outras grátis: Jessica cgSgspJ2msm6clMCkdW9, Bella hpp4J3VqNfWAUOO0d1Us
+  ELEVEN_MODEL = 'eleven_turbo_v2_5',       // turbo = metade dos créditos
+  ELEVEN_MONTHLY_LIMIT = '9500',            // trava: para antes dos 10 mil/mês do grátis
 } = process.env;
 
 for (const [k, v] of Object.entries({ GEMINI_API_KEY, SUPABASE_URL, SUPABASE_ANON_KEY })) {
@@ -313,50 +315,33 @@ async function callGemini(contents, sysExtra) {
 }
 
 // ============================================================
-//  VOZ (TTS) — Edge TTS grátis. Gera o MP3 da fala da Sila.
+//  VOZ (TTS) — ElevenLabs (voz neural). Gera o MP3 da fala da Sila.
 //  Funciona no iPhone também (o navegador só TOCA o áudio).
-//  Token de segurança Sec-MS-GEC calculado em float (igual ao Edge).
+//  TRAVA DE GASTO: conta caracteres do mês; passou do limite grátis,
+//  para de chamar (o front cai na voz do navegador). Qualquer erro da
+//  API também faz cair. Impossível gerar cobrança.
 // ============================================================
-const TTS_TRUSTED_TOKEN = '6A5AA1D4EAFF4E9FB37E23D68491D6F4';
-function secMsGec() {
-  let t = (Date.now() / 1000) + 11644473600; // float (igual ao Edge)
-  t = t - (t % 300);
-  t = t * 1e7;
-  return createHash('sha256').update(t.toFixed(0) + TTS_TRUSTED_TOKEN).digest('hex').toUpperCase();
-}
-function ttsSsml(text, voice) {
-  const safe = String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  return `<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='pt-BR'><voice name='${voice}'><prosody rate='4%' pitch='0%'>${safe}</prosody></voice></speak>`;
-}
-function edgeTTS(text, voice) {
-  return new Promise((resolve, reject) => {
-    const url = `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${TTS_TRUSTED_TOKEN}&Sec-MS-GEC=${secMsGec()}&Sec-MS-GEC-Version=1-131.0.2903.86&ConnectionId=${randomUUID().replace(/-/g, '')}`;
-    let ws;
-    try {
-      ws = new WebSocket(url, { headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0',
-        'Origin': 'chrome-extension://jdiccldimpdaibmpdkjnbmckianbfold',
-        'Pragma': 'no-cache', 'Cache-Control': 'no-cache',
-      } });
-    } catch (e) { return reject(e); }
-    const chunks = [];
-    const timer = setTimeout(() => { try { ws.terminate(); } catch (e) {} reject(new Error('tts timeout')); }, 15000);
-    ws.on('open', () => {
-      const ts = new Date().toISOString();
-      ws.send(`X-Timestamp:${ts}\r\nContent-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"false"},"outputFormat":"audio-24khz-48kbitrate-mono-mp3"}}}}`);
-      ws.send(`X-RequestId:${randomUUID().replace(/-/g, '')}\r\nContent-Type:application/ssml+xml\r\nX-Timestamp:${ts}\r\nPath:ssml\r\n\r\n${ttsSsml(text, voice)}`);
-    });
-    ws.on('message', (data, isBinary) => {
-      if (!isBinary) {
-        if (data.toString().includes('Path:turn.end')) { clearTimeout(timer); try { ws.close(); } catch (e) {} resolve(Buffer.concat(chunks)); }
-      } else {
-        const b = Buffer.isBuffer(data) ? data : Buffer.from(data);
-        const hl = b.readUInt16BE(0);
-        if (b.slice(2, 2 + hl).toString().includes('Path:audio')) chunks.push(b.slice(2 + hl));
-      }
-    });
-    ws.on('error', (e) => { clearTimeout(timer); reject(e); });
+const ELEVEN_LIMIT = Number(ELEVEN_MONTHLY_LIMIT) || 9500;
+let ttsMonth = '';
+let ttsCharsUsed = 0;
+function ttsMonthKey() { const d = new Date(); return `${d.getUTCFullYear()}-${d.getUTCMonth()}`; }
+
+async function elevenTTS(text) {
+  // reseta o contador quando vira o mês
+  const mk = ttsMonthKey();
+  if (mk !== ttsMonth) { ttsMonth = mk; ttsCharsUsed = 0; }
+  // trava: não passa do limite grátis do mês
+  if (ttsCharsUsed + text.length > ELEVEN_LIMIT) { const e = new Error('limite mensal de voz atingido'); e.capped = true; throw e; }
+
+  const r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVEN_VOICE_ID}?output_format=mp3_44100_128`, {
+    method: 'POST',
+    headers: { 'xi-api-key': ELEVEN_API_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, model_id: ELEVEN_MODEL }),
   });
+  if (!r.ok) { const t = await r.text(); throw new Error(`eleven ${r.status}: ${t.slice(0, 160)}`); }
+  const buf = Buffer.from(await r.arrayBuffer());
+  ttsCharsUsed += text.length; // só conta quando deu certo
+  return buf;
 }
 
 // ============================================================
@@ -381,20 +366,20 @@ app.use((req, res, next) => {
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
-// Voz da Sila: recebe { text } e devolve o MP3 falado (Edge TTS).
+// Voz da Sila: recebe { text } e devolve o MP3 falado (ElevenLabs).
 app.post('/tts', async (req, res) => {
-  const text = String((req.body && req.body.text) || '').slice(0, 1500).trim();
-  const voice = (req.body && req.body.voice) || TTS_VOICE;
+  if (!ELEVEN_API_KEY) return res.status(503).json({ error: 'tts_desligado' }); // sem chave: front usa voz do navegador
+  const text = String((req.body && req.body.text) || '').slice(0, 1200).trim();
   if (!text) return res.status(400).json({ error: 'sem_texto' });
   try {
-    const audio = await edgeTTS(text, voice);
+    const audio = await elevenTTS(text);
     if (!audio || !audio.length) throw new Error('audio vazio');
     res.set('Content-Type', 'audio/mpeg');
     res.set('Cache-Control', 'no-store');
     res.send(audio);
   } catch (e) {
-    console.error('[ai] tts:', e && e.message);
-    res.status(502).json({ error: 'tts_falhou', detalhe: (e && e.message) || '' });
+    console.warn('[ai] tts:', e && e.message); // capped/erro -> front cai na voz do navegador
+    res.status(502).json({ error: 'tts_falhou' });
   }
 });
 

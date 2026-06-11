@@ -11,6 +11,10 @@
   var CFG = window.SMERP_CONFIG || {};
   if (!CFG.AI_SERVICE_URL || !window.supabase) return;
 
+  // Voz neural pelo servidor (ElevenLabs). Se o /tts falhar ou estourar a cota,
+  // cai sozinho na voz do navegador. Pra desligar de vez, mude pra false.
+  var USE_SERVER_TTS = true;
+
   // Cliente próprio, mas compartilhando a sessão do Hub (mesmo storageKey).
   var sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY, {
     auth: { storageKey: CFG.STORAGE_KEY, persistSession: true, autoRefreshToken: true }
