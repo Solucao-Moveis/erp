@@ -1,5 +1,6 @@
 # Assistente de IA do SMERP — imagem mínima pro EasyPanel.
-FROM node:20-alpine
+# Node 22 (tem WebSocket nativo, exigido pela lib nova do Supabase).
+FROM node:22-alpine
 WORKDIR /app
 COPY package.json ./
 RUN npm install --omit=dev
