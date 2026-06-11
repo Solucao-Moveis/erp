@@ -267,8 +267,8 @@ async function callGemini(contents, attempt = 0) {
   if (!resp.ok) {
     const t = await resp.text();
     // Engasgo temporário do Gemini (sobrecarga / limite): tenta de novo.
-    if ((resp.status === 503 || resp.status === 429) && attempt < 4) {
-      await sleep(700 * (attempt + 1));
+    if ((resp.status === 503 || resp.status === 429 || resp.status === 500) && attempt < 6) {
+      await sleep(600 * (attempt + 1));
       return callGemini(contents, attempt + 1);
     }
     throw new Error(`Gemini ${resp.status}: ${t.slice(0, 400)}`);
@@ -298,6 +298,16 @@ app.use((req, res, next) => {
 });
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
+
+// Autoteste temporário (sem segredo) — confirma Gemini de dentro do container.
+app.get('/selftest', async (_req, res) => {
+  try {
+    const c = await callGemini([{ role: 'user', parts: [{ text: 'ping' }] }]);
+    res.json({ gemini: 'ok', text: (c?.parts || []).map((p) => p.text || '').join('') });
+  } catch (e) {
+    res.status(500).json({ gemini: 'falhou', erro: e && e.message });
+  }
+});
 
 app.post('/chat', async (req, res) => {
   const { access_token, messages, audio } = req.body || {};
@@ -344,7 +354,7 @@ app.post('/chat', async (req, res) => {
     res.json({ reply });
   } catch (e) {
     console.error('[ai] erro:', e && e.message);
-    res.status(500).json({ error: 'erro_interno', reply: 'Tive um problema técnico agora. Tente de novo em instantes.' });
+    res.status(500).json({ error: 'erro_interno', reply: '[diag] ' + (e && e.message ? e.message : 'erro desconhecido') });
   }
 });
 
