@@ -251,18 +251,6 @@ app.use((req, res, next) => {
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
-// Autoteste temporário: confirma se o container alcança o Gemini com a chave
-// do Ambiente. Não revela a chave. (remover depois do diagnóstico)
-app.get('/selftest', async (_req, res) => {
-  const keyHint = (GEMINI_API_KEY || '').slice(0, 4) + '…(' + (GEMINI_API_KEY || '').length + ' chars)';
-  try {
-    const c = await callGemini([{ role: 'user', parts: [{ text: 'ping' }] }]);
-    res.json({ gemini: 'ok', model: GEMINI_MODEL, keyHint, text: (c?.parts || []).map((p) => p.text || '').join('') });
-  } catch (e) {
-    res.status(500).json({ gemini: 'falhou', model: GEMINI_MODEL, keyHint, erro: e && e.message });
-  }
-});
-
 app.post('/chat', async (req, res) => {
   const { access_token, messages, audio } = req.body || {};
   if (!access_token) return res.status(401).json({ error: 'sem_token' });
@@ -277,7 +265,7 @@ app.post('/chat', async (req, res) => {
     const { data: allowed, error: gateErr } = await sb.rpc('can_use_assistant');
     if (gateErr) {
       console.error('[ai] gate (can_use_assistant) falhou:', gateErr.message);
-      return res.status(500).json({ error: 'gate_falhou', reply: '[diagnóstico] Falha ao verificar acesso: ' + gateErr.message });
+      return res.status(500).json({ error: 'gate_falhou', reply: 'Não consegui verificar seu acesso agora. Tente de novo em instantes.' });
     }
     if (allowed !== true) return res.status(403).json({ error: 'sem_acesso', reply: 'Você ainda não tem acesso ao assistente. Peça pro responsável (master) liberar.' });
 
@@ -308,7 +296,7 @@ app.post('/chat', async (req, res) => {
     res.json({ reply });
   } catch (e) {
     console.error('[ai] erro:', e && e.message);
-    res.status(500).json({ error: 'erro_interno', reply: '[diagnóstico] Erro técnico: ' + (e && e.message ? e.message : 'desconhecido') });
+    res.status(500).json({ error: 'erro_interno', reply: 'Tive um problema técnico agora. Tente de novo em instantes.' });
   }
 });
 
