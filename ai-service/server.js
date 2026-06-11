@@ -256,7 +256,10 @@ app.post('/chat', async (req, res) => {
 
     // 2) Esta pessoa pode usar o assistente? (só quem o master liberou)
     const { data: allowed, error: gateErr } = await sb.rpc('can_use_assistant');
-    if (gateErr) return res.status(500).json({ error: 'gate_falhou' });
+    if (gateErr) {
+      console.error('[ai] gate (can_use_assistant) falhou:', gateErr.message);
+      return res.status(500).json({ error: 'gate_falhou', reply: '[diagnóstico] Falha ao verificar acesso: ' + gateErr.message });
+    }
     if (allowed !== true) return res.status(403).json({ error: 'sem_acesso', reply: 'Você ainda não tem acesso ao assistente. Peça pro responsável (master) liberar.' });
 
     // 3) Conversa com o Gemini, executando ferramentas até ele responder em texto.
@@ -286,7 +289,7 @@ app.post('/chat', async (req, res) => {
     res.json({ reply });
   } catch (e) {
     console.error('[ai] erro:', e && e.message);
-    res.status(500).json({ error: 'erro_interno', reply: 'Tive um problema técnico agora. Tente de novo em instantes.' });
+    res.status(500).json({ error: 'erro_interno', reply: '[diagnóstico] Erro técnico: ' + (e && e.message ? e.message : 'desconhecido') });
   }
 });
 
