@@ -244,6 +244,18 @@ app.use((req, res, next) => {
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
+// Autoteste temporário: confirma se o container alcança o Gemini com a chave
+// do Ambiente. Não revela a chave. (remover depois do diagnóstico)
+app.get('/selftest', async (_req, res) => {
+  const keyHint = (GEMINI_API_KEY || '').slice(0, 4) + '…(' + (GEMINI_API_KEY || '').length + ' chars)';
+  try {
+    const c = await callGemini([{ role: 'user', parts: [{ text: 'ping' }] }]);
+    res.json({ gemini: 'ok', model: GEMINI_MODEL, keyHint, text: (c?.parts || []).map((p) => p.text || '').join('') });
+  } catch (e) {
+    res.status(500).json({ gemini: 'falhou', model: GEMINI_MODEL, keyHint, erro: e && e.message });
+  }
+});
+
 app.post('/chat', async (req, res) => {
   const { access_token, messages, audio } = req.body || {};
   if (!access_token) return res.status(401).json({ error: 'sem_token' });
