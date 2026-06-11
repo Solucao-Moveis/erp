@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.9',
+    data: '11/06/2026',
+    titulo: 'Hora a Hora: administrador agora entra e enxerga tudo',
+    resumo: 'No Produção Hora a Hora, quem tinha o papel de ADMINISTRADOR estava ficando preso na tela "Aguardando atribuição" — mesmo já tendo o acesso liberado. Isso foi corrigido: agora o administrador entra normalmente e vê o mesmo conjunto completo de telas do PCP (Metas, Dashboard, Indicadores, Desvios e Usuários). Se você é administrador e estava vendo a mensagem "Aguardando atribuição", basta abrir o app de novo (toque em "Voltar ao ERP" e entre no Hora a Hora outra vez) que ele já abre liberado.',
+    mudancas: [
+      {
+        app: 'Produção Hora a Hora',
+        o_que: 'Corrigido o controle de acesso do app: a tela inicial só liberava os papéis PCP, Líder e Qualidade e esquecia o papel Administrador, então todo administrador caía em "Aguardando atribuição" mesmo com o acesso correto. Agora o administrador passa direto e recebe as mesmas telas do PCP (acesso total).',
+        como: 'Se você é administrador do Hora a Hora e via "Aguardando atribuição", abra o app novamente: na própria tela, toque em "Voltar ao ERP" e clique de novo no Hora a Hora. Ele vai abrir já com todas as telas (Metas, Dashboard, Indicadores, Desvios e Usuários).'
+      }
+    ]
+  },
+  {
     versao: '6.8',
     data: '11/06/2026',
     titulo: 'Assistente de IA no Hub (abre solicitação de compra conversando)',
