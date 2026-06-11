@@ -20,6 +20,8 @@
   var open = false;
   var sending = false;
   var built = false;
+  var voiceOn = false; // Sila falar as respostas (TTS)
+  var ttsVoice = null; // voz pt-BR escolhida
   var els = {};
 
   // ---------- estilos ----------
@@ -34,7 +36,9 @@
       + '.ai-panel.is-open{display:flex}'
       + '.ai-hd{background:linear-gradient(135deg,#E8722A,#f0913f);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px}'
       + '.ai-hd b{font-size:15px;font-weight:700}.ai-hd small{display:block;font-size:11px;opacity:.9;font-weight:500}'
-      + '.ai-hd .ai-x{margin-left:auto;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:18px;line-height:1}'
+      + '.ai-hd .ai-voice{margin-left:auto;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center}'
+      + '.ai-hd .ai-voice.on{background:#fff;color:#E8722A}.ai-hd .ai-voice svg{width:16px;height:16px}'
+      + '.ai-hd .ai-x{margin-left:6px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:18px;line-height:1}'
       + '.ai-body{flex:1;overflow-y:auto;padding:16px;background:#f7f7f8;display:flex;flex-direction:column;gap:10px}'
       + '.ai-msg{max-width:85%;padding:10px 13px;border-radius:14px;font-size:14px;line-height:1.45;white-space:pre-wrap;word-wrap:break-word}'
       + '.ai-msg.user{align-self:flex-end;background:#E8722A;color:#fff;border-bottom-right-radius:4px}'
@@ -67,6 +71,7 @@
     panel.innerHTML =
       '<div class="ai-hd"><img class="ai-hd-logo" src="assets/icon-192.png" alt="" />'
       + '<div><b>Sila</b><small>Assistente da Solução Móveis</small></div>'
+      + '<button class="ai-voice" id="aiVoice" type="button" title="Sila falar as respostas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14"/></svg></button>'
       + '<button class="ai-x" type="button" title="Fechar">&times;</button></div>'
       + '<div class="ai-body" id="aiBody"></div>'
       + '<div class="ai-foot">'
@@ -83,8 +88,18 @@
     els.input = panel.querySelector('#aiInput');
     els.send = panel.querySelector('#aiSend');
     els.mic = panel.querySelector('#aiMic');
+    els.voice = panel.querySelector('#aiVoice');
     panel.querySelector('.ai-x').addEventListener('click', toggle);
     els.send.addEventListener('click', send);
+    // Voz da Sila (TTS): liga/desliga, lembrado entre sessões.
+    voiceOn = localStorage.getItem('sila-voz') === '1';
+    els.voice.classList.toggle('on', voiceOn);
+    els.voice.addEventListener('click', function () {
+      voiceOn = !voiceOn;
+      els.voice.classList.toggle('on', voiceOn);
+      localStorage.setItem('sila-voz', voiceOn ? '1' : '0');
+      if (!voiceOn && window.speechSynthesis) window.speechSynthesis.cancel();
+    });
     els.input.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
     });
@@ -100,6 +115,8 @@
     if (open) {
       if (!messages.length) addBot('Oi! 👋 Eu sou a Sila, sua assistente aqui no SMERP. Posso abrir uma solicitação de compra pra você ou tirar dúvidas. O que você precisa?');
       els.input.focus();
+    } else if (window.speechSynthesis) {
+      window.speechSynthesis.cancel(); // para de falar ao fechar
     }
   }
 
@@ -111,6 +128,37 @@
   }
   function addUser(t) { addMsg(t, 'user'); }
   function addBot(t) { addMsg(t, 'bot'); }
+
+  // ---------- voz da Sila (TTS, grátis, via navegador) ----------
+  // Escolhe a melhor voz em PORTUGUÊS DO BRASIL disponível no aparelho.
+  function pickVoice() {
+    if (!window.speechSynthesis) return null;
+    var vs = window.speechSynthesis.getVoices() || [];
+    var br = vs.filter(function (v) { return /pt[-_]?br/i.test(v.lang); });
+    if (!br.length) br = vs.filter(function (v) { return /^pt/i.test(v.lang); });
+    // preferência por vozes brasileiras naturais/conhecidas
+    var pref = ['Google português do Brasil', 'Luciana', 'Maria', 'Francisca', 'Thalita', 'Camila', 'Microsoft Maria', 'Microsoft Daniel', 'Natural', 'Brasil'];
+    for (var i = 0; i < pref.length; i++) {
+      for (var j = 0; j < br.length; j++) { if (br[j].name.indexOf(pref[i]) !== -1) return br[j]; }
+    }
+    return br[0] || null;
+  }
+  function speak(text) {
+    if (!voiceOn || !window.speechSynthesis || !text) return;
+    window.speechSynthesis.cancel();
+    if (!ttsVoice) ttsVoice = pickVoice();
+    // tira emojis/símbolos pra não "ler" caracteres estranhos
+    var clean = text.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE0F}]/gu, '').trim();
+    var u = new SpeechSynthesisUtterance(clean);
+    u.lang = 'pt-BR';
+    if (ttsVoice) u.voice = ttsVoice;
+    u.rate = 1.0; u.pitch = 1.05;
+    window.speechSynthesis.speak(u);
+  }
+  // as vozes carregam de forma assíncrona em alguns navegadores
+  if (window.speechSynthesis) {
+    window.speechSynthesis.onvoiceschanged = function () { ttsVoice = pickVoice(); };
+  }
 
   // ---------- enviar pro serviço ----------
   async function send() {
@@ -136,6 +184,7 @@
       typing.remove();
       var reply = data.reply || 'Não consegui responder agora. Tente de novo.';
       addBot(reply);
+      speak(reply);
       messages.push({ role: 'assistant', content: reply });
     } catch (e) {
       typing.remove();

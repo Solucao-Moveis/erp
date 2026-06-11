@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.10',
+    data: '11/06/2026',
+    titulo: 'Sila (assistente de IA): agora consulta dados e fala com você',
+    resumo: 'A Sila, a assistente de IA do Hub, evoluiu. Agora além de abrir solicitação de compra, ela CONSULTA DADOS do sistema pra você — é só perguntar em linguagem normal, tipo "quantas solicitações de compra estão pendentes?" ou "quanto a gente gastou em compras esse mês?". Ela busca a resposta no banco e te conta. Importante: a Sila só enxerga o que VOCÊ já poderia ver (respeita o seu acesso) e só LÊ os dados, nunca altera nada. E ganhou VOZ: no topo do chat tem um botão de alto-falante — ligue e a Sila passa a FALAR as respostas (em português do Brasil). Junto com o microfone, dá pra conversar com ela só na voz.',
+    mudancas: [
+      {
+        app: 'SMERP (hub)',
+        o_que: 'A Sila ganhou duas habilidades novas: (1) Consultar dados — responde perguntas sobre números/relatórios/status consultando o banco em tempo real, sempre em modo somente-leitura e respeitando o acesso da pessoa (ela só vê o que aquele usuário já veria nos apps; nunca altera dados). (2) Voz (TTS) — um botão de alto-falante no topo do chat liga/desliga a fala; quando ligado, a Sila lê as respostas em voz, com voz em português do Brasil. Somado ao microfone que já existia, permite uma conversa totalmente por voz.',
+        como: 'Abra a Sila (botão redondo com o "S" no canto inferior direito). Para CONSULTAR, pergunte naturalmente, ex.: "quantas solicitações de compra estão abertas?". Para a VOZ, clique no ícone de alto-falante no topo do chat para ligar — a partir daí ela fala as respostas; clique de novo para desligar. Para falar com ela, use o ícone de microfone e fale; o que você disser vira texto. Se uma consulta não trouxer nada, pode ser que você não tenha acesso àquela informação.'
+      }
+    ]
+  },
+  {
     versao: '6.9',
     data: '11/06/2026',
     titulo: 'Hora a Hora: administrador agora entra e enxerga tudo',
