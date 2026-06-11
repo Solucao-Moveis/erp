@@ -25,9 +25,10 @@
   // ---------- estilos ----------
   function injectStyles() {
     var css = ''
-      + '.ai-fab{position:fixed;right:20px;bottom:20px;z-index:9000;width:58px;height:58px;border-radius:50%;border:none;cursor:pointer;'
-      + 'background:linear-gradient(135deg,#E8722A,#f0913f);color:#fff;box-shadow:0 8px 24px rgba(232,114,42,.45);display:flex;align-items:center;justify-content:center;transition:transform .15s}'
-      + '.ai-fab:hover{transform:scale(1.06)}.ai-fab svg{width:26px;height:26px}'
+      + '.ai-fab{position:fixed;right:20px;bottom:20px;z-index:9000;width:62px;height:62px;border-radius:50%;border:2px solid #fff;cursor:pointer;'
+      + 'background:#fff;box-shadow:0 8px 24px rgba(232,114,42,.5);display:flex;align-items:center;justify-content:center;transition:transform .15s;overflow:hidden;padding:0}'
+      + '.ai-fab:hover{transform:scale(1.07)}.ai-fab img{width:100%;height:100%;object-fit:cover}'
+      + '.ai-hd-logo{width:30px;height:30px;border-radius:8px;object-fit:cover;flex:0 0 auto;background:#fff}'
       + '.ai-panel{position:fixed;right:20px;bottom:90px;z-index:9001;width:380px;max-width:calc(100vw - 32px);height:560px;max-height:calc(100vh - 130px);'
       + 'background:#fff;border-radius:18px;box-shadow:0 16px 50px rgba(0,0,0,.22);display:none;flex-direction:column;overflow:hidden;font-family:Inter,system-ui,sans-serif}'
       + '.ai-panel.is-open{display:flex}'
@@ -57,15 +58,15 @@
     injectStyles();
 
     var fab = document.createElement('button');
-    fab.className = 'ai-fab'; fab.type = 'button'; fab.title = 'Assistente';
-    fab.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>';
+    fab.className = 'ai-fab'; fab.type = 'button'; fab.title = 'Sila — assistente';
+    fab.innerHTML = '<img src="assets/icon-192.png" alt="Sila" />';
     fab.addEventListener('click', toggle);
 
     var panel = document.createElement('div');
     panel.className = 'ai-panel';
     panel.innerHTML =
-      '<div class="ai-hd"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l1.9 5.8L20 8l-4.7 3.6L17 18l-5-3.4L7 18l1.7-6.4L4 8l6.1-.2z"/></svg>'
-      + '<div><b>Assistente SMERP</b><small>Posso abrir solicitações e responder dúvidas</small></div>'
+      '<div class="ai-hd"><img class="ai-hd-logo" src="assets/icon-192.png" alt="" />'
+      + '<div><b>Sila</b><small>Assistente da Solução Móveis</small></div>'
       + '<button class="ai-x" type="button" title="Fechar">&times;</button></div>'
       + '<div class="ai-body" id="aiBody"></div>'
       + '<div class="ai-foot">'
@@ -97,7 +98,7 @@
     open = !open;
     els.panel.classList.toggle('is-open', open);
     if (open) {
-      if (!messages.length) addBot('Oi! 👋 Sou o assistente do SMERP. Posso abrir uma solicitação de compra pra você ou tirar dúvidas. O que você precisa?');
+      if (!messages.length) addBot('Oi! 👋 Eu sou a Sila, sua assistente aqui no SMERP. Posso abrir uma solicitação de compra pra você ou tirar dúvidas. O que você precisa?');
       els.input.focus();
     }
   }
