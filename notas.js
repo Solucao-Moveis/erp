@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.7',
+    data: '11/06/2026',
+    titulo: 'Compras: anexar foto/arquivo a qualquer momento na solicitação',
+    resumo: 'No Compras, agora dá para ADICIONAR fotos ou arquivos a uma solicitação de compra mesmo DEPOIS de ela já estar criada ou concluída — antes só era possível no momento de abrir a solicitação. E qualquer pessoa que usa o sistema pode anexar, não só quem abriu o chamado. Na tela da solicitação aparece o botão "Anexar foto" (ou "Editar", para quem pode editar): por ali você adiciona novos arquivos, baixa ou remove os que já existem.',
+    mudancas: [
+      {
+        app: 'Compras',
+        o_que: 'A tela de edição da solicitação ganhou a seção "Anexos", onde dá para enviar novas fotos/arquivos, baixar e remover os já existentes. O acesso a anexar foi liberado para qualquer usuário logado e em qualquer status da solicitação (inclusive já concluída); a alteração dos demais campos (itens, justificativa, prazo etc.) continua restrita a quem abriu a solicitação enquanto ela está pendente, ou ao administrador. Na tela de detalhes, quem não pode editar vê um botão "Anexar foto" que leva direto a essa seção.',
+        como: 'No Compras, abra a solicitação desejada e clique em "Anexar foto" (ou "Editar", se você puder editá-la). Na seção "Anexos", clique em "Adicionar fotos ou arquivos" e escolha as imagens/arquivos; se quiser, baixe (ícone de seta) ou remova (X) os anexos já enviados. Por fim, clique em "Salvar alterações".'
+      }
+    ]
+  },
+  {
     versao: '6.6',
     data: '10/06/2026',
     titulo: 'Modo escuro (tema claro/escuro)',
