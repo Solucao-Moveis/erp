@@ -39,7 +39,7 @@ for (const [k, v] of Object.entries({ GEMINI_API_KEY, SUPABASE_URL, SUPABASE_ANO
 // Dá pra customizar pelo env GEMINI_MODELS (lista separada por vírgula).
 const MODEL_LIST = [...new Set(
   // Capacidade primeiro (modelo mais esperto), caindo pros mais leves quando a cota acaba.
-  (process.env.GEMINI_MODELS || 'gemini-2.5-flash,gemini-flash-latest,gemini-2.0-flash,gemini-2.5-flash-lite,gemini-2.0-flash-lite')
+  (process.env.GEMINI_MODELS || 'gemini-flash-latest,gemini-2.5-flash,gemini-2.5-flash-lite,gemini-2.0-flash,gemini-2.0-flash-lite')
     .split(',').map((s) => s.trim()).filter(Boolean)
 )];
 
@@ -77,8 +77,30 @@ ONDE CADA COISA VIVE (pra VOCÊ saber onde procurar — nunca conte isso pra pes
 - Planos de ação, projetos, 5W2H, marcos/prazos → schema planos_acao.
 - Expedição, carregamento → schema bip. Veículos/frota/abastecimento → frota. Sobras → sobras.
 
-COMO BUSCAR BEM (faça sozinha, rápido):
-1. Identifique o schema certo pela pergunta. 2. Chame descrever_banco(schema) UMA vez pra ver tabelas/colunas. 3. Escreva UM consultar_dados com um SELECT objetivo — use joins e agregações (count, sum, comparação meta x realizado). Sempre qualifique a tabela com o schema (ex.: fabrill.production_goals). 4. Responda em linguagem simples.
+TABELAS QUE VOCÊ JÁ CONHECE (use DIRETO no consultar_dados, SEM chamar descrever_banco):
+
+PRODUÇÃO (schema fabrill):
+- fabrill.areas(id, name) — áreas/setores de produção. name ex.: 'Metalurgia', 'Marcenaria'.
+- fabrill.machines(id, area_id→areas.id, name) — máquinas, cada uma numa área.
+- fabrill.production_goals(machine_id→machines.id, goal_date date, goal int) — META do dia por máquina.
+- fabrill.production_entries(machine_id→machines.id, entry_date date, hour_slot, quantity int) — REALIZADO (some quantity do dia).
+  EXEMPLO "máquinas da metalurgia, meta x realizado hoje" (use este modelo):
+    select m.name, g.goal as meta, coalesce(sum(e.quantity),0) as realizado
+    from fabrill.machines m
+    join fabrill.areas a on a.id=m.area_id and a.name ilike 'metalurgia'
+    left join fabrill.production_goals g on g.machine_id=m.id and g.goal_date=current_date
+    left join fabrill.production_entries e on e.machine_id=m.id and e.entry_date=current_date
+    group by m.name, g.goal
+  "bateu a meta" = realizado >= meta. Para outra área, troque 'metalurgia'.
+
+COMPRAS (schema compras):
+- compras.purchase_requests(number, status, requester_id, sector_id→sectors.id, needed_by date, priority, description, created_at, purchase_amount) — status: pendente, aprovado, comprado, negado, finalizado, cancelado, parcial.
+- compras.request_items(request_id→purchase_requests.id, description, quantity, unit)
+- compras.sectors(id, name)
+  EXEMPLO "quantas solicitações pendentes": select count(*) as pendentes from compras.purchase_requests where status='pendente'
+
+COMO BUSCAR BEM (faça sozinha, rápido — gaste o MÍNIMO de passos):
+1. É de Produção ou Compras? Já sabe as tabelas acima → vá DIRETO no consultar_dados (NÃO chame descrever_banco). 2. É de OUTRO app (manutencao, planos_acao, bip, frota, sobras)? Aí sim chame descrever_banco(schema) UMA vez, depois consultar_dados. 3. Escreva UM SELECT objetivo (qualifique com o schema). 4. Responda em linguagem simples. Não fique repetindo consultas: se a primeira trouxer o dado, responda.
 - Se vier vazio, tente OUTRO ângulo (outra tabela/filtro) antes de desistir. Só diga que não achou depois de tentar de verdade; aí explique simples (pode não existir ainda, ou você pode não ter acesso àquela informação — você só enxerga o que a própria pessoa já poderia ver).
 
 AÇÕES (criar/abrir coisas):
