@@ -317,19 +317,26 @@ async function callModel(model, contents, sysExtra, attempt = 0) {
   return json?.candidates?.[0]?.content || null;
 }
 
-// Cascata: tenta cada modelo da lista; se um estourar a cota (429) ou cair
-// (503/500), passa pro próximo. Só desiste quando TODOS falharem.
+// Cascata INTELIGENTE: pula modelos que já sabemos estar esgotados.
+// Quando um modelo dá 429 do DIA, ele "descansa" por horas (não adianta
+// insistir hoje); 429 do MINUTO descansa ~1 min; 503 é passageiro.
+const modelDeadUntil = new Map(); // model -> timestamp ms até quando pular
 async function callGemini(contents, sysExtra) {
   let lastErr;
   for (const model of MODEL_LIST) {
+    if ((modelDeadUntil.get(model) || 0) > Date.now()) continue; // esgotado: pula
     try {
       return await callModel(model, contents, sysExtra);
     } catch (e) {
       lastErr = e;
-      if (e.status === 429 || e.status === 503 || e.status === 500) {
-        console.warn(`[ai] modelo ${model} indisponível (${e.status}) — tentando o próximo`);
-        continue; // próximo modelo da lista
+      const m = (e && e.message) || '';
+      if (e.status === 429) {
+        const perDay = /per ?day|requestsperday/i.test(m);
+        modelDeadUntil.set(model, Date.now() + (perDay ? 3 * 3600 * 1000 : 65 * 1000));
+        console.warn(`[ai] ${model} 429 (${perDay ? 'dia' : 'minuto'}) — pulando por um tempo`);
+        continue;
       }
+      if (e.status === 503 || e.status === 500) { console.warn(`[ai] ${model} ${e.status} — próximo`); continue; }
       throw e; // erro que não é de cota/disponibilidade (ex.: 400): trocar não ajuda
     }
   }
