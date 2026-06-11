@@ -228,10 +228,15 @@ async function callGemini(contents) {
 const app = express();
 app.use(express.json({ limit: '12mb' })); // áudio base64 cabe aqui
 
-// CORS — o Hub (browser) chama de outra origem.
+// CORS — o Hub (browser) chama de outra origem. Espelha a origem de quem
+// chama (navegador, celular ou app de PC). O endpoint já é protegido pelo
+// token do usuário + can_use_assistant, então refletir a origem é seguro.
+// Se ALLOWED_ORIGIN for um domínio específico (≠ '*'), só ele é aceito.
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  const origin = req.headers.origin;
+  res.header('Access-Control-Allow-Origin', origin || ALLOWED_ORIGIN || '*');
+  res.header('Vary', 'Origin');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
