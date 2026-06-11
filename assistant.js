@@ -22,6 +22,9 @@
   var built = false;
   var voiceOn = false; // Sila falar as respostas (TTS)
   var ttsVoice = null; // voz pt-BR escolhida
+  var rec = null;            // reconhecimento de fala (STT)
+  var callMode = false;      // tela de "ligação" (conversa por voz) ativa
+  var callProcessing = false; // aguardando resposta/falando -> não re-ouvir agora
   var els = {};
 
   // ---------- estilos ----------
@@ -52,7 +55,23 @@
       + '.ai-mic{background:#f0f0f0;color:#555}.ai-mic.rec{background:#DC2626;color:#fff;animation:aipulse 1s infinite}'
       + '.ai-btn svg{width:20px;height:20px}'
       + '@keyframes aipulse{0%,100%{opacity:1}50%{opacity:.55}}'
-      + '@media(max-width:480px){.ai-panel{right:8px;left:8px;width:auto;bottom:84px}}';
+      // ---- tela de "ligação" (modo voz) ----
+      + '.ai-call{position:fixed;inset:0;z-index:9100;display:none;flex-direction:column;align-items:center;justify-content:space-between;'
+      + 'background:linear-gradient(160deg,#E8722A 0%,#c75416 100%);color:#fff;padding:54px 24px 44px;font-family:Inter,system-ui,sans-serif}'
+      + '.ai-call.is-open{display:flex}'
+      + '.ai-call__top{font-size:13px;letter-spacing:1.5px;opacity:.8;text-transform:uppercase}'
+      + '.ai-call__center{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:4vh}'
+      + '.ai-call__avatar{width:130px;height:130px;border-radius:50%;object-fit:cover;border:4px solid rgba(255,255,255,.55)}'
+      + '.ai-call.listening .ai-call__avatar{animation:aicall 1.5s infinite}'
+      + '.ai-call.speaking .ai-call__avatar{animation:aicall 0.9s infinite}'
+      + '@keyframes aicall{0%{box-shadow:0 0 0 0 rgba(255,255,255,.5)}70%{box-shadow:0 0 0 28px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}'
+      + '.ai-call__name{font-size:27px;font-weight:800}'
+      + '.ai-call__status{font-size:15px;opacity:.92;min-height:22px;text-align:center;max-width:280px}'
+      + '.ai-call__end{width:70px;height:70px;border-radius:50%;border:none;background:#DC2626;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 26px rgba(0,0,0,.35)}'
+      + '.ai-call__end:active{transform:scale(.94)}.ai-call__end svg{width:32px;height:32px}'
+      // ---- celular: chat em tela cheia (corrige a UX quebrada) ----
+      + '@media(max-width:480px){.ai-panel{right:0;left:0;top:0;bottom:0;width:auto;height:auto;max-width:none;max-height:none;border-radius:0}'
+      + '.ai-hd{padding-top:18px}.ai-fab{width:56px;height:56px;right:16px;bottom:16px}}';
     var s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
   }
 
@@ -82,6 +101,24 @@
 
     document.body.appendChild(fab);
     document.body.appendChild(panel);
+
+    // ---- tela de "ligação" (modo voz, tela cheia) ----
+    var call = document.createElement('div');
+    call.className = 'ai-call';
+    call.innerHTML =
+      '<div class="ai-call__top">Conversa por voz</div>'
+      + '<div class="ai-call__center">'
+      + '<img class="ai-call__avatar" src="assets/icon-192.png" alt="Sila" />'
+      + '<div class="ai-call__name">Sila</div>'
+      + '<div class="ai-call__status" id="aiCallStatus">Conectando…</div>'
+      + '</div>'
+      + '<button class="ai-call__end" id="aiCallEnd" type="button" title="Encerrar conversa">'
+      + '<svg viewBox="0 0 24 24" fill="currentColor" style="transform:rotate(135deg)"><path d="M21 15.46l-5.27-.61-2.52 2.52a15.05 15.05 0 0 1-6.59-6.59l2.53-2.53L8.54 3H3.03C2.45 13.18 10.82 21.55 21 20.97v-5.51z"/></svg>'
+      + '</button>';
+    document.body.appendChild(call);
+    els.call = call;
+    els.callStatus = call.querySelector('#aiCallStatus');
+    call.querySelector('#aiCallEnd').addEventListener('click', endCall);
 
     els.fab = fab; els.panel = panel;
     els.body = panel.querySelector('#aiBody');
@@ -143,16 +180,19 @@
     }
     return br[0] || null;
   }
-  function speak(text) {
-    if (!voiceOn || !window.speechSynthesis || !text) return;
+  function speak(text, onend) {
+    // fala se a voz estiver ligada OU se estiver numa ligação
+    if (!window.speechSynthesis || !text || (!voiceOn && !callMode)) { if (onend) onend(); return; }
     window.speechSynthesis.cancel();
     if (!ttsVoice) ttsVoice = pickVoice();
     // tira emojis/símbolos pra não "ler" caracteres estranhos
     var clean = text.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE0F}]/gu, '').trim();
+    if (!clean) { if (onend) onend(); return; }
     var u = new SpeechSynthesisUtterance(clean);
     u.lang = 'pt-BR';
     if (ttsVoice) u.voice = ttsVoice;
     u.rate = 1.0; u.pitch = 1.05;
+    if (onend) { u.onend = onend; u.onerror = onend; }
     window.speechSynthesis.speak(u);
   }
   // as vozes carregam de forma assíncrona em alguns navegadores
@@ -161,19 +201,26 @@
   }
 
   // ---------- enviar pro serviço ----------
-  async function send() {
+  function send() {
     var text = (els.input.value || '').trim();
-    if (!text || sending) return;
+    if (!text) return;
     els.input.value = ''; els.input.style.height = 'auto';
+    sendText(text);
+  }
+
+  async function sendText(text) {
+    text = (text || '').trim();
+    if (!text || sending) return;
     addUser(text);
     messages.push({ role: 'user', content: text });
 
     sending = true; els.send.disabled = true;
-    var typing = addMsg('digitando…', 'bot typing');
+    var typing = callMode ? null : addMsg('digitando…', 'bot typing');
+    if (callMode) setCallStatus('Sila está pensando…', 'thinking');
 
     try {
       var ses = (await sb.auth.getSession()).data.session;
-      if (!ses) { typing.remove(); addBot('Você precisa estar logado no Hub.'); return; }
+      if (!ses) { if (typing) typing.remove(); finishReply('Você precisa estar logado no Hub.'); return; }
 
       var r = await fetch(CFG.AI_SERVICE_URL.replace(/\/$/, '') + '/chat', {
         method: 'POST',
@@ -181,40 +228,100 @@
         body: JSON.stringify({ access_token: ses.access_token, messages: messages })
       });
       var data = await r.json().catch(function () { return {}; });
-      typing.remove();
+      if (typing) typing.remove();
       var reply = data.reply || 'Não consegui responder agora. Tente de novo.';
       addBot(reply);
-      speak(reply);
       messages.push({ role: 'assistant', content: reply });
+      finishReply(reply);
     } catch (e) {
-      typing.remove();
-      addBot('Tive um problema de conexão. Tente de novo em instantes.');
+      if (typing) typing.remove();
+      var msg = 'Tive um problema de conexão. Tente de novo em instantes.';
+      addBot(msg);
+      finishReply(msg);
     } finally {
-      sending = false; els.send.disabled = false; els.input.focus();
+      sending = false; els.send.disabled = false;
+      if (!callMode) els.input.focus();
     }
   }
 
-  // ---------- microfone (fala -> texto, via navegador) ----------
+  // Fala a resposta. Em modo ligação, ao terminar de falar volta a te ouvir.
+  function finishReply(text) {
+    if (callMode) {
+      setCallStatus('Sila está falando…', 'speaking');
+      speak(text, function () { callProcessing = false; if (callMode) startListen(); });
+    } else {
+      speak(text);
+    }
+  }
+
+  // ---------- voz: microfone abre a "ligação" (ouvir <-> responder) ----------
   function setupMic() {
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { els.mic.style.display = 'none'; return; }   // navegador sem suporte: esconde
-    var rec = new SR();
+    // sem suporte a STT (ex.: iPhone/Safari): o microfone vira só um aviso.
+    if (!SR) {
+      els.mic.title = 'Falar por voz funciona no Android (Chrome) e no PC';
+      els.mic.addEventListener('click', function () {
+        addBot('Pra falar por voz, use o Android (Chrome) ou o computador. No iPhone dá pra digitar e eu respondo falando, se a voz estiver ligada (🔊).');
+      });
+      return;
+    }
+    rec = new SR();
     rec.lang = 'pt-BR'; rec.interimResults = false; rec.maxAlternatives = 1;
-    var listening = false;
 
     rec.onresult = function (ev) {
-      var t = ev.results[0][0].transcript;
-      els.input.value = (els.input.value ? els.input.value + ' ' : '') + t;
-      els.input.dispatchEvent(new Event('input'));
+      var t = (ev.results[0][0].transcript || '').trim();
+      if (callMode) {
+        if (!t) { startListen(); return; }   // não pegou nada: continua ouvindo
+        callProcessing = true;
+        sendText(t);
+      } else {
+        els.mic.classList.remove('rec');
+        if (t) { els.input.value = (els.input.value ? els.input.value + ' ' : '') + t; els.input.dispatchEvent(new Event('input')); }
+      }
     };
-    rec.onend = function () { listening = false; els.mic.classList.remove('rec'); };
-    rec.onerror = function () { listening = false; els.mic.classList.remove('rec'); };
+    rec.onend = function () {
+      if (!callMode) { els.mic.classList.remove('rec'); return; }
+      // em ligação: terminou de ouvir; se não pegou fala e não está processando, volta a ouvir
+      if (!callProcessing) setTimeout(function () { if (callMode && !callProcessing) startListen(); }, 350);
+    };
+    rec.onerror = function (e) {
+      if (!callMode) { els.mic.classList.remove('rec'); return; }
+      var err = e && e.error;
+      if (err === 'not-allowed' || err === 'service-not-allowed') { setCallStatus('Preciso de permissão do microfone 🎤', null); return; }
+      if (!callProcessing && err !== 'aborted') setTimeout(function () { if (callMode && !callProcessing) startListen(); }, 500);
+    };
 
-    els.mic.addEventListener('click', function () {
-      if (listening) { rec.stop(); return; }
-      try { rec.start(); listening = true; els.mic.classList.add('rec'); els.input.focus(); }
-      catch (e) { /* já rodando */ }
-    });
+    els.mic.addEventListener('click', startCall);
+  }
+
+  function startListen() {
+    if (!rec || !callMode) return;
+    try { rec.start(); setCallStatus('Pode falar… estou te ouvindo', 'listening'); }
+    catch (e) { /* já está ativo */ }
+  }
+
+  function setCallStatus(txt, state) {
+    if (els.callStatus) els.callStatus.textContent = txt;
+    if (els.call) {
+      els.call.classList.remove('listening', 'thinking', 'speaking');
+      if (state) els.call.classList.add(state);
+    }
+  }
+
+  function startCall() {
+    if (!rec) return;
+    callMode = true; callProcessing = false;
+    voiceOn = true; if (els.voice) els.voice.classList.add('on'); localStorage.setItem('sila-voz', '1');
+    els.call.classList.add('is-open');
+    setCallStatus('Pode falar… estou te ouvindo', 'listening');
+    startListen();
+  }
+
+  function endCall() {
+    callMode = false; callProcessing = false;
+    if (rec) { try { rec.abort(); } catch (e) {} }
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    if (els.call) els.call.classList.remove('is-open', 'listening', 'thinking', 'speaking');
   }
 
   // ---------- gate: só mostra pra quem o master liberou ----------
