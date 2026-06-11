@@ -28,6 +28,7 @@ create policy "pe_select" on compras.purchase_entries
 -- (antes: "roles write pcp" deixava qualquer PCP escrever qualquer papel)
 -- ------------------------------------------------------------
 drop policy if exists "roles write pcp" on fabrill.user_roles;
+drop policy if exists "roles write admin or pcp (nao-admin)" on fabrill.user_roles;
 create policy "roles write admin or pcp (nao-admin)" on fabrill.user_roles for all to authenticated
   using      (fabrill.is_admin(auth.uid()) or (fabrill.is_pcp(auth.uid()) and role <> 'administrador'))
   with check (fabrill.is_admin(auth.uid()) or (fabrill.is_pcp(auth.uid()) and role <> 'administrador'));
