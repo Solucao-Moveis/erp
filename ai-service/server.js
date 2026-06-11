@@ -203,7 +203,9 @@ function toGeminiContents(messages, audio) {
   return contents;
 }
 
-async function callGemini(contents) {
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function callGemini(contents, attempt = 0) {
   const resp = await fetch(GEMINI_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -216,6 +218,11 @@ async function callGemini(contents) {
   });
   if (!resp.ok) {
     const t = await resp.text();
+    // Engasgo temporário do Gemini (sobrecarga / limite): tenta de novo.
+    if ((resp.status === 503 || resp.status === 429) && attempt < 4) {
+      await sleep(700 * (attempt + 1));
+      return callGemini(contents, attempt + 1);
+    }
     throw new Error(`Gemini ${resp.status}: ${t.slice(0, 400)}`);
   }
   const json = await resp.json();
