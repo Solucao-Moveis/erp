@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.12',
+    data: '15/06/2026',
+    titulo: 'Expedição: bipagem dos carregamentos ficou bem mais rápida',
+    resumo: 'Quem usa o Gestor de Expedição para bipar os pacotes de um carregamento estava sentindo um atraso a partir do segundo bipe — o primeiro era rápido e os seguintes "travavam" um pouco. Corrigimos isso: agora cada código bipado é registrado na hora, o contador e o "✓ registrado" aparecem na mesma hora, sem aquela espera. As conferências continuam as mesmas (limite por pacote, quantidade total e código repetido seguem sendo checados) — só ficou mais rápido.',
+    mudancas: [
+      {
+        app: 'Gestor de Expedição (Bip)',
+        o_que: 'A bipagem dos carregamentos era lenta porque, a cada código, o app conversava muitas vezes seguidas com o sistema (lia o pedido inteiro, registrava, e relia tudo de novo), e esse atraso ia se acumulando do segundo bipe em diante. Agora o código entra na lista imediatamente, sem reler o pedido todo a cada vez, e o registro do histórico acontece em segundo plano sem segurar a tela.',
+        como: 'Na tela do carregamento, bipe (ou digite) os códigos normalmente como antes. A diferença é que cada pacote agora aparece na contagem na mesma hora, sem demora entre um bipe e o outro. Se um código não puder entrar (pacote já completo, quantidade total atingida ou código repetido), o aviso aparece igual a antes.'
+      }
+    ]
+  },
+  {
     versao: '6.11',
     data: '15/06/2026',
     titulo: 'Sila: voz por microfone mais estável (Android) e melhor no iPhone',
