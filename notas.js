@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.11',
+    data: '15/06/2026',
+    titulo: 'Sila: voz por microfone mais estável (Android) e melhor no iPhone',
+    resumo: 'Ajustamos a conversa por VOZ com a Sila. No Android e no PC, quando o microfone não te ouve ou falta permissão/internet, a Sila agora AVISA na tela o que aconteceu (em vez de ficar parada em silêncio) e volta a te ouvir sozinha. No iPhone, onde a "ligação" por voz não funcionava bem, voltamos para o jeito que funciona: você DIGITA e a Sila responde FALANDO (se a voz estiver ligada). A leitura das respostas em voz continua igual em todos os aparelhos.',
+    mudancas: [
+      {
+        app: 'SMERP (hub)',
+        o_que: 'Reconhecimento de fala (microfone) da Sila mais robusto. No Android/Chrome e no PC: erros de microfone deixaram de ser silenciosos — a tela mostra mensagens claras ("Preciso de permissão do microfone", "Não encontrei o microfone", "Sem internet pro reconhecimento de voz", "Não te ouvi… pode falar de novo?") e a escuta recomeça sozinha nos casos recuperáveis. No iPhone/iPad: a tela de "ligação" por voz era instável (o Safari não sustenta a escuta contínua), então o microfone agora orienta a digitar e a Sila responde em voz — o jeito que funciona de fato no iPhone.',
+        como: 'No Hub, abra a Sila (botão redondo no canto inferior direito). No Android ou no PC, toque no microfone e fale; se aparecer algum aviso na tela (permissão, microfone ou internet), resolva o que ele indicar e fale de novo. No iPhone, digite a sua mensagem e ligue o alto-falante (ícone no topo do chat) para a Sila responder falando.'
+      }
+    ]
+  },
+  {
     versao: '6.10',
     data: '11/06/2026',
     titulo: 'Sila (assistente de IA): agora consulta dados e fala com você',

@@ -30,6 +30,11 @@
   var audioPrimed = false; // iOS: tocar áudio também precisa de um toque pra liberar
   var SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
   var rec = null;            // reconhecimento de fala (STT)
+  // iOS expõe webkitSpeechRecognition, mas o Safari só inicia a escuta dentro de
+  // um toque do usuário — o modo "ligação" (que re-escuta sozinho) morre calado.
+  // Então tratamos iPhone/iPad como "sem STT": digita e a Sila responde falando.
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   var callMode = false;      // tela de "ligação" (conversa por voz) ativa
   var callProcessing = false; // aguardando resposta/falando -> não re-ouvir agora
   var els = {};
@@ -327,8 +332,8 @@
   // ---------- voz: microfone abre a "ligação" (ouvir <-> responder) ----------
   function setupMic() {
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    // sem suporte a STT (ex.: iPhone/Safari): o microfone vira só um aviso.
-    if (!SR) {
+    // sem STT confiável (iPhone/Safari não sustenta a ligação): microfone vira aviso.
+    if (!SR || isIOS) {
       els.mic.title = 'Falar por voz funciona no Android (Chrome) e no PC';
       els.mic.addEventListener('click', function () {
         addBot('Pra falar por voz, use o Android (Chrome) ou o computador. No iPhone dá pra digitar e eu respondo falando, se a voz estiver ligada (🔊).');
@@ -356,8 +361,14 @@
     };
     rec.onerror = function (e) {
       if (!callMode) { els.mic.classList.remove('rec'); return; }
-      var err = e && e.error;
+      var err = (e && e.error) || '';
+      // erros que travam de verdade: avisa e NÃO fica reiniciando à toa
       if (err === 'not-allowed' || err === 'service-not-allowed') { setCallStatus('Preciso de permissão do microfone 🎤', null); return; }
+      if (err === 'audio-capture') { setCallStatus('Não encontrei o microfone 🎤', null); return; }
+      if (err === 'network') { setCallStatus('Sem internet pro reconhecimento de voz 📶', null); return; }
+      // não te ouviu: avisa e volta a ouvir
+      if (err === 'no-speech') setCallStatus('Não te ouvi… pode falar de novo?', 'listening');
+      // qualquer outro caso recuperável: volta a ouvir
       if (!callProcessing && err !== 'aborted') setTimeout(function () { if (callMode && !callProcessing) startListen(); }, 500);
     };
 
