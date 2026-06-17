@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=6" />
+  <link rel="stylesheet" href="styles.css?v=9" />
 </head>
 <body>
   <div class="scrollbar" id="scrollbar" aria-hidden="true"></div>
@@ -50,7 +50,7 @@
       </div>
       <div class="hero__media">
         <div class="frame">
-          <div class="frame__img" style="background-image:url('../assets/fotos/fabrica.png?v=5')" role="img" aria-label="Fábrica da Solução Móveis"></div>
+          <div class="frame__img" style="background-image:url('../assets/fotos/fabrica.png?v=6')" role="img" aria-label="Fábrica da Solução Móveis"></div>
         </div>
         <span class="frame__badge">Santana do Paraíso · MG</span>
       </div>
@@ -154,7 +154,7 @@
         <h2>Estrutura e processo em imagens</h2>
       </header>
       <div class="gal">
-        <figure class="gal__cell gal__cell--big" style="background-image:url('../assets/fotos/fabrica.png?v=5')"><figcaption>Santana do Paraíso/MG</figcaption></figure>
+        <figure class="gal__cell gal__cell--big" style="background-image:url('../assets/fotos/fabrica.png?v=6')"><figcaption>Santana do Paraíso/MG</figcaption></figure>
         <figure class="gal__cell" style="background-image:url('../assets/fotos/maquina-corte.jpg')"><figcaption>Corte a laser</figcaption></figure>
         <figure class="gal__cell" style="background-image:url('../assets/fotos/robo-solda.jpg')"><figcaption>Solda robotizada</figcaption></figure>
         <figure class="gal__cell" style="background-image:url('../assets/fotos/solda-manual.jpg')"><figcaption>Solda manual</figcaption></figure>
@@ -184,20 +184,19 @@
       <header class="head">
         <span class="kicker">Presença nacional</span>
         <h2>Fornecemos para todo o Brasil</h2>
-        <p class="head__lead">Atendemos prefeituras e secretarias estaduais de ensino por meio de licitações públicas.</p>
+        <p class="head__lead">Passe o mouse nos pontos pra ver onde já atendemos — e clique pra falar com o comercial.</p>
       </header>
-      <div class="estados">
-        <span>MG</span><span>SP</span><span>GO</span><span>MA</span><span>AL</span><span>PB</span><span>MT</span><span>PI</span>
-      </div>
-      <div class="clientes">
-        <span>Prefeitura de São Paulo · SME</span>
-        <span>Prefeitura de Anápolis · GO</span>
-        <span>SEDUC · Paraíba</span>
-        <span>SEDUC · Maranhão</span>
-        <span>Prefeitura de Santa Luzia · MG</span>
-        <span>Prefeitura de Sarzedo · MG</span>
-        <span>Prefeitura de Pilar · AL</span>
-        <span>Prefeitura de Jaciara · MT</span>
+      <div class="mapa">
+        <div class="mapa__brasil" style="background-image:url('../assets/brasil.svg?v=2')">
+          <a class="pin" href="#contato" style="left:66%;top:66%"><span class="pin__s"><img src="../assets/icon-192.png" alt=""></span><span class="pin__tip">Minas Gerais · sede</span></a>
+          <a class="pin" href="#contato" style="left:60%;top:73%"><span class="pin__s"><img src="../assets/icon-192.png" alt=""></span><span class="pin__tip">São Paulo · SME</span></a>
+          <a class="pin" href="#contato" style="left:55%;top:58%"><span class="pin__s"><img src="../assets/icon-192.png" alt=""></span><span class="pin__tip">Goiás · Anápolis</span></a>
+          <a class="pin" href="#contato" style="left:43%;top:56%"><span class="pin__s"><img src="../assets/icon-192.png" alt=""></span><span class="pin__tip">Mato Grosso · Jaciara</span></a>
+          <a class="pin" href="#contato" style="left:64%;top:34%"><span class="pin__s"><img src="../assets/icon-192.png" alt=""></span><span class="pin__tip">Maranhão · SEDUC</span></a>
+          <a class="pin" href="#contato" style="left:69%;top:40%"><span class="pin__s"><img src="../assets/icon-192.png" alt=""></span><span class="pin__tip">Piauí</span></a>
+          <a class="pin" href="#contato" style="left:88%;top:36%"><span class="pin__s"><img src="../assets/icon-192.png" alt=""></span><span class="pin__tip">Paraíba · SEDUC</span></a>
+          <a class="pin" href="#contato" style="left:84%;top:43%"><span class="pin__s"><img src="../assets/icon-192.png" alt=""></span><span class="pin__tip">Alagoas · Pilar</span></a>
+        </div>
       </div>
     </div>
   </section>
@@ -211,6 +210,24 @@
         <p>Veja as vagas abertas e candidate-se no nosso portal.</p>
       </div>
       <a href="https://solucaomoveis.vagas.solides.com.br/#quem-somos" target="_blank" rel="noopener" class="btn btn--light btn--lg">Ver vagas de trabalho</a>
+    </div>
+  </section>
+
+  <!-- ===================== ENTRE EM CONTATO ===================== -->
+  <section class="sec contato-sec" id="contato">
+    <div class="wrap">
+      <div class="contato-card">
+        <div class="contato-card__txt">
+          <span class="kicker">Entre em contato</span>
+          <h2>Vamos equipar a sua instituição?</h2>
+          <p>Atendemos escolas, prefeituras e redes de ensino em todo o Brasil. Fale com o nosso comercial e receba uma proposta sob medida.</p>
+        </div>
+        <div class="contato-acoes">
+          <a class="contato-item" href="tel:+553138226009"><span class="contato-item__ic">📞</span><div><b>Comercial</b><br>(31) 3822-6009</div></a>
+          <a class="contato-item" href="mailto:comercial@solucaomoveis.ind.br"><span class="contato-item__ic">✉️</span><div><b>E-mail</b><br>comercial@solucaomoveis.ind.br</div></a>
+          <a class="btn btn--orange" href="mailto:comercial@solucaomoveis.ind.br?subject=Quero%20uma%20proposta%20-%20mobili%C3%A1rio%20escolar">Falar com o comercial</a>
+        </div>
+      </div>
     </div>
   </section>
 

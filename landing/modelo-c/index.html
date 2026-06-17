@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=10" />
+  <link rel="stylesheet" href="styles.css?v=11" />
 </head>
 <body>
   <div class="scrollbar" id="scrollbar" aria-hidden="true"></div>
@@ -129,7 +129,7 @@
     </div>
     <div class="wrap split">
       <div class="split__media reveal">
-        <div class="ph-photo" style="background-image:url('../assets/fotos/fabrica.png?v=5')" role="img" aria-label="Fábrica da Solução Móveis"></div>
+        <div class="ph-photo" style="background-image:url('../assets/fotos/fabrica.png?v=6')" role="img" aria-label="Fábrica da Solução Móveis"></div>
       </div>
       <div class="split__txt reveal">
         <span class="kicker">Ofício + tecnologia</span>
@@ -150,18 +150,19 @@
       <header class="head reveal">
         <span class="kicker">Onde estamos</span>
         <h2 class="display">Presentes em escolas de todo o Brasil</h2>
-        <p class="head__lead">Instituições e redes de ensino que já equipamos:</p>
+        <p class="head__lead">Passe o mouse nos pontos e clique pra falar com o comercial.</p>
       </header>
-      <div class="clientes reveal">
-        <span>Prefeitura de São Paulo · SME</span>
-        <span>Prefeitura de Anápolis · GO</span>
-        <span>SEDUC · Paraíba</span>
-        <span>SEDUC · Maranhão</span>
-        <span>Prefeitura de Santa Luzia · MG</span>
-        <span>Prefeitura de Sarzedo · MG</span>
-        <span>Prefeitura de Pilar · AL</span>
-        <span>Prefeitura de Jaciara · MT</span>
-        <span>Município (PI) · via Facilita</span>
+      <div class="mapa reveal">
+        <div class="mapa__brasil" style="background-image:url('../assets/brasil.svg?v=2')">
+          <a class="pin" href="#contato" style="left:66%;top:66%"><span class="pin__s"><img src="../assets/icon-192.png" alt=""></span><span class="pin__tip">Minas Gerais · sede</span></a>
+          <a class="pin" href="#contato" style="left:60%;top:73%"><span class="pin__s"><img src="../assets/icon-192.png" alt=""></span><span class="pin__tip">São Paulo · SME</span></a>
+          <a class="pin" href="#contato" style="left:55%;top:58%"><span class="pin__s"><img src="../assets/icon-192.png" alt=""></span><span class="pin__tip">Goiás · Anápolis</span></a>
+          <a class="pin" href="#contato" style="left:43%;top:56%"><span class="pin__s"><img src="../assets/icon-192.png" alt=""></span><span class="pin__tip">Mato Grosso · Jaciara</span></a>
+          <a class="pin" href="#contato" style="left:64%;top:34%"><span class="pin__s"><img src="../assets/icon-192.png" alt=""></span><span class="pin__tip">Maranhão · SEDUC</span></a>
+          <a class="pin" href="#contato" style="left:69%;top:40%"><span class="pin__s"><img src="../assets/icon-192.png" alt=""></span><span class="pin__tip">Piauí</span></a>
+          <a class="pin" href="#contato" style="left:88%;top:36%"><span class="pin__s"><img src="../assets/icon-192.png" alt=""></span><span class="pin__tip">Paraíba · SEDUC</span></a>
+          <a class="pin" href="#contato" style="left:84%;top:43%"><span class="pin__s"><img src="../assets/icon-192.png" alt=""></span><span class="pin__tip">Alagoas · Pilar</span></a>
+        </div>
       </div>
     </div>
   </section>
@@ -173,6 +174,24 @@
       <h2 class="display">Faça parte da nossa história</h2>
       <p>Estamos sempre em busca de bons profissionais. Veja as vagas abertas e candidate-se.</p>
       <a href="https://solucaomoveis.vagas.solides.com.br/#quem-somos" target="_blank" rel="noopener" class="btn">Ver vagas de trabalho</a>
+    </div>
+  </section>
+
+  <!-- ===================== ENTRE EM CONTATO ===================== -->
+  <section class="sec contato-sec" id="contato">
+    <div class="wrap">
+      <div class="contato-card">
+        <div class="contato-card__txt">
+          <span class="kicker">Entre em contato</span>
+          <h2>Vamos equipar a sua instituição?</h2>
+          <p>Atendemos escolas, prefeituras e redes de ensino em todo o Brasil. Fale com o nosso comercial e receba uma proposta sob medida.</p>
+        </div>
+        <div class="contato-acoes">
+          <a class="contato-item" href="tel:+553138226009"><span class="contato-item__ic">📞</span><div><b>Comercial</b><br>(31) 3822-6009</div></a>
+          <a class="contato-item" href="mailto:comercial@solucaomoveis.ind.br"><span class="contato-item__ic">✉️</span><div><b>E-mail</b><br>comercial@solucaomoveis.ind.br</div></a>
+          <a class="btn" href="mailto:comercial@solucaomoveis.ind.br?subject=Quero%20uma%20proposta%20-%20mobili%C3%A1rio%20escolar">Falar com o comercial</a>
+        </div>
+      </div>
     </div>
   </section>
 
