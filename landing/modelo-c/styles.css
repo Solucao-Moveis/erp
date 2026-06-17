@@ -37,7 +37,7 @@ a{color:inherit;text-decoration:none}
 .nav__burger span{width:24px;height:2px;background:var(--ink);border-radius:2px;transition:.3s}
 
 /* hero / manifesto */
-.hero{min-height:92vh;display:flex;align-items:center;padding:120px 0 70px;background:radial-gradient(120% 80% at 100% 0,rgba(232,114,42,.08),transparent 60%),var(--paper)}
+.hero{position:relative;min-height:92vh;display:flex;align-items:center;padding:120px 0 70px;background:linear-gradient(100deg,rgba(244,239,230,.97) 0%,rgba(244,239,230,.9) 40%,rgba(244,239,230,.55) 60%,rgba(244,239,230,.12) 80%,rgba(244,239,230,0) 92%),url('../assets/fotos/fabrica.png?v=3') center/cover;background-color:var(--paper)}
 .hero__in{max-width:920px}
 .eyebrow{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--orange-deep);margin-bottom:26px}
 .hero__h1{font-size:clamp(38px,6.5vw,84px)}
