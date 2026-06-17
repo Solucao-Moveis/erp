@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Solução Móveis — Indústria de Móveis Escolares</title>
-  <meta name="description" content="Solução Móveis: metalúrgica de mobiliário escolar em Santana do Paraíso/MG. Conjuntos aluno e professor, educação infantil, refeitório e biblioteca — certificados INMETRO, ABNT NBR 14006 e padrão FNDE. Entregas em todo o Brasil." />
+  <title>Solução Móveis — Indústria metalúrgica de mobiliário escolar</title>
+  <meta name="description" content="Solução Móveis: indústria metalúrgica de mobiliário escolar em Santana do Paraíso/MG. Parque fabril com corte a laser, soldagem robotizada e pintura — produção própria, certificada INMETRO, ABNT e padrão FNDE." />
   <meta name="theme-color" content="#1C1A17" />
   <!-- URL "oculta": não indexar enquanto for preview. Remover quando for ao ar num domínio público. -->
   <meta name="robots" content="noindex, nofollow" />
@@ -12,14 +12,14 @@
   <link rel="apple-touch-icon" href="assets/icon-192.png" />
 
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Solução Móveis — Móveis Escolares" />
-  <meta property="og:description" content="Mobiliário escolar feito com ofício — do berçário ao ensino superior." />
+  <meta property="og:title" content="Solução Móveis — Indústria metalúrgica" />
+  <meta property="og:description" content="Produção própria de mobiliário escolar em aço — do corte à pintura, com tecnologia e certificação." />
   <meta property="og:image" content="assets/logo-solucao-moveis.png" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=15" />
+  <link rel="stylesheet" href="styles.css?v=17" />
 </head>
 <body>
   <!-- barra de progresso de scroll -->
@@ -33,10 +33,8 @@
       </a>
       <nav class="nav__links" id="navLinks">
         <a href="#empresa">A empresa</a>
-        <a href="#produtos">Produtos</a>
-        <a href="#ambientes">Ambientes</a>
+        <a href="#fabrica">Fábrica</a>
         <a href="#diferenciais">Diferenciais</a>
-        <a href="#estrutura">Estrutura</a>
         <a href="#trabalhe" class="nav__cta">Trabalhe conosco</a>
       </nav>
       <button class="nav__burger" id="burger" aria-label="Abrir menu" aria-expanded="false">
@@ -47,29 +45,27 @@
 
   <!-- ============================== HERO ============================== -->
   <section class="hero" id="top">
-    <!-- fundo em crossfade (troque pelas fotos) -->
     <div class="hero__bgs" aria-hidden="true">
-      <!-- Hero: padrão de losangos da marca (inspirado no estande) + móveis recortados em losango -->
+      <!-- padrão de losangos da marca + FOTOS DA PRODUÇÃO recortadas em losango -->
       <div class="hero__bg is-on" style="background-image:url('assets/padrao-losango.svg?v=4'); background-size:1120px 280px; background-repeat:repeat; background-position:right top"></div>
-      <img class="hero__gem hero__gem--1" src="assets/fotos/produto-coletiva.png" alt="" />
-      <img class="hero__gem hero__gem--2" src="assets/fotos/produto-aluno.png" alt="" />
-      <img class="hero__gem hero__gem--3" src="assets/fotos/produto-universitaria.png" alt="" />
-      <img class="hero__gem hero__gem--4" src="assets/fotos/produto-professor.png" alt="" />
-      <img class="hero__gem hero__gem--5" src="assets/fotos/produto-infantil.png" alt="" />
+      <img class="hero__gem hero__gem--1" src="assets/fotos/fabrica.png?v=3" alt="" />
+      <img class="hero__gem hero__gem--2" src="assets/fotos/maquina-corte.jpg" alt="" />
+      <img class="hero__gem hero__gem--3" src="assets/fotos/robo-solda.jpg" alt="" />
+      <img class="hero__gem hero__gem--4" src="assets/fotos/solda-manual.jpg" alt="" />
+      <img class="hero__gem hero__gem--5" src="assets/fotos/pintura.jpg" alt="" />
     </div>
     <div class="hero__scrim" aria-hidden="true"></div>
 
     <div class="wrap hero__in">
-      <span class="eyebrow eyebrow--light">Metalúrgica · mobiliário escolar</span>
-      <h1 class="hero__title">Móveis escolares feitos<br>para durar <em>gerações</em>.</h1>
+      <span class="eyebrow eyebrow--light">Indústria metalúrgica · mobiliário escolar</span>
+      <h1 class="hero__title">Aço que vira mobiliário<br>para <em>formar gerações</em>.</h1>
       <p class="hero__lead">
-        Projetamos e fabricamos cada peça com ergonomia, segurança e o cuidado de quem
-        entende de sala de aula — do berçário ao ensino superior.
+        Uma fábrica própria em Santana do Paraíso (MG) — do corte do aço à pintura,
+        com tecnologia, robótica e o cuidado de quem entende de produção.
       </p>
       <div class="hero__cta">
-        <a href="#produtos" class="btn btn--solid">Conheça a linha</a>
-        <!-- Suba o PDF em: assets/catalogo-solucao-moveis.pdf -->
-        <a href="assets/catalogo-solucao-moveis.pdf" class="btn btn--light" download>Baixar catálogo</a>
+        <a href="#fabrica" class="btn btn--solid">Conheça nossa fábrica</a>
+        <a href="#trabalhe" class="btn btn--light">Trabalhe conosco</a>
       </div>
     </div>
 
@@ -87,8 +83,8 @@
       <span>Certificado INMETRO</span><span class="ticker__dot">✶</span>
       <span>ABNT NBR 14006</span><span class="ticker__dot">✶</span>
       <span>Padrão FNDE</span><span class="ticker__dot">✶</span>
-      <span>Estrutura em aço tubular</span><span class="ticker__dot">✶</span>
-      <span>Entregas em todo o Brasil</span><span class="ticker__dot">✶</span>
+      <span>Corte a laser & soldagem robotizada</span><span class="ticker__dot">✶</span>
+      <span>Produção própria · Indústria 4.0</span><span class="ticker__dot">✶</span>
     </div>
   </div>
 
@@ -96,8 +92,8 @@
   <section class="sec empresa" id="empresa">
     <div class="wrap empresa__grid">
       <div class="empresa__media reveal">
-        <!-- Foto da fábrica (galpão de produção). -->
-        <div class="photo photo--portrait" style="background-image:url('assets/fotos/fabrica.png?v=2')" role="img" aria-label="Galpão de produção da Solução Móveis"></div>
+        <!-- Fachada real da fábrica -->
+        <div class="photo photo--portrait" style="background-image:url('assets/fotos/fabrica.png?v=3')" role="img" aria-label="Fábrica da Solução Móveis"></div>
         <div class="empresa__tagcard">
           <strong>Desde 2016</strong>
           <span>metalúrgica em Santana do Paraíso/MG</span>
@@ -116,124 +112,37 @@
         </p>
         <p class="muted">
           Somos fornecedores de referência nacional: atendemos prefeituras e secretarias estaduais
-          de ensino em todo o Brasil. Nosso portfólio cobre todas as idades — do infantil ao adulto —
-          com foco em ergonomia, durabilidade e qualidade industrial.
+          de ensino em todo o Brasil, com foco em ergonomia, durabilidade e qualidade industrial.
         </p>
         <p class="muted">
           Produzimos tudo sob o mesmo teto: corte a laser, dobra robotizada, soldagem, marcenaria,
           pintura e montagem — integrando estrutura metálica e polipropileno injetado, com células
           robotizadas rumo à Indústria 4.0.
         </p>
-        <a href="#estrutura" class="btn btn--link">Conheça nosso parque fabril</a>
+        <a href="#fabrica" class="btn btn--link">Conheça nosso parque fabril</a>
       </div>
     </div>
   </section>
 
-  <!-- ============================== 02 · PRODUTOS ============================== -->
-  <section class="sec sec--paper2 produtos" id="produtos">
-    <div class="wrap">
-      <div class="sechead sechead--center reveal">
-        <span class="sechead__idx">02</span>
-        <span class="kicker">Linha escolar</span>
-        <h2 class="display">Mobiliário para cada fase do aprendizado</h2>
-      </div>
-
-      <div class="filtro reveal" id="filtro" role="tablist" aria-label="Filtrar por nível">
-        <button class="filtro__btn is-active" data-seg="todos" role="tab" aria-selected="true">Todos</button>
-        <button class="filtro__btn" data-seg="infantil" role="tab">Educação Infantil</button>
-        <button class="filtro__btn" data-seg="fundamental" role="tab">Fundamental</button>
-        <button class="filtro__btn" data-seg="medio" role="tab">Médio e Superior</button>
-        <button class="filtro__btn" data-seg="refeitorio" role="tab">Refeitório</button>
-      </div>
-
-      <!-- carrossel de produtos -->
-      <div class="car reveal" data-carousel>
-        <div class="car__track" data-track id="produtosGrid">
-          <article class="card" data-seg="infantil">
-            <div class="card__media" style="background-image:url('assets/fotos/produto-infantil.png')" role="img" aria-label="Mesa e cadeira infantil"></div>
-            <div class="card__body">
-              <span class="card__tag">Educação Infantil</span>
-              <h3>Mesa &amp; Cadeira Infantil</h3>
-              <p>Mesa e cadeira individuais, em tamanhos menores e cores vivas, para creches e a educação infantil.</p>
-            </div>
-          </article>
-
-          <article class="card" data-seg="infantil">
-            <div class="card__media" style="background-image:url('assets/fotos/produto-coletiva.png')" role="img" aria-label="Mesa coletiva infantil"></div>
-            <div class="card__body">
-              <span class="card__tag">Educação Infantil</span>
-              <h3>Mesa Coletiva</h3>
-              <p>Mesa trapezoidal e cadeiras coloridas para atividades em grupo na educação infantil.</p>
-            </div>
-          </article>
-
-          <article class="card" data-seg="fundamental medio">
-            <div class="card__media" style="background-image:url('assets/fotos/produto-aluno.png')" role="img" aria-label="Conjunto Aluno"></div>
-            <div class="card__body">
-              <span class="card__tag">Fundamental · Médio</span>
-              <h3>Conjunto Aluno (CJA)</h3>
-              <p>Carteira e cadeira individuais: aço tubular, tampo em MDF 18 mm e assento em polipropileno (T1–T6).</p>
-            </div>
-          </article>
-
-          <article class="card" data-seg="infantil fundamental medio">
-            <div class="card__media" style="background-image:url('assets/fotos/produto-professor.png')" role="img" aria-label="Conjunto Professor"></div>
-            <div class="card__body">
-              <span class="card__tag">Todos os níveis</span>
-              <h3>Conjunto Professor</h3>
-              <p>Mesa do professor com tampo em MDF e gaveta, e cadeira confortável para a jornada.</p>
-            </div>
-          </article>
-
-          <article class="card" data-seg="medio">
-            <div class="card__media" style="background-image:url('assets/fotos/produto-universitaria.png')" role="img" aria-label="Cadeira Universitária"></div>
-            <div class="card__body">
-              <span class="card__tag">Médio e Superior</span>
-              <h3>Cadeira Universitária</h3>
-              <p>Carteira com prancheta integrada, em aço e polipropileno — para o ensino médio e superior.</p>
-            </div>
-          </article>
-
-          <article class="card" data-seg="refeitorio">
-            <div class="card__media" style="background-image:url('assets/fotos/produto-refeitorio.png')" role="img" aria-label="Conjunto de refeitório"></div>
-            <div class="card__body">
-              <span class="card__tag">Refeitório</span>
-              <h3>Refeitório</h3>
-              <p>Mesa e bancos robustos, fáceis de limpar e dimensionados para grupos.</p>
-            </div>
-          </article>
-        </div>
-
-        <div class="car__nav">
-          <button class="car__btn" data-prev aria-label="Anterior">
-            <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
-          </button>
-          <button class="car__btn" data-next aria-label="Próximo">
-            <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <p class="prod__note reveal">Produção própria, sob medida e em escala — feita sob encomenda para os nossos clientes.</p>
-    </div>
-  </section>
-
-  <!-- ============================== 03 · AMBIENTES ============================== -->
-  <section class="sec ambientes" id="ambientes">
+  <!-- ============================== 02 · NOSSA FÁBRICA ============================== -->
+  <section class="sec ambientes" id="fabrica">
     <div class="wrap">
       <div class="sechead reveal">
-        <span class="sechead__idx">03</span>
-        <span class="kicker">Ambientes equipados</span>
-        <h2 class="display">Nossos móveis na sala de aula</h2>
+        <span class="sechead__idx">02</span>
+        <span class="kicker">Nosso parque fabril</span>
+        <h2 class="display">Onde o aço vira mobiliário escolar</h2>
+        <p class="lead">Corte a laser, dobra robotizada, soldagem, pintura e montagem — tudo na nossa própria fábrica.</p>
       </div>
     </div>
 
-    <!-- carrossel de ambientes (full-bleed) -->
+    <!-- carrossel das imagens da fábrica (full-bleed) -->
     <div class="car car--wide reveal" data-carousel>
       <div class="car__track" data-track>
-        <figure class="amb" style="background-image:url('assets/fotos/ambiente-sala-aula.png')"><figcaption>Sala de aula</figcaption></figure>
-        <figure class="amb" style="background-image:url('assets/fotos/ambiente-infantil.png')"><figcaption>Educação infantil</figcaption></figure>
-        <figure class="amb" style="background-image:url('assets/fotos/ambiente-biblioteca.png')"><figcaption>Biblioteca</figcaption></figure>
+        <figure class="amb" style="background-image:url('assets/fotos/fabrica.png?v=3')"><figcaption>Nossa fábrica · Santana do Paraíso/MG</figcaption></figure>
+        <figure class="amb" style="background-image:url('assets/fotos/maquina-corte.jpg')"><figcaption>Corte do aço</figcaption></figure>
+        <figure class="amb" style="background-image:url('assets/fotos/robo-solda.jpg')"><figcaption>Solda robotizada</figcaption></figure>
+        <figure class="amb" style="background-image:url('assets/fotos/solda-manual.jpg')"><figcaption>Solda manual</figcaption></figure>
+        <figure class="amb" style="background-image:url('assets/fotos/pintura.jpg')"><figcaption>Pintura</figcaption></figure>
       </div>
       <div class="wrap car__nav car__nav--wide">
         <button class="car__btn" data-prev aria-label="Anterior"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -242,11 +151,11 @@
     </div>
   </section>
 
-  <!-- ============================== 04 · DIFERENCIAIS ============================== -->
+  <!-- ============================== 03 · DIFERENCIAIS ============================== -->
   <section class="sec sec--paper2" id="diferenciais">
     <div class="wrap">
       <div class="sechead reveal">
-        <span class="sechead__idx">04</span>
+        <span class="sechead__idx">03</span>
         <span class="kicker">Por que a Solução Móveis</span>
         <h2 class="display">Qualidade que se vê — e que dura</h2>
       </div>
@@ -254,23 +163,23 @@
       <div class="feats">
         <div class="feat reveal">
           <span class="feat__n">01</span>
-          <h3>Ergonomia por faixa etária</h3>
-          <p>Tamanhos dimensionados para cada idade, do infantil ao adulto.</p>
+          <h3>Tecnologia de produção</h3>
+          <p>Corte a laser, dobra robotizada e células de solda — precisão industrial.</p>
         </div>
         <div class="feat reveal">
           <span class="feat__n">02</span>
-          <h3>Segurança em primeiro lugar</h3>
-          <p>Cantos arredondados, ponteiras de proteção e materiais atóxicos.</p>
+          <h3>Estrutura em aço</h3>
+          <p>Aço tubular com proteção anticorrosiva (ABNT NBR 8094), feito para durar.</p>
         </div>
         <div class="feat reveal">
           <span class="feat__n">03</span>
           <h3>Certificado INMETRO</h3>
-          <p>Conjuntos certificados pelo INMETRO e em conformidade com a ABNT NBR 14006.</p>
+          <p>Produção certificada pelo INMETRO e em conformidade com a ABNT NBR 14006.</p>
         </div>
         <div class="feat reveal">
           <span class="feat__n">04</span>
-          <h3>Estrutura em aço</h3>
-          <p>Aço tubular com proteção anticorrosiva (ABNT NBR 8094) e tampo em MDF de 18 mm.</p>
+          <h3>Pintura & acabamento</h3>
+          <p>Pintura própria com proteção anticorrosiva e acabamento resistente.</p>
         </div>
         <div class="feat reveal">
           <span class="feat__n">05</span>
@@ -316,31 +225,12 @@
     </div>
   </section>
 
-  <!-- ============================== 05 · ESTRUTURA / MÁQUINAS ============================== -->
-  <section class="sec estrutura" id="estrutura">
-    <div class="wrap">
-      <div class="sechead reveal">
-        <span class="sechead__idx">05</span>
-        <span class="kicker">Nosso parque fabril</span>
-        <h2 class="display">Tecnologia para produzir<br>com qualidade e escala</h2>
-        <p class="lead">Corte a laser, dobra robotizada, soldagem, pintura e montagem — com células robotizadas e automação rumo à Indústria 4.0.</p>
-      </div>
-
-      <!-- SUBSTITUIR cada .ph por foto de máquina/equipamento -->
-      <div class="maq">
-        <figure class="maq__cell maq__cell--big ph reveal" data-need="Foto: linha de produção / galpão (ampla)"><figcaption>Linha de produção</figcaption></figure>
-        <figure class="maq__cell ph reveal" data-need="Foto: corte a laser / dobra robotizada"><figcaption>Corte a laser &amp; dobra robotizada</figcaption></figure>
-        <figure class="maq__cell ph reveal" data-need="Foto: soldagem / pintura / montagem"><figcaption>Soldagem, pintura &amp; montagem</figcaption></figure>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================== 06 · TRABALHE CONOSCO ============================== -->
+  <!-- ============================== 04 · TRABALHE CONOSCO ============================== -->
   <section class="sec sec--ink trabalhe" id="trabalhe">
     <div class="wrap trabalhe__grid">
       <div class="trabalhe__txt reveal">
         <div class="sechead">
-          <span class="sechead__idx sechead__idx--light">06</span>
+          <span class="sechead__idx sechead__idx--light">04</span>
           <span class="kicker kicker--light">Trabalhe conosco</span>
         </div>
         <h2 class="display">Venha fazer parte<br>do nosso time</h2>
@@ -349,7 +239,6 @@
           abertas e candidate-se direto no nosso portal.
         </p>
         <ul class="contato__list">
-          <!-- SUBSTITUIR pelos dados reais -->
           <li><span class="ic">📍</span><div><b>Onde estamos</b><br>Av. Vitor Gaggiato, s/n — Distrito Industrial · Santana do Paraíso/MG · CEP 35179-972</div></li>
           <li><span class="ic">✉️</span><div><b>RH</b><br>pessoal@solucaomoveis.ind.br</div></li>
           <li><span class="ic">📷</span><div><b>Instagram</b><br>@solucaomoveisescolares</div></li>
@@ -370,20 +259,19 @@
     <div class="wrap foot__in">
       <div class="foot__brand">
         <img src="assets/logo-solucao-moveis.png" alt="Solução Móveis" />
-        <p>Metalúrgica de mobiliário escolar em Santana do Paraíso/MG. Certificada INMETRO, ABNT e padrão FNDE. Entregas em todo o Brasil.</p>
+        <p>Indústria metalúrgica de mobiliário escolar em Santana do Paraíso/MG. Certificada INMETRO, ABNT e padrão FNDE. Entregas em todo o Brasil.</p>
         <p class="foot__contact">Comercial: comercial@solucao.ind.br<br>Licitações: licitacao@solucaomoveis.ind.br</p>
       </div>
       <nav class="foot__col">
         <b>Navegar</b>
         <a href="#empresa">A empresa</a>
-        <a href="#produtos">Produtos</a>
-        <a href="#ambientes">Ambientes</a>
-        <a href="#estrutura">Estrutura</a>
+        <a href="#fabrica">Fábrica</a>
+        <a href="#diferenciais">Diferenciais</a>
+        <a href="#trabalhe">Trabalhe conosco</a>
       </nav>
       <nav class="foot__col">
         <b>Mais</b>
-        <a href="#trabalhe">Trabalhe conosco</a>
-        <a href="assets/catalogo-solucao-moveis.pdf" download>Baixar catálogo</a>
+        <a href="#trabalhe">Vagas</a>
         <a href="https://instagram.com/solucaomoveisescolares" target="_blank" rel="noopener">Instagram</a>
       </nav>
     </div>
@@ -392,6 +280,22 @@
       <a href="https://supabase-supabase.h5xdag.easypanel.host/" class="foot__sys" title="Acesso restrito à equipe">Área do colaborador</a>
     </div>
   </footer>
+
+  <!-- ===== seletor de modelo (PREVIEW — remover ao publicar o oficial) ===== -->
+  <style>
+    .lp-switch{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:400;display:flex;flex-direction:column;align-items:center;gap:7px;background:rgba(28,26,23,.92);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);padding:11px 9px;border-radius:100px;box-shadow:0 14px 34px -12px rgba(0,0,0,.5);font-family:'Inter',sans-serif}
+    .lp-switch__lbl{font-size:9px;font-weight:800;letter-spacing:.12em;color:rgba(255,255,255,.5)}
+    .lp-switch__btn{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:15px;color:#fff;background:rgba(255,255,255,.13);transition:background .2s,transform .2s;text-decoration:none}
+    .lp-switch__btn:hover{background:rgba(255,255,255,.28);transform:scale(1.08)}
+    .lp-switch__btn.is-active{background:var(--orange,#E8722A);color:#fff}
+    @media(max-width:600px){.lp-switch{right:auto;left:50%;top:auto;bottom:14px;transform:translateX(-50%);flex-direction:row}.lp-switch__lbl{display:none}}
+  </style>
+  <nav class="lp-switch" aria-label="Trocar modelo de landing">
+    <span class="lp-switch__lbl">LP</span>
+    <a href="index.html" class="lp-switch__btn is-active" title="Modelo A — produção">A</a>
+    <a href="modelo-b/index.html" class="lp-switch__btn" title="Modelo B — Indústria 4.0">B</a>
+    <a href="modelo-c/index.html" class="lp-switch__btn" title="Modelo C — História">C</a>
+  </nav>
 
   <script src="main.js?v=7"></script>
 </body>

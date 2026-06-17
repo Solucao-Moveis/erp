@@ -272,13 +272,13 @@ a { color:inherit; text-decoration:none; }
 .maq__cell { border-radius:var(--r); overflow:hidden; position:relative; background-size:cover; background-position:center; box-shadow:var(--shadow-sm); }
 .maq__cell--big { grid-row:span 2; }
 .maq__cell figcaption { position:absolute; left:20px; bottom:16px; color:#fff; font-family:'Fraunces',serif; font-size:19px; text-shadow:0 2px 14px rgba(0,0,0,.5); z-index:2; }
-.maq__cell.ph::after { content:''; position:absolute; inset:0; background:linear-gradient(0deg,rgba(28,26,23,.32),transparent 55%); }
+.maq__cell::after { content:''; position:absolute; inset:0; background:linear-gradient(0deg,rgba(28,26,23,.38),transparent 55%); }
 
 /* ===================== 06 · TRABALHE CONOSCO ===================== */
 /* foto do time ao fundo, com véu escuro forte pra manter texto e formulário legíveis */
 .trabalhe {
   background: linear-gradient(rgba(20,18,15,.86), rgba(20,18,15,.92)),
-              url('assets/fotos/equipe.jpg') center/cover no-repeat,
+              url('assets/fotos/equipe.jpg') center 20%/cover no-repeat,
               #15130F;
 }
 .trabalhe__grid { display:grid; grid-template-columns:1fr 1fr; gap:clamp(36px,5vw,72px); align-items:start; }
