@@ -41,7 +41,7 @@ h1,h2,h3{font-family:'Space Grotesk',sans-serif;font-weight:600;line-height:1.1;
 .nav.is-scrolled .nav__burger span{background:var(--ink)}
 
 /* hero (C) — imagem da fábrica bem visível, véu suave só onde fica o texto */
-.hero{position:relative;min-height:92vh;display:flex;align-items:center;padding:120px 0 70px;background:linear-gradient(100deg,rgba(26,22,17,.8) 0%,rgba(26,22,17,.58) 50%,rgba(26,22,17,.44) 100%),url('../assets/fotos/fabrica.png?v=8') center/cover;background-color:var(--inksec)}
+.hero{position:relative;min-height:92vh;display:flex;align-items:center;padding:120px 0 70px;background:linear-gradient(100deg,rgba(26,22,17,.8) 0%,rgba(26,22,17,.58) 50%,rgba(26,22,17,.44) 100%),url('../assets/fotos/fabrica.png?v=9') center/cover;background-color:var(--inksec)}
 .hero__in{position:relative;max-width:900px}
 .eyebrow{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:24px}
 .hero__h1{font-family:'Newsreader',Georgia,serif;font-weight:500;font-size:clamp(38px,6.2vw,78px);line-height:1.06;letter-spacing:-.01em;color:#fff}
