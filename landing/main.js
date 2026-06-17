@@ -145,6 +145,15 @@ if (filtro) {
   });
 }
 
+/* ---- clipes de produção: tocam quando visíveis, pausam fora ---- */
+const clips = document.querySelectorAll('.clip video');
+if (clips.length) {
+  const vio = new IntersectionObserver((es) => es.forEach((e) => {
+    if (e.isIntersecting) e.target.play().catch(() => {}); else e.target.pause();
+  }), { threshold: 0.35 });
+  clips.forEach((v) => vio.observe(v));
+}
+
 /* ---- loop infinito do ticker e do marquee (duplica o conteúdo) ---- */
 ['ticker', 'marquee'].forEach((id) => {
   const row = document.getElementById(id);
