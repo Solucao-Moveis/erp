@@ -115,6 +115,25 @@ function initCarousel(root) {
   track.addEventListener('pointercancel', end);
   track.addEventListener('click', (e) => { if (moved) { e.preventDefault(); e.stopPropagation(); } }, true);
 
+  /* autoplay opcional (data-autoplay="ms") — pausa no hover/arraste, volta ao início no fim */
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (root.hasAttribute('data-autoplay') && !reduce) {
+    const delay = parseInt(root.getAttribute('data-autoplay'), 10) || 4500;
+    let timer = null;
+    const tick = () => {
+      const max = track.scrollWidth - track.clientWidth - 2;
+      if (track.scrollLeft >= max) track.scrollTo({ left: 0, behavior: 'smooth' });
+      else track.scrollBy({ left: step(), behavior: 'smooth' });
+    };
+    const play = () => { if (!timer) timer = setInterval(tick, delay); };
+    const stop = () => { if (timer) { clearInterval(timer); timer = null; } };
+    root.addEventListener('pointerenter', stop);
+    root.addEventListener('pointerleave', play);
+    track.addEventListener('pointerdown', stop);
+    document.addEventListener('visibilitychange', () => (document.hidden ? stop() : play()));
+    play();
+  }
+
   update();
   window.addEventListener('resize', update, { passive: true });
   return { update, track };
