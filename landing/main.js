@@ -115,23 +115,31 @@ function initCarousel(root) {
   track.addEventListener('pointercancel', end);
   track.addEventListener('click', (e) => { if (moved) { e.preventDefault(); e.stopPropagation(); } }, true);
 
-  /* autoplay opcional (data-autoplay="ms") — pausa no hover/arraste, volta ao início no fim */
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (root.hasAttribute('data-autoplay') && !reduce) {
-    const delay = parseInt(root.getAttribute('data-autoplay'), 10) || 4500;
-    let timer = null;
-    const tick = () => {
-      const max = track.scrollWidth - track.clientWidth - 2;
-      if (track.scrollLeft >= max) track.scrollTo({ left: 0, behavior: 'smooth' });
-      else track.scrollBy({ left: step(), behavior: 'smooth' });
+  /* marquee CONTÍNUO (data-autoplay="px/seg") — desliza sem parar nunca, loop perfeito */
+  if (root.hasAttribute('data-autoplay')) {
+    const n = track.children.length;
+    for (let i = 0; i < n; i++) track.appendChild(track.children[i].cloneNode(true)); // duplica p/ loop sem emenda
+    track.style.overflow = 'visible';
+    track.style.scrollSnapType = 'none';
+    track.style.paddingLeft = '0';
+    track.style.paddingRight = '0';
+    root.style.overflow = 'hidden';
+    if (prev) prev.style.display = 'none';
+    if (next) next.style.display = 'none';
+    const speed = parseFloat(root.getAttribute('data-autoplay')) || 80; // px por segundo
+    let anim = null;
+    const run = () => {
+      if (anim) anim.cancel();
+      const setW = track.children[n].offsetLeft; // largura exata de 1 conjunto
+      if (!setW) return;
+      anim = track.animate(
+        [{ transform: 'translateX(0)' }, { transform: 'translateX(-' + setW + 'px)' }],
+        { duration: (setW / speed) * 1000, iterations: Infinity, easing: 'linear' }
+      );
     };
-    const play = () => { if (!timer) timer = setInterval(tick, delay); };
-    const stop = () => { if (timer) { clearInterval(timer); timer = null; } };
-    root.addEventListener('pointerenter', stop);
-    root.addEventListener('pointerleave', play);
-    track.addEventListener('pointerdown', stop);
-    document.addEventListener('visibilitychange', () => (document.hidden ? stop() : play()));
-    play();
+    run();
+    window.addEventListener('resize', run, { passive: true });
+    return { track };
   }
 
   update();
