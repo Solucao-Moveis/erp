@@ -10,6 +10,29 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.15',
+    data: '18/06/2026',
+    titulo: 'Manutenção: acesso da produção limitado às Ordens de Serviço + filtros de busca nas OS; Hora a Hora: Tratamento e Pintura agora separam cadeira e mesa',
+    resumo: 'Três pedidos resolvidos. No app de Manutenção: (1) quem é da produção (e demais áreas que não são da equipe de manutenção) agora só enxerga e usa a aba "Ordens de Serviço" — as outras telas ficaram restritas à equipe de manutenção; (2) a lista de Ordens de Serviço ganhou uma barra de filtros para achar uma OS rapidinho, mesmo com muitos registros. No Hora a Hora: os setores de Tratamento e de Pintura passaram a ter as opções "cadeira" e "mesa", do mesmo jeito que já existe na Montagem.',
+    mudancas: [
+      {
+        app: 'Pro-Care — Manutenção',
+        o_que: 'O acesso passou a respeitar o cargo. Quem não é da equipe de manutenção (ex.: produção e outras áreas) agora vê apenas a aba "Ordens de Serviço" no menu; as demais telas (Dashboard, Indicadores, Preventivas, Máquinas, Setores, Técnicos, Estoque, Usuários) ficaram visíveis somente para a equipe de manutenção e administradores. Mesmo digitando o endereço de outra tela na barra do navegador, quem não é da manutenção é mandado de volta para as Ordens de Serviço.',
+        como: 'Não precisa fazer nada: ao entrar no app de Manutenção, cada pessoa vê o menu de acordo com o seu cargo. Se você é da produção, vai ver só "Ordens de Serviço", onde abre e acompanha os chamados normalmente. Se faltar acesso a alguém da manutenção, um administrador ajusta o cargo na aba "Usuários".'
+      },
+      {
+        app: 'Pro-Care — Manutenção',
+        o_que: 'A lista de Ordens de Serviço ganhou uma barra de filtros logo abaixo do título, com: caixa de busca por texto (nº da OS, máquina, problema ou solicitante), e filtros por Status, Setor, Máquina e Técnico. Ao escolher um Setor, a lista de Máquinas do filtro mostra só as máquinas daquele setor. Um botão "Limpar" aparece quando há algum filtro ativo.',
+        como: 'Abra a aba "Ordens de Serviço". Use a caixa de busca para digitar parte do número, do nome da máquina, do problema ou de quem abriu. Para refinar, escolha Status, Setor, Máquina e/ou Técnico nas listas ao lado. As duas tabelas (OS em aberto e OS fechadas) já aparecem filtradas. Para voltar a ver tudo, toque em "Limpar".'
+      },
+      {
+        app: 'Hora a Hora',
+        o_que: 'Nos setores Tratamento e Pintura, foram criadas as opções "cadeira" e "mesa" (Máquina de tratamento cadeira/mesa e Máquina de pintura cadeira/mesa), igual ao que já existe na Montagem. As máquinas antigas de Tratamento e de Pintura foram mantidas com todo o histórico; as novas começam zeradas.',
+        como: 'Na página do Hora a Hora, dentro de Tratamento e de Pintura agora aparecem as linhas separadas de "cadeira" e "mesa". Registre a produção e as metas na linha correspondente (cadeira ou mesa). Os números antigos continuam na linha da máquina original.'
+      }
+    ]
+  },
+  {
     versao: '6.14',
     data: '18/06/2026',
     titulo: 'Compras: agora dá pra anotar o número do Pedido de Compra em cada solicitação',
