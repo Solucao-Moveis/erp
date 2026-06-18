@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.13',
+    data: '18/06/2026',
+    titulo: 'Expedição: agora dá pra editar a foto do carregamento (trocar imagem ou observação)',
+    resumo: 'No Gestor de Expedição (Bip), as fotos do registro fotográfico de um carregamento agora podem ser editadas pelo celular. Antes, ao tocar numa foto ela só abria em tela cheia; agora abre uma tela de edição onde você pode TROCAR a foto (tirar outra na hora ou escolher da galeria) ou mudar a OBSERVAÇÃO escrita embaixo dela. Útil quando a foto saiu ruim ou a descrição estava errada — sem precisar apagar e enviar de novo.',
+    mudancas: [
+      {
+        app: 'Gestor de Expedição (Bip)',
+        o_que: 'As fotos já anexadas a um carregamento passaram a ser editáveis: dá pra substituir a imagem por uma nova (câmera ou galeria) e/ou alterar a observação. Enquanto o carregamento estiver aberto (não finalizado), tocar na foto abre a edição; quando o carregamento já está travado/finalizado, a foto continua só abrindo em tela cheia, como antes.',
+        como: 'Na tela do carregamento, no "Registro Fotográfico", toque na foto que quer ajustar (ou no lápis que aparece no canto dela). Na janela que abrir, use "Tirar outra" ou "Trocar da galeria" para mudar a imagem, e/ou edite o texto da observação. Toque em "Salvar". Para remover a foto de vez, continue usando a lixeira no canto da foto.'
+      }
+    ]
+  },
+  {
     versao: '6.12',
     data: '15/06/2026',
     titulo: 'Expedição: bipagem dos carregamentos ficou bem mais rápida',
