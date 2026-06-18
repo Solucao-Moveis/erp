@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.14',
+    data: '18/06/2026',
+    titulo: 'Compras: agora dá pra anotar o número do Pedido de Compra em cada solicitação',
+    resumo: 'No app de Compras, cada solicitação ganhou um campo "Pedido de compra" para você registrar o número do pedido feito ao fornecedor. Qualquer pessoa com acesso à solicitação pode preencher ou corrigir esse número. Depois, na lista de solicitações, você consegue achar uma solicitação pesquisando pelo número do pedido — e o número aparece embaixo do código da solicitação na própria lista.',
+    mudancas: [
+      {
+        app: 'Compras',
+        o_que: 'Foi criado o campo "Pedido de compra" em cada solicitação. Ele fica no quadro "Detalhes" da tela da solicitação e pode ser preenchido/editado por qualquer usuário logado (não precisa ser comprador nem administrador). A busca da lista de solicitações passou a considerar também esse número, e o pedido aparece logo abaixo do número da solicitação na listagem.',
+        como: 'Abra a solicitação de compra. No quadro "Detalhes" (lado direito), digite o número do pedido no campo "Pedido de compra" e toque em "Salvar". Para localizar depois, vá na lista de Solicitações e digite o número do pedido na caixa de busca lá em cima — a solicitação correspondente aparece. O número do pedido também fica visível embaixo do código da solicitação na lista.'
+      }
+    ]
+  },
+  {
     versao: '6.13',
     data: '18/06/2026',
     titulo: 'Expedição: agora dá pra editar a foto do carregamento (trocar imagem ou observação)',
