@@ -12,6 +12,12 @@
   word-wrap: break-word;
 }
 
+/* Marca-texto (highlight) */
+.caderno-prose mark {
+  padding: 0 0.12em;
+  border-radius: 2px;
+}
+
 /* Garante uma altura mínima clicável quando usado dentro do editor */
 .caderno-prose:focus {
   outline: none;
