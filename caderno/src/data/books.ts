@@ -102,6 +102,23 @@ export function useBookConteudo(id: string | undefined) {
   });
 }
 
+async function fetchTodosLivros(): Promise<Book[]> {
+  const { data, error } = await supabase
+    .from("books")
+    .select("*")
+    .order("nome", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as Book[];
+}
+
+/** Todos os livros visíveis (RLS filtra), para a grade da rota /livros. */
+export function useTodosLivros() {
+  return useQuery({
+    queryKey: qk.todosLivros,
+    queryFn: fetchTodosLivros,
+  });
+}
+
 // ---------- mutations ----------
 
 /** Cria um livro; opcionalmente já o vincula a uma estante. */

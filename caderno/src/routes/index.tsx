@@ -1,29 +1,72 @@
 // ============================================================
-// INÍCIO — boas-vindas + grade de estantes.
-// É a home do Caderno (substitui o antigo redirect).
+// INÍCIO — painel inicial do Caderno (estilo BookStack), em 3 colunas.
+// Coluna 1: Meus Rascunhos + Vistos recentemente.
+// Coluna 2: Favoritos mais vistos + Páginas atualizadas recentemente.
+// Coluna 3: Atividade recente.
+// Topo: toggle "Alternar Detalhes" liga/desliga trecho/meta dos itens.
 // ============================================================
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { BookOpen, Library, Plus } from "lucide-react";
-import { toast } from "sonner";
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState, type ReactNode } from "react";
+import {
+  Activity as ActivityIcon,
+  Eye,
+  FilePen,
+  FileClock,
+  Star,
+  SlidersHorizontal,
+} from "lucide-react";
 
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { EntidadeDialog, type EntidadeFormValues } from "@/components/caderno/EntidadeDialog";
-import { VisibilidadeBadge } from "@/components/caderno/VisibilidadeBadge";
-import { ensureProfile, useCreateShelf, useShelves } from "@/data";
-import type { Shelf } from "@/integrations/supabase/types-caderno";
+import { AtividadeItem } from "@/components/caderno/AtividadeItem";
+import { ColunaPainel } from "@/components/caderno/ColunaPainel";
+import { EntityListItem } from "@/components/caderno/EntityListItem";
+import { Layout3Col } from "@/components/caderno/Layout3Col";
+import {
+  ensureProfile,
+  useAtividadeRecente,
+  useMeusFavoritos,
+  useMeusRascunhos,
+  usePaginasAtualizadas,
+  useVistosRecentemente,
+} from "@/data";
+import { tempoRelativo } from "@/lib/tempo";
+import type {
+  EntidadeTipo,
+  PaginaComLivro,
+} from "@/integrations/supabase/types-caderno";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
+/**
+ * Rota + params de destino por tipo de entidade.
+ * Capítulo não tem rota própria neste app; quando há `bookId`, aponta
+ * para o livro (mesmo padrão do AtividadeItem); senão usa a rota de capítulo.
+ */
+function rotaPara(
+  tipo: EntidadeTipo,
+  id: string,
+  bookId?: string | null,
+): { to: string; params: Record<string, string> } {
+  switch (tipo) {
+    case "page":
+      return { to: "/paginas/$pageId", params: { pageId: id } };
+    case "book":
+      return { to: "/livros/$bookId", params: { bookId: id } };
+    case "shelf":
+      return { to: "/estantes/$shelfId", params: { shelfId: id } };
+    case "chapter":
+      return bookId
+        ? { to: "/livros/$bookId", params: { bookId } }
+        : { to: "/capitulos/$chapterId", params: { chapterId: id } };
+  }
+}
+
 function Index() {
-  const { data: shelves, isLoading, isError } = useShelves();
-  const createShelf = useCreateShelf();
-  const [dialogAberto, setDialogAberto] = useState(false);
+  const [mostrarDetalhes, setMostrarDetalhes] = useState(true);
 
   // Garante o perfil do usuário logado (upsert lazy) uma única vez.
   useEffect(() => {
@@ -32,127 +75,241 @@ function Index() {
     });
   }, []);
 
-  const handleCriar = async (values: EntidadeFormValues) => {
-    try {
-      await createShelf.mutateAsync({
-        nome: values.nome,
-        descricao: values.descricao || null,
-        visibilidade: values.visibilidade,
-        team_id: values.team_id,
-      });
-      toast.success("Estante criada!");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Não foi possível criar a estante.");
-      throw err;
-    }
-  };
-
   return (
     <AppLayout>
-      <div className="mx-auto w-full max-w-6xl space-y-8 p-4 sm:p-6 lg:p-8">
-        {/* Cabeçalho de boas-vindas */}
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="mx-auto w-full max-w-7xl space-y-6 p-4 sm:p-6 lg:p-8">
+        {/* Cabeçalho + toggle de detalhes */}
+        <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
-            <h1 className="text-3xl font-bold tracking-tight">Bem-vindo ao Caderno</h1>
-            <p className="text-muted-foreground">
-              Organize a documentação da empresa em estantes, livros e páginas.
+            <h1 className="text-2xl font-bold tracking-tight">Início</h1>
+            <p className="text-sm text-muted-foreground">
+              Seu painel: rascunhos, favoritos e o que mudou por aqui.
             </p>
           </div>
-          <Button onClick={() => setDialogAberto(true)} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Nova estante
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            aria-pressed={mostrarDetalhes}
+            onClick={() => setMostrarDetalhes((v) => !v)}
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            Alternar Detalhes
           </Button>
         </header>
 
-        <section className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Library className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold">Estantes</h2>
-          </div>
-
-          {isLoading ? (
-            <GradeSkeleton />
-          ) : isError ? (
-            <Card>
-              <CardContent className="py-10 text-center text-sm text-muted-foreground">
-                Não foi possível carregar as estantes. Tente recarregar a página.
-              </CardContent>
-            </Card>
-          ) : (shelves ?? []).length === 0 ? (
-            <EstadoVazio onCriar={() => setDialogAberto(true)} />
-          ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {shelves!.map((shelf) => (
-                <EstanteCard key={shelf.id} shelf={shelf} />
-              ))}
+        <Layout3Col>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {/* Coluna 1 */}
+            <div className="space-y-6">
+              <PainelRascunhos mostrarDetalhes={mostrarDetalhes} />
+              <PainelVistos mostrarDetalhes={mostrarDetalhes} />
             </div>
-          )}
-        </section>
-      </div>
 
-      <EntidadeDialog
-        open={dialogAberto}
-        onOpenChange={setDialogAberto}
-        titulo="Nova estante"
-        descricaoDialog="Estantes agrupam livros por tema ou área."
-        textoConfirmar="Criar estante"
-        onSubmit={handleCriar}
-      />
+            {/* Coluna 2 */}
+            <div className="space-y-6">
+              <PainelFavoritos mostrarDetalhes={mostrarDetalhes} />
+              <PainelAtualizadas mostrarDetalhes={mostrarDetalhes} />
+            </div>
+
+            {/* Coluna 3 */}
+            <div className="space-y-6">
+              <PainelAtividade />
+            </div>
+          </div>
+        </Layout3Col>
+      </div>
     </AppLayout>
   );
 }
 
-function EstanteCard({ shelf }: { shelf: Shelf }) {
+// ------------------------------------------------------------
+// Painéis
+// ------------------------------------------------------------
+
+interface ComDetalhes {
+  mostrarDetalhes: boolean;
+}
+
+function PainelRascunhos({ mostrarDetalhes }: ComDetalhes) {
+  const { data, isLoading, isError } = useMeusRascunhos(8);
+
   return (
-    <Link to="/estantes/$shelfId" params={{ shelfId: shelf.id }} className="group block">
-      <Card className="h-full transition-shadow hover:shadow-md">
-        <CardHeader>
-          <div className="flex items-start justify-between gap-2">
-            <CardTitle className="line-clamp-2 group-hover:text-primary">{shelf.nome}</CardTitle>
-            <VisibilidadeBadge visibilidade={shelf.visibilidade} />
+    <ColunaPainel titulo="Meus Rascunhos" icon={FilePen}>
+      <ConteudoLista
+        isLoading={isLoading}
+        isError={isError}
+        vazio={(data ?? []).length === 0}
+      >
+        {(data ?? []).map((r) => (
+          <EntityListItem
+            key={r.page_id}
+            tipo="page"
+            nome={r.nome}
+            to="/paginas/$pageId"
+            params={{ pageId: r.page_id }}
+            meta={mostrarDetalhes ? r.book_nome ?? undefined : undefined}
+            trecho={mostrarDetalhes ? tempoRelativo(r.updated_at) : undefined}
+          />
+        ))}
+      </ConteudoLista>
+    </ColunaPainel>
+  );
+}
+
+function PainelVistos({ mostrarDetalhes }: ComDetalhes) {
+  const { data, isLoading, isError } = useVistosRecentemente(8);
+
+  return (
+    <ColunaPainel titulo="Vistos recentemente" icon={Eye}>
+      <ConteudoLista
+        isLoading={isLoading}
+        isError={isError}
+        vazio={(data ?? []).length === 0}
+      >
+        {(data ?? []).map((v) => {
+          const rota = rotaPara(v.tipo, v.entidade_id, v.book_id);
+          return (
+            <EntityListItem
+              key={`${v.tipo}:${v.entidade_id}`}
+              tipo={v.tipo}
+              nome={v.nome ?? "(sem nome)"}
+              to={rota.to}
+              params={rota.params}
+              trecho={mostrarDetalhes ? tempoRelativo(v.visto_em) : undefined}
+            />
+          );
+        })}
+      </ConteudoLista>
+    </ColunaPainel>
+  );
+}
+
+function PainelFavoritos({ mostrarDetalhes }: ComDetalhes) {
+  const { data, isLoading, isError } = useMeusFavoritos();
+
+  return (
+    <ColunaPainel titulo="Favoritos mais vistos" icon={Star}>
+      <ConteudoLista
+        isLoading={isLoading}
+        isError={isError}
+        vazio={(data ?? []).length === 0}
+      >
+        {(data ?? []).map((f) => {
+          const rota = rotaPara(f.tipo, f.entidade_id, f.book_id);
+          return (
+            <EntityListItem
+              key={`${f.tipo}:${f.entidade_id}`}
+              tipo={f.tipo}
+              nome={f.nome ?? "(sem nome)"}
+              to={rota.to}
+              params={rota.params}
+              meta={
+                mostrarDetalhes
+                  ? `${f.vezes} ${f.vezes === 1 ? "visualização" : "visualizações"}`
+                  : undefined
+              }
+            />
+          );
+        })}
+      </ConteudoLista>
+    </ColunaPainel>
+  );
+}
+
+function PainelAtualizadas({ mostrarDetalhes }: ComDetalhes) {
+  const { data, isLoading, isError } = usePaginasAtualizadas(8);
+
+  return (
+    <ColunaPainel titulo="Páginas atualizadas recentemente" icon={FileClock}>
+      <ConteudoLista
+        isLoading={isLoading}
+        isError={isError}
+        vazio={(data ?? []).length === 0}
+      >
+        {(data ?? []).map((p: PaginaComLivro) => (
+          <EntityListItem
+            key={p.id}
+            tipo="page"
+            nome={p.nome}
+            to="/paginas/$pageId"
+            params={{ pageId: p.id }}
+            meta={mostrarDetalhes ? p.book?.nome ?? undefined : undefined}
+            trecho={mostrarDetalhes ? tempoRelativo(p.updated_at) : undefined}
+          />
+        ))}
+      </ConteudoLista>
+    </ColunaPainel>
+  );
+}
+
+function PainelAtividade() {
+  const { data, isLoading, isError } = useAtividadeRecente(20);
+
+  return (
+    <ColunaPainel titulo="Atividade recente" icon={ActivityIcon}>
+      <ConteudoLista
+        isLoading={isLoading}
+        isError={isError}
+        vazio={(data ?? []).length === 0}
+      >
+        {(data ?? []).map((a) => (
+          <AtividadeItem key={a.id} atividade={a} />
+        ))}
+      </ConteudoLista>
+    </ColunaPainel>
+  );
+}
+
+// ------------------------------------------------------------
+// Estados compartilhados (loading / erro / vazio)
+// ------------------------------------------------------------
+
+interface ConteudoListaProps {
+  isLoading: boolean;
+  isError: boolean;
+  vazio: boolean;
+  children: ReactNode;
+}
+
+/** Decide entre skeleton, erro, vazio ou a lista de itens. */
+function ConteudoLista({
+  isLoading,
+  isError,
+  vazio,
+  children,
+}: ConteudoListaProps) {
+  if (isLoading) return <ListaSkeleton />;
+  if (isError) {
+    return (
+      <p className="px-2 py-3 text-sm text-muted-foreground">
+        Não foi possível carregar agora.
+      </p>
+    );
+  }
+  if (vazio) {
+    return (
+      <p className="px-2 py-3 text-sm text-muted-foreground">
+        Nada por aqui ainda.
+      </p>
+    );
+  }
+  return <div className="space-y-0.5">{children}</div>;
+}
+
+/** Skeleton simples: algumas linhas com chip + texto. */
+function ListaSkeleton() {
+  return (
+    <div className="space-y-2">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-3 px-2 py-2">
+          <Skeleton className="h-8 w-8 shrink-0 rounded-md" />
+          <div className="min-w-0 flex-1 space-y-1.5">
+            <Skeleton className="h-4 w-2/3" />
+            <Skeleton className="h-3 w-1/3" />
           </div>
-          {shelf.descricao && (
-            <CardDescription className="line-clamp-2">{shelf.descricao}</CardDescription>
-          )}
-        </CardHeader>
-      </Card>
-    </Link>
-  );
-}
-
-function EstadoVazio({ onCriar }: { onCriar: () => void }) {
-  return (
-    <Card>
-      <CardContent className="flex flex-col items-center gap-4 py-14 text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-          <BookOpen className="h-7 w-7 text-primary" />
         </div>
-        <div className="space-y-1">
-          <p className="font-medium">Crie sua primeira estante</p>
-          <p className="text-sm text-muted-foreground">
-            As estantes são o ponto de partida para organizar seus livros.
-          </p>
-        </div>
-        <Button onClick={onCriar} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Nova estante
-        </Button>
-      </CardContent>
-    </Card>
-  );
-}
-
-function GradeSkeleton() {
-  return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <Card key={i}>
-          <CardHeader className="space-y-3">
-            <Skeleton className="h-5 w-2/3" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-1/2" />
-          </CardHeader>
-        </Card>
       ))}
     </div>
   );

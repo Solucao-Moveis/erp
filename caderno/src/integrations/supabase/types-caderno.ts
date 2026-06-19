@@ -182,3 +182,65 @@ export type NovaShelf = Pick<Shelf, "nome" | "descricao"> & Partial<Pick<Shelf, 
 export type NovoBook = Pick<Book, "nome" | "descricao"> & Partial<Pick<Book, "visibilidade" | "team_id" | "capa_url" | "ordem">>;
 export type NovoChapter = Pick<Chapter, "book_id" | "nome"> & Partial<Pick<Chapter, "descricao" | "ordem">>;
 export type NovaPage = Pick<Page, "book_id" | "nome"> & Partial<Pick<Page, "chapter_id" | "html" | "texto" | "rascunho" | "ordem">>;
+
+// ---------- v2 (redesenho BookStack): atividade, vistos, favoritos, rascunhos, equipes ----------
+
+export type Acao = "criou" | "atualizou" | "excluiu";
+
+/** Linha do feed "Atividade recente" (RPC caderno.atividade_recente). */
+export interface Activity {
+  id: string;
+  user_id: string | null;
+  autor: string | null;       // nome ou e-mail de quem fez
+  acao: Acao;
+  tipo: EntidadeTipo;
+  entidade_id: string;
+  entidade_nome: string | null;
+  book_id: string | null;     // p/ montar o link da entidade
+  created_at: string;
+}
+
+/** Item "Vistos recentemente" (RPC caderno.meus_vistos). */
+export interface VistoItem {
+  tipo: EntidadeTipo;
+  entidade_id: string;
+  nome: string | null;
+  book_id: string | null;
+  visto_em: string;
+}
+
+/** Item "Favoritos" (RPC caderno.meus_favoritos). */
+export interface FavoritoItem {
+  tipo: EntidadeTipo;
+  entidade_id: string;
+  nome: string | null;
+  book_id: string | null;
+  vezes: number;              // nº de visualizações (p/ "mais vistos")
+}
+
+/** Item "Meus rascunhos" (RPC caderno.meus_rascunhos). */
+export interface RascunhoItem {
+  page_id: string;
+  nome: string;
+  book_id: string;
+  book_nome: string | null;
+  updated_at: string;
+}
+
+/** Membro de uma equipe (RPC caderno.listar_membros). */
+export interface MembroEquipe {
+  user_id: string;
+  email: string | null;
+  full_name: string | null;
+}
+
+/** Página com o nome do livro (consulta direta em pages + embed). */
+export interface PaginaComLivro extends Page {
+  book?: { nome: string } | null;
+}
+
+/** Capítulo com suas páginas (para a tela de capítulo). */
+export interface ChapterConteudo extends Chapter {
+  paginas: Page[];
+  book?: Book | null;
+}

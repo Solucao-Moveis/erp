@@ -13,10 +13,15 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as BuscaRouteImport } from './routes/busca'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LivrosIndexRouteImport } from './routes/livros.index'
 import { Route as EstantesIndexRouteImport } from './routes/estantes.index'
-import { Route as LivrosBookIdRouteImport } from './routes/livros.$bookId'
+import { Route as EquipesIndexRouteImport } from './routes/equipes.index'
 import { Route as EstantesShelfIdRouteImport } from './routes/estantes.$shelfId'
+import { Route as EquipesTeamIdRouteImport } from './routes/equipes.$teamId'
 import { Route as PaginasPageIdIndexRouteImport } from './routes/paginas.$pageId.index'
+import { Route as LivrosBookIdIndexRouteImport } from './routes/livros.$bookId.index'
+import { Route as CapitulosChapterIdIndexRouteImport } from './routes/capitulos.$chapterId.index'
+import { Route as PaginasPageIdRevisoesRouteImport } from './routes/paginas.$pageId.revisoes'
 import { Route as PaginasPageIdEditarRouteImport } from './routes/paginas.$pageId.editar'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -39,14 +44,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LivrosIndexRoute = LivrosIndexRouteImport.update({
+  id: '/livros/',
+  path: '/livros/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EstantesIndexRoute = EstantesIndexRouteImport.update({
   id: '/estantes/',
   path: '/estantes/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LivrosBookIdRoute = LivrosBookIdRouteImport.update({
-  id: '/livros/$bookId',
-  path: '/livros/$bookId',
+const EquipesIndexRoute = EquipesIndexRouteImport.update({
+  id: '/equipes/',
+  path: '/equipes/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EstantesShelfIdRoute = EstantesShelfIdRouteImport.update({
@@ -54,9 +64,29 @@ const EstantesShelfIdRoute = EstantesShelfIdRouteImport.update({
   path: '/estantes/$shelfId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EquipesTeamIdRoute = EquipesTeamIdRouteImport.update({
+  id: '/equipes/$teamId',
+  path: '/equipes/$teamId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PaginasPageIdIndexRoute = PaginasPageIdIndexRouteImport.update({
   id: '/paginas/$pageId/',
   path: '/paginas/$pageId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LivrosBookIdIndexRoute = LivrosBookIdIndexRouteImport.update({
+  id: '/livros/$bookId/',
+  path: '/livros/$bookId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CapitulosChapterIdIndexRoute = CapitulosChapterIdIndexRouteImport.update({
+  id: '/capitulos/$chapterId/',
+  path: '/capitulos/$chapterId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaginasPageIdRevisoesRoute = PaginasPageIdRevisoesRouteImport.update({
+  id: '/paginas/$pageId/revisoes',
+  path: '/paginas/$pageId/revisoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PaginasPageIdEditarRoute = PaginasPageIdEditarRouteImport.update({
@@ -70,10 +100,15 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/busca': typeof BuscaRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/equipes/$teamId': typeof EquipesTeamIdRoute
   '/estantes/$shelfId': typeof EstantesShelfIdRoute
-  '/livros/$bookId': typeof LivrosBookIdRoute
+  '/equipes/': typeof EquipesIndexRoute
   '/estantes/': typeof EstantesIndexRoute
+  '/livros/': typeof LivrosIndexRoute
   '/paginas/$pageId/editar': typeof PaginasPageIdEditarRoute
+  '/paginas/$pageId/revisoes': typeof PaginasPageIdRevisoesRoute
+  '/capitulos/$chapterId/': typeof CapitulosChapterIdIndexRoute
+  '/livros/$bookId/': typeof LivrosBookIdIndexRoute
   '/paginas/$pageId/': typeof PaginasPageIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -81,10 +116,15 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/busca': typeof BuscaRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/equipes/$teamId': typeof EquipesTeamIdRoute
   '/estantes/$shelfId': typeof EstantesShelfIdRoute
-  '/livros/$bookId': typeof LivrosBookIdRoute
+  '/equipes': typeof EquipesIndexRoute
   '/estantes': typeof EstantesIndexRoute
+  '/livros': typeof LivrosIndexRoute
   '/paginas/$pageId/editar': typeof PaginasPageIdEditarRoute
+  '/paginas/$pageId/revisoes': typeof PaginasPageIdRevisoesRoute
+  '/capitulos/$chapterId': typeof CapitulosChapterIdIndexRoute
+  '/livros/$bookId': typeof LivrosBookIdIndexRoute
   '/paginas/$pageId': typeof PaginasPageIdIndexRoute
 }
 export interface FileRoutesById {
@@ -93,10 +133,15 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/busca': typeof BuscaRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/equipes/$teamId': typeof EquipesTeamIdRoute
   '/estantes/$shelfId': typeof EstantesShelfIdRoute
-  '/livros/$bookId': typeof LivrosBookIdRoute
+  '/equipes/': typeof EquipesIndexRoute
   '/estantes/': typeof EstantesIndexRoute
+  '/livros/': typeof LivrosIndexRoute
   '/paginas/$pageId/editar': typeof PaginasPageIdEditarRoute
+  '/paginas/$pageId/revisoes': typeof PaginasPageIdRevisoesRoute
+  '/capitulos/$chapterId/': typeof CapitulosChapterIdIndexRoute
+  '/livros/$bookId/': typeof LivrosBookIdIndexRoute
   '/paginas/$pageId/': typeof PaginasPageIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -106,10 +151,15 @@ export interface FileRouteTypes {
     | '/auth'
     | '/busca'
     | '/reset-password'
+    | '/equipes/$teamId'
     | '/estantes/$shelfId'
-    | '/livros/$bookId'
+    | '/equipes/'
     | '/estantes/'
+    | '/livros/'
     | '/paginas/$pageId/editar'
+    | '/paginas/$pageId/revisoes'
+    | '/capitulos/$chapterId/'
+    | '/livros/$bookId/'
     | '/paginas/$pageId/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -117,10 +167,15 @@ export interface FileRouteTypes {
     | '/auth'
     | '/busca'
     | '/reset-password'
+    | '/equipes/$teamId'
     | '/estantes/$shelfId'
-    | '/livros/$bookId'
+    | '/equipes'
     | '/estantes'
+    | '/livros'
     | '/paginas/$pageId/editar'
+    | '/paginas/$pageId/revisoes'
+    | '/capitulos/$chapterId'
+    | '/livros/$bookId'
     | '/paginas/$pageId'
   id:
     | '__root__'
@@ -128,10 +183,15 @@ export interface FileRouteTypes {
     | '/auth'
     | '/busca'
     | '/reset-password'
+    | '/equipes/$teamId'
     | '/estantes/$shelfId'
-    | '/livros/$bookId'
+    | '/equipes/'
     | '/estantes/'
+    | '/livros/'
     | '/paginas/$pageId/editar'
+    | '/paginas/$pageId/revisoes'
+    | '/capitulos/$chapterId/'
+    | '/livros/$bookId/'
     | '/paginas/$pageId/'
   fileRoutesById: FileRoutesById
 }
@@ -140,10 +200,15 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BuscaRoute: typeof BuscaRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  EquipesTeamIdRoute: typeof EquipesTeamIdRoute
   EstantesShelfIdRoute: typeof EstantesShelfIdRoute
-  LivrosBookIdRoute: typeof LivrosBookIdRoute
+  EquipesIndexRoute: typeof EquipesIndexRoute
   EstantesIndexRoute: typeof EstantesIndexRoute
+  LivrosIndexRoute: typeof LivrosIndexRoute
   PaginasPageIdEditarRoute: typeof PaginasPageIdEditarRoute
+  PaginasPageIdRevisoesRoute: typeof PaginasPageIdRevisoesRoute
+  CapitulosChapterIdIndexRoute: typeof CapitulosChapterIdIndexRoute
+  LivrosBookIdIndexRoute: typeof LivrosBookIdIndexRoute
   PaginasPageIdIndexRoute: typeof PaginasPageIdIndexRoute
 }
 
@@ -177,6 +242,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/livros/': {
+      id: '/livros/'
+      path: '/livros'
+      fullPath: '/livros/'
+      preLoaderRoute: typeof LivrosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/estantes/': {
       id: '/estantes/'
       path: '/estantes'
@@ -184,11 +256,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EstantesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/livros/$bookId': {
-      id: '/livros/$bookId'
-      path: '/livros/$bookId'
-      fullPath: '/livros/$bookId'
-      preLoaderRoute: typeof LivrosBookIdRouteImport
+    '/equipes/': {
+      id: '/equipes/'
+      path: '/equipes'
+      fullPath: '/equipes/'
+      preLoaderRoute: typeof EquipesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/estantes/$shelfId': {
@@ -198,11 +270,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EstantesShelfIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/equipes/$teamId': {
+      id: '/equipes/$teamId'
+      path: '/equipes/$teamId'
+      fullPath: '/equipes/$teamId'
+      preLoaderRoute: typeof EquipesTeamIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/paginas/$pageId/': {
       id: '/paginas/$pageId/'
       path: '/paginas/$pageId'
       fullPath: '/paginas/$pageId/'
       preLoaderRoute: typeof PaginasPageIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/livros/$bookId/': {
+      id: '/livros/$bookId/'
+      path: '/livros/$bookId'
+      fullPath: '/livros/$bookId/'
+      preLoaderRoute: typeof LivrosBookIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/capitulos/$chapterId/': {
+      id: '/capitulos/$chapterId/'
+      path: '/capitulos/$chapterId'
+      fullPath: '/capitulos/$chapterId/'
+      preLoaderRoute: typeof CapitulosChapterIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/paginas/$pageId/revisoes': {
+      id: '/paginas/$pageId/revisoes'
+      path: '/paginas/$pageId/revisoes'
+      fullPath: '/paginas/$pageId/revisoes'
+      preLoaderRoute: typeof PaginasPageIdRevisoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/paginas/$pageId/editar': {
@@ -220,10 +320,15 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BuscaRoute: BuscaRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  EquipesTeamIdRoute: EquipesTeamIdRoute,
   EstantesShelfIdRoute: EstantesShelfIdRoute,
-  LivrosBookIdRoute: LivrosBookIdRoute,
+  EquipesIndexRoute: EquipesIndexRoute,
   EstantesIndexRoute: EstantesIndexRoute,
+  LivrosIndexRoute: LivrosIndexRoute,
   PaginasPageIdEditarRoute: PaginasPageIdEditarRoute,
+  PaginasPageIdRevisoesRoute: PaginasPageIdRevisoesRoute,
+  CapitulosChapterIdIndexRoute: CapitulosChapterIdIndexRoute,
+  LivrosBookIdIndexRoute: LivrosBookIdIndexRoute,
   PaginasPageIdIndexRoute: PaginasPageIdIndexRoute,
 }
 export const routeTree = rootRouteImport

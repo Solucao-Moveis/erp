@@ -56,6 +56,25 @@ export function usePageRevisions(pageId: string | undefined) {
   });
 }
 
+async function fetchRevision(id: string): Promise<PageRevision> {
+  const { data, error } = await supabase
+    .from("page_revisions")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (error) throw error;
+  return data as PageRevision;
+}
+
+/** Uma revisão específica. */
+export function useRevision(id: string | undefined) {
+  return useQuery({
+    queryKey: qk.revisao(id ?? ""),
+    queryFn: () => fetchRevision(id as string),
+    enabled: !!id,
+  });
+}
+
 // ---------- mutations ----------
 
 /** Cria uma página dentro de um livro (e opcionalmente de um capítulo). */
@@ -151,6 +170,46 @@ export function useMovePage() {
     onSuccess: (page) => {
       qc.invalidateQueries({ queryKey: qk.page(page.id) });
       qc.invalidateQueries({ queryKey: qk.bookConteudo(page.book_id) });
+    },
+  });
+}
+
+/**
+ * Restaura uma revisão antiga: copia nome/html da revisão para a página
+ * (o trigger do banco gera uma nova revisão a partir desse update).
+ */
+export function useRestaurarRevisao() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      pageId: string;
+      revisionId: string;
+    }): Promise<Page> => {
+      const { data: rev, error: revErr } = await supabase
+        .from("page_revisions")
+        .select("*")
+        .eq("id", input.revisionId)
+        .single();
+      if (revErr) throw revErr;
+      const revisao = rev as PageRevision;
+
+      const updated_by = await getUserId();
+      const { data, error } = await supabase
+        .from("pages")
+        .update({
+          nome: revisao.nome,
+          html: revisao.html,
+          updated_by,
+        })
+        .eq("id", input.pageId)
+        .select()
+        .single();
+      if (error) throw error;
+      return data as Page;
+    },
+    onSuccess: (page) => {
+      qc.invalidateQueries({ queryKey: qk.page(page.id) });
+      qc.invalidateQueries({ queryKey: qk.revisoes(page.id) });
     },
   });
 }

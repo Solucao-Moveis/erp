@@ -1,30 +1,47 @@
 // ============================================================
-// VISÃO DA PÁGINA — layout de 3 colunas (estilo BookStack):
-//   esquerda  = navegação do livro (árvore)
-//   centro    = breadcrumb + título + conteúdo
-//   direita   = sumário (TOC) + informações
-// No mobile as colunas empilham.
+// VISÃO DA PÁGINA — layout de 3 colunas (clone do BookStack):
+//   esquerda  = "Navegação da Página" (sumário/TOC) +
+//               "Navegação do Livro" (árvore de capítulos/páginas)
+//   centro    = breadcrumb com ícones + título grande + conteúdo
+//   direita   = Detalhes (revisão, criado/atualizado) + Ações
+//               (Editar, Copiar, Mover, Revisões, Permissões,
+//                Excluir, Acompanhar, Favoritar)
+// No mobile as rails empilham acima/abaixo do centro.
 // ============================================================
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { Info, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Copy,
+  Eye,
+  FolderInput,
+  History,
+  Lock,
+  Pencil,
+  Star,
+  Trash2,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { AppLayout } from "@/components/AppLayout";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Breadcrumbs } from "@/components/caderno/Breadcrumbs";
 import { ConfirmarExclusao } from "@/components/caderno/ConfirmarExclusao";
+import { Layout3Col } from "@/components/caderno/Layout3Col";
 import { LivroArvore } from "@/components/caderno/LivroArvore";
-import { useBookConteudo, useDeletePage, usePage, useProfile } from "@/data";
+import { MoverPaginaDialog } from "@/components/caderno/MoverPaginaDialog";
+import { RailAcoes, type AcaoRail } from "@/components/caderno/RailAcoes";
+import { RailDetalhes } from "@/components/caderno/RailDetalhes";
+import {
+  registrarView,
+  useBookConteudo,
+  useDeletePage,
+  useIsFavorito,
+  usePage,
+  usePageRevisions,
+  useProfile,
+  useToggleFavorito,
+} from "@/data";
 import { RichContent, gerarSumario } from "@/features/editor";
 import type { Chapter } from "@/integrations/supabase/types-caderno";
 
@@ -38,10 +55,22 @@ function PaginaView() {
 
   const { data: page, isLoading, isError } = usePage(pageId);
   const { data: book } = useBookConteudo(page?.book_id);
-  const { data: autor } = useProfile(page?.created_by);
+  const { data: revisoes } = usePageRevisions(pageId);
+  const { data: criadoPor } = useProfile(page?.created_by);
+  const { data: atualizadoPor } = useProfile(page?.updated_by ?? undefined);
+  const { data: favorito } = useIsFavorito("page", pageId);
+  const toggleFavorito = useToggleFavorito();
   const deletePage = useDeletePage();
 
   const [excluir, setExcluir] = useState(false);
+  const [mover, setMover] = useState(false);
+
+  // Registra a visualização ao abrir a página.
+  useEffect(() => {
+    void registrarView("page", pageId).catch(() => {
+      // visualização é best-effort; falha não atrapalha a tela
+    });
+  }, [pageId]);
 
   // Capítulo da página atual (para o breadcrumb).
   const capitulo: Chapter | undefined = useMemo(() => {
@@ -52,7 +81,15 @@ function PaginaView() {
       .find((c) => c.id === page.chapter_id);
   }, [page?.chapter_id, book]);
 
+  // Sumário (TOC) derivado dos títulos do HTML.
   const sumario = useMemo(() => (page ? gerarSumario(page.html) : []), [page]);
+
+  const nomeCriador = criadoPor?.full_name || criadoPor?.email || undefined;
+  const nomeAtualizador =
+    atualizadoPor?.full_name || atualizadoPor?.email || undefined;
+
+  // Número da revisão = total de revisões + 1 (a versão atual).
+  const numeroRevisao = (revisoes?.length ?? 0) + 1;
 
   const handleExcluir = async () => {
     if (!page) return;
@@ -64,6 +101,14 @@ function PaginaView() {
       toast.error(err instanceof Error ? err.message : "Não foi possível excluir.");
       throw err;
     }
+  };
+
+  const handleFavoritar = () => {
+    toggleFavorito.mutate({
+      tipo: "page",
+      entidade_id: pageId,
+      favorito: favorito ?? false,
+    });
   };
 
   if (isLoading) {
@@ -90,137 +135,139 @@ function PaginaView() {
     );
   }
 
+  // ---- Ações da rail direita (estilo BookStack) ----
+  const acoes: AcaoRail[] = [
+    {
+      icon: Pencil,
+      label: "Editar",
+      to: "/paginas/$pageId/editar",
+      params: { pageId: page.id },
+    },
+    {
+      icon: Copy,
+      label: "Copiar",
+      onClick: () => toast.info("Cópia de páginas em breve."),
+    },
+    {
+      icon: FolderInput,
+      label: "Mover",
+      onClick: () => setMover(true),
+    },
+    {
+      icon: History,
+      label: "Revisões",
+      to: "/paginas/$pageId/revisoes",
+      params: { pageId: page.id },
+    },
+    {
+      icon: Lock,
+      label: "Permissões",
+      onClick: () => toast.info("Permissões por página em breve."),
+    },
+    {
+      icon: Eye,
+      label: "Acompanhar",
+      onClick: () => toast.info("Acompanhar páginas em breve."),
+    },
+    {
+      icon: Star,
+      label: favorito ? "Desfavoritar" : "Favoritar",
+      onClick: handleFavoritar,
+    },
+    {
+      icon: Trash2,
+      label: "Excluir",
+      onClick: () => setExcluir(true),
+      danger: true,
+    },
+  ];
+
+  // ---- Rail esquerda: navegação da página + do livro ----
+  const esquerda = (
+    <div className="space-y-6">
+      {sumario.length > 0 && (
+        <nav className="rounded-xl border bg-card p-3 text-sm">
+          <h2 className="mb-2 px-2 font-semibold">Navegação da Página</h2>
+          <div className="space-y-0.5">
+            {sumario.map((item) => (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                className={
+                  "block truncate rounded px-2 py-1 text-muted-foreground transition-colors hover:bg-muted hover:text-primary " +
+                  (item.nivel === 3 ? "pl-5" : "")
+                }
+              >
+                {item.texto}
+              </a>
+            ))}
+          </div>
+        </nav>
+      )}
+
+      <div className="rounded-xl border bg-card p-3">
+        <h2 className="mb-2 px-2 text-sm font-semibold">Navegação do Livro</h2>
+        {book ? (
+          <LivroArvore
+            arvore={book.arvore}
+            bookId={page.book_id}
+            currentPageId={page.id}
+          />
+        ) : (
+          <div className="space-y-2 px-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-5 w-full" />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  // ---- Rail direita: detalhes + ações ----
+  const direita = (
+    <>
+      <RailDetalhes
+        revisao={numeroRevisao}
+        criadoEm={page.created_at}
+        criadoPor={nomeCriador}
+        atualizadoEm={page.updated_at}
+        atualizadoPor={nomeAtualizador}
+      />
+      <RailAcoes acoes={acoes} />
+    </>
+  );
+
   return (
     <AppLayout>
       <div className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[16rem_minmax(0,1fr)_15rem]">
-          {/* ESQUERDA: navegação do livro */}
-          <aside className="lg:sticky lg:top-6 lg:self-start">
-            <div className="rounded-xl border bg-card p-3">
-              <Link
-                to="/livros/$bookId"
-                params={{ bookId: page.book_id }}
-                className="mb-2 block px-2 text-sm font-semibold hover:text-primary"
-              >
-                {book?.nome ?? "Livro"}
-              </Link>
-              <Separator className="mb-2" />
-              {book ? (
-                <LivroArvore arvore={book.arvore} currentPageId={page.id} />
-              ) : (
-                <div className="space-y-2 px-2">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <Skeleton key={i} className="h-5 w-full" />
-                  ))}
-                </div>
-              )}
-            </div>
-          </aside>
-
+        <Layout3Col esquerda={esquerda} direita={direita}>
           {/* CENTRO: breadcrumb + título + conteúdo */}
-          <article className="min-w-0">
-            <Breadcrumbs
-              className="mb-3"
-              itens={[
-                { label: book?.nome ?? "Livro", to: undefined },
-                ...(capitulo ? [{ label: capitulo.nome }] : []),
-                { label: page.nome },
-              ]}
-            />
+          <Breadcrumbs
+            className="mb-4"
+            itens={[
+              { tipo: "book", label: "Livros", to: "/estantes" },
+              {
+                tipo: "book",
+                label: book?.nome ?? "Livro",
+                to: "/livros/$bookId",
+                params: { bookId: page.book_id },
+              },
+              ...(capitulo
+                ? [{ tipo: "chapter" as const, label: capitulo.nome, to: "/capitulos/$chapterId", params: { chapterId: capitulo.id } }]
+                : []),
+              { tipo: "page" as const, label: page.nome },
+            ]}
+          />
 
-            <div className="mb-4 flex items-start justify-between gap-3">
-              <h1 className="text-3xl font-bold tracking-tight">{page.nome}</h1>
-              <div className="flex shrink-0 items-center gap-2">
-                <Button asChild className="gap-2">
-                  <Link to="/paginas/$pageId/editar" params={{ pageId: page.id }}>
-                    <Pencil className="h-4 w-4" />
-                    Editar
-                  </Link>
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="icon" aria-label="Mais ações">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      onClick={() => setExcluir(true)}
-                      className="text-destructive focus:text-destructive"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Excluir
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
+          <h1 className="mb-5 text-3xl font-bold tracking-tight">{page.nome}</h1>
 
-            {page.html.trim() ? (
-              <RichContent html={page.html} />
-            ) : (
-              <p className="text-muted-foreground">
-                Esta página ainda está vazia.{" "}
-                <Link
-                  to="/paginas/$pageId/editar"
-                  params={{ pageId: page.id }}
-                  className="text-primary underline-offset-4 hover:underline"
-                >
-                  Adicionar conteúdo
-                </Link>
-                .
-              </p>
-            )}
-
-            {/* Fase 2: tags, anexos e comentários entram aqui. */}
-          </article>
-
-          {/* DIREITA: sumário + informações */}
-          <aside className="lg:sticky lg:top-6 lg:self-start">
-            <div className="space-y-6 text-sm">
-              {sumario.length > 0 && (
-                <div>
-                  <h2 className="mb-2 font-semibold">Sumário</h2>
-                  <nav className="space-y-1">
-                    {sumario.map((item) => (
-                      <a
-                        key={item.id}
-                        href={`#${item.id}`}
-                        className={
-                          "block truncate text-muted-foreground transition-colors hover:text-primary " +
-                          (item.nivel === 3 ? "pl-4" : "")
-                        }
-                      >
-                        {item.texto}
-                      </a>
-                    ))}
-                  </nav>
-                </div>
-              )}
-
-              <div>
-                <h2 className="mb-2 flex items-center gap-1.5 font-semibold">
-                  <Info className="h-4 w-4" />
-                  Informações
-                </h2>
-                <dl className="space-y-1 text-muted-foreground">
-                  <div>
-                    <dt className="text-xs uppercase tracking-wide">Atualizado</dt>
-                    <dd className="text-foreground">{formatarData(page.updated_at)}</dd>
-                  </div>
-                  {autor && (
-                    <div>
-                      <dt className="text-xs uppercase tracking-wide">Autor</dt>
-                      <dd className="text-foreground">
-                        {autor.full_name || autor.email || "—"}
-                      </dd>
-                    </div>
-                  )}
-                </dl>
-              </div>
-            </div>
-          </aside>
-        </div>
+          {page.html.trim() ? (
+            <RichContent html={page.html} />
+          ) : (
+            <p className="text-muted-foreground">Esta página ainda está vazia.</p>
+          )}
+        </Layout3Col>
       </div>
 
       <ConfirmarExclusao
@@ -230,30 +277,25 @@ function PaginaView() {
         descricao="A página será removida permanentemente. Esta ação não pode ser desfeita."
         onConfirm={handleExcluir}
       />
+
+      <MoverPaginaDialog
+        open={mover}
+        onOpenChange={setMover}
+        page={{
+          id: page.id,
+          book_id: page.book_id,
+          chapter_id: page.chapter_id,
+        }}
+      />
     </AppLayout>
   );
 }
 
-/** Formata uma data ISO em pt-BR (data + hora). */
-function formatarData(iso: string): string {
-  try {
-    return new Date(iso).toLocaleString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch {
-    return iso;
-  }
-}
-
 function CarregandoPagina() {
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[16rem_minmax(0,1fr)_15rem]">
-      <Skeleton className="h-64 w-full rounded-xl" />
-      <div className="space-y-4">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[240px_minmax(0,1fr)_280px]">
+      <Skeleton className="hidden h-64 w-full rounded-xl lg:block" />
+      <div className="space-y-4 rounded-xl border bg-card p-5">
         <Skeleton className="h-4 w-1/3" />
         <Skeleton className="h-9 w-2/3" />
         <Skeleton className="h-4 w-full" />

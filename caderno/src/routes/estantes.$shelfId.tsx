@@ -1,32 +1,32 @@
 // ============================================================
-// VISÃO DA ESTANTE — cabeçalho + livros + criar/editar/excluir.
+// VISÃO DA ESTANTE (estilo BookStack) — Layout3Col:
+// centro com breadcrumb, título, descrição e grade de livros;
+// rail direita com Detalhes + Ações (criar/editar/permissões/excluir).
 // ============================================================
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { BookOpen, MoreVertical, Pencil, Plus, Trash2 } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { Lock, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppLayout } from "@/components/AppLayout";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Breadcrumbs } from "@/components/caderno/Breadcrumbs";
 import { ConfirmarExclusao } from "@/components/caderno/ConfirmarExclusao";
 import { EntidadeDialog, type EntidadeFormValues } from "@/components/caderno/EntidadeDialog";
+import { EntityCard } from "@/components/caderno/EntityCard";
+import { Layout3Col } from "@/components/caderno/Layout3Col";
+import { RailAcoes } from "@/components/caderno/RailAcoes";
+import { RailDetalhes } from "@/components/caderno/RailDetalhes";
 import { VisibilidadeBadge } from "@/components/caderno/VisibilidadeBadge";
 import {
+  registrarView,
   useCreateBook,
   useDeleteShelf,
+  useProfile,
   useShelf,
   useUpdateShelf,
 } from "@/data";
-import type { Book } from "@/integrations/supabase/types-caderno";
 
 export const Route = createFileRoute("/estantes/$shelfId")({
   component: ShelfPage,
@@ -36,6 +36,7 @@ function ShelfPage() {
   const { shelfId } = Route.useParams();
   const navigate = useNavigate();
   const { data: shelf, isLoading, isError } = useShelf(shelfId);
+  const { data: autor } = useProfile(shelf?.created_by);
 
   const createBook = useCreateBook();
   const updateShelf = useUpdateShelf();
@@ -43,7 +44,15 @@ function ShelfPage() {
 
   const [novoLivro, setNovoLivro] = useState(false);
   const [editar, setEditar] = useState(false);
+  const [permissoes, setPermissoes] = useState(false);
   const [excluir, setExcluir] = useState(false);
+
+  // Registra a visualização ao abrir a estante.
+  useEffect(() => {
+    registrarView("shelf", shelfId).catch(() => {
+      // visualização é best-effort; ignora falhas silenciosamente
+    });
+  }, [shelfId]);
 
   const handleNovoLivro = async (values: EntidadeFormValues) => {
     try {
@@ -88,30 +97,69 @@ function ShelfPage() {
     }
   };
 
-  return (
-    <AppLayout>
-      <div className="mx-auto w-full max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8">
-        <Breadcrumbs
-          itens={[
-            { label: "Estantes", to: "/estantes" },
-            { label: shelf?.nome ?? "Estante" },
-          ]}
-        />
-
-        {isLoading ? (
-          <CabecalhoSkeleton />
-        ) : isError || !shelf ? (
+  // Erro / não encontrada: tela enxuta dentro do AppLayout.
+  if (isError || (!isLoading && !shelf)) {
+    return (
+      <AppLayout>
+        <div className="mx-auto w-full max-w-7xl space-y-6 p-4 sm:p-6 lg:p-8">
+          <Breadcrumbs
+            itens={[
+              { tipo: "shelf", label: "Estantes", to: "/estantes" },
+              { tipo: "shelf", label: "Estante" },
+            ]}
+          />
           <Card>
             <CardContent className="py-10 text-center text-sm text-muted-foreground">
               Não foi possível carregar a estante.
             </CardContent>
           </Card>
-        ) : (
-          <>
-            <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <h1 className="text-2xl font-bold tracking-tight">{shelf.nome}</h1>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  const rail = shelf ? (
+    <>
+      <RailDetalhes
+        criadoEm={shelf.created_at}
+        criadoPor={autor?.full_name ?? undefined}
+        atualizadoEm={shelf.updated_at}
+      />
+      <RailAcoes
+        acoes={[
+          { icon: Plus, label: "Novo livro", onClick: () => setNovoLivro(true) },
+          { icon: Pencil, label: "Editar", onClick: () => setEditar(true) },
+          { icon: Lock, label: "Permissões", onClick: () => setPermissoes(true) },
+          {
+            icon: Trash2,
+            label: "Excluir",
+            onClick: () => setExcluir(true),
+            danger: true,
+          },
+        ]}
+      />
+    </>
+  ) : undefined;
+
+  return (
+    <AppLayout>
+      <div className="mx-auto w-full max-w-7xl space-y-6 p-4 sm:p-6 lg:p-8">
+        <Layout3Col direita={rail}>
+          {isLoading || !shelf ? (
+            <ConteudoSkeleton />
+          ) : (
+            <>
+              <Breadcrumbs
+                className="mb-4"
+                itens={[
+                  { tipo: "shelf", label: "Estantes", to: "/estantes" },
+                  { tipo: "shelf", label: shelf.nome },
+                ]}
+              />
+
+              <header className="mb-6 space-y-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h1 className="text-3xl font-bold tracking-tight">{shelf.nome}</h1>
                   <VisibilidadeBadge visibilidade={shelf.visibilidade} />
                 </div>
                 {shelf.descricao && (
@@ -120,59 +168,30 @@ function ShelfPage() {
                 <p className="text-sm text-muted-foreground">
                   {shelf.livros.length} {shelf.livros.length === 1 ? "livro" : "livros"}
                 </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button onClick={() => setNovoLivro(true)} className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  Novo livro
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="icon" aria-label="Mais ações">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => setEditar(true)}>
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Editar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => setExcluir(true)}
-                      className="text-destructive focus:text-destructive"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Excluir
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </header>
+              </header>
 
-            {shelf.livros.length === 0 ? (
-              <Card>
-                <CardContent className="flex flex-col items-center gap-4 py-14 text-center">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-                    <BookOpen className="h-7 w-7 text-primary" />
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Esta estante ainda não tem livros.
-                  </p>
-                  <Button onClick={() => setNovoLivro(true)} className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Novo livro
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {shelf.livros.map((livro) => (
-                  <LivroCard key={livro.id} livro={livro} />
-                ))}
-              </div>
-            )}
-          </>
-        )}
+              {shelf.livros.length === 0 ? (
+                <div className="flex flex-col items-center gap-4 rounded-lg border border-dashed py-14 text-center">
+                  <p className="text-sm text-muted-foreground">Sem livros ainda.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  {shelf.livros.map((livro) => (
+                    <EntityCard
+                      key={livro.id}
+                      tipo="book"
+                      nome={livro.nome}
+                      descricao={livro.descricao}
+                      capaUrl={livro.capa_url}
+                      to="/livros/$bookId"
+                      params={{ bookId: livro.id }}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </Layout3Col>
       </div>
 
       <EntidadeDialog
@@ -185,19 +204,36 @@ function ShelfPage() {
       />
 
       {shelf && (
-        <EntidadeDialog
-          open={editar}
-          onOpenChange={setEditar}
-          titulo="Editar estante"
-          textoConfirmar="Salvar"
-          inicial={{
-            nome: shelf.nome,
-            descricao: shelf.descricao ?? "",
-            visibilidade: shelf.visibilidade,
-            team_id: shelf.team_id,
-          }}
-          onSubmit={handleEditar}
-        />
+        <>
+          <EntidadeDialog
+            open={editar}
+            onOpenChange={setEditar}
+            titulo="Editar estante"
+            textoConfirmar="Salvar"
+            inicial={{
+              nome: shelf.nome,
+              descricao: shelf.descricao ?? "",
+              visibilidade: shelf.visibilidade,
+              team_id: shelf.team_id,
+            }}
+            onSubmit={handleEditar}
+          />
+
+          <EntidadeDialog
+            open={permissoes}
+            onOpenChange={setPermissoes}
+            titulo="Permissões da estante"
+            descricaoDialog="Defina quem pode ver esta estante."
+            textoConfirmar="Salvar permissões"
+            inicial={{
+              nome: shelf.nome,
+              descricao: shelf.descricao ?? "",
+              visibilidade: shelf.visibilidade,
+              team_id: shelf.team_id,
+            }}
+            onSubmit={handleEditar}
+          />
+        </>
       )}
 
       <ConfirmarExclusao
@@ -211,43 +247,22 @@ function ShelfPage() {
   );
 }
 
-function LivroCard({ livro }: { livro: Book }) {
-  return (
-    <Link to="/livros/$bookId" params={{ bookId: livro.id }} className="group block">
-      <Card className="h-full transition-shadow hover:shadow-md">
-        <CardHeader>
-          <div className="flex items-start justify-between gap-2">
-            <CardTitle className="line-clamp-2 group-hover:text-primary">
-              <span className="inline-flex items-center gap-2">
-                <BookOpen className="h-4 w-4 shrink-0 text-primary" />
-                {livro.nome}
-              </span>
-            </CardTitle>
-            <VisibilidadeBadge visibilidade={livro.visibilidade} />
-          </div>
-          {livro.descricao && (
-            <CardDescription className="line-clamp-3">{livro.descricao}</CardDescription>
-          )}
-        </CardHeader>
-      </Card>
-    </Link>
-  );
-}
-
-function CabecalhoSkeleton() {
+function ConteudoSkeleton() {
   return (
     <div className="space-y-6">
+      <Skeleton className="h-6 w-48" />
       <div className="space-y-3">
-        <Skeleton className="h-8 w-1/3" />
+        <Skeleton className="h-9 w-1/2" />
         <Skeleton className="h-4 w-2/3" />
       </div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <Card key={i}>
-            <CardHeader className="space-y-3">
+          <Card key={i} className="overflow-hidden p-0">
+            <Skeleton className="h-24 w-full rounded-none" />
+            <div className="space-y-3 p-4">
               <Skeleton className="h-5 w-2/3" />
               <Skeleton className="h-4 w-full" />
-            </CardHeader>
+            </div>
           </Card>
         ))}
       </div>

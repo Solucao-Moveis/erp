@@ -1,7 +1,7 @@
 // ============================================================
-// Árvore de conteúdo do livro: capítulos (com suas páginas) e
-// páginas soltas. Usada na visão do livro e na coluna de
-// navegação da visão da página (destaca a página atual).
+// Árvore de navegação do livro (estilo BookStack "Book Navigation"):
+// lista capítulos com suas páginas indentadas e páginas soltas.
+// Destaca o item atual com uma barrinha à esquerda. Cada item é Link.
 // ============================================================
 import { Link } from "@tanstack/react-router";
 import { FileText, Folder } from "lucide-react";
@@ -11,43 +11,60 @@ import type { ItemArvore } from "@/integrations/supabase/types-caderno";
 
 interface LivroArvoreProps {
   arvore: ItemArvore[];
-  /** Id da página atual (para destacar na navegação). */
+  /** Id do livro (reservado para futuras rotas; mantém a API completa). */
+  bookId?: string;
+  /** Id da página atual (destaca na navegação). */
   currentPageId?: string;
+  /** Id do capítulo atual (destaca o cabeçalho do capítulo). */
+  currentChapterId?: string;
   className?: string;
 }
 
-/** Link de uma página dentro da árvore. */
-function PaginaLink({
-  id,
+/** Item da árvore com barrinha de destaque à esquerda quando ativo. */
+function ItemLink({
+  to,
+  params,
   nome,
-  current,
+  Icon,
+  ativo,
   recuo,
+  forte,
 }: {
-  id: string;
+  to: string;
+  params: Record<string, string>;
   nome: string;
-  current: boolean;
+  Icon: typeof FileText;
+  ativo: boolean;
   recuo?: boolean;
+  forte?: boolean;
 }) {
   return (
     <Link
-      to="/paginas/$pageId"
-      params={{ pageId: id }}
+      to={to as never}
+      params={params as never}
       className={cn(
-        "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
-        recuo && "ml-5",
-        current
-          ? "bg-primary/10 font-medium text-primary"
-          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+        // A borda esquerda vira a "barrinha" de destaque do item ativo.
+        "flex items-center gap-2 border-l-2 px-2 py-1.5 text-sm transition-colors",
+        recuo && "pl-7",
+        ativo
+          ? "border-primary bg-primary/10 font-medium text-primary"
+          : "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground",
+        forte && !ativo && "font-semibold text-foreground",
       )}
     >
-      <FileText className="h-4 w-4 shrink-0" />
+      <Icon className={cn("h-4 w-4 shrink-0", forte && !ativo && "text-primary")} />
       <span className="truncate">{nome}</span>
     </Link>
   );
 }
 
-/** Renderiza a árvore de capítulos e páginas. */
-export function LivroArvore({ arvore, currentPageId, className }: LivroArvoreProps) {
+/** Árvore de capítulos e páginas do livro. */
+export function LivroArvore({
+  arvore,
+  currentPageId,
+  currentChapterId,
+  className,
+}: LivroArvoreProps) {
   if (arvore.length === 0) {
     return (
       <p className={cn("px-2 py-4 text-sm text-muted-foreground", className)}>
@@ -57,28 +74,33 @@ export function LivroArvore({ arvore, currentPageId, className }: LivroArvorePro
   }
 
   return (
-    <nav className={cn("space-y-1", className)}>
+    <nav className={cn("space-y-0.5", className)}>
       {arvore.map((item) => {
         if (item.tipo === "chapter" && item.chapter) {
           const cap = item.chapter;
           const paginas = item.paginas ?? [];
           return (
-            <div key={`cap-${cap.id}`} className="space-y-1">
-              <div className="flex items-center gap-2 px-2 py-1.5 text-sm font-semibold text-foreground">
-                <Folder className="h-4 w-4 shrink-0 text-primary" />
-                <span className="truncate">{cap.nome}</span>
-              </div>
+            <div key={`cap-${cap.id}`} className="space-y-0.5">
+              {/* O capítulo abre a tela do capítulo. */}
+              <ItemLink
+                to="/capitulos/$chapterId"
+                params={{ chapterId: cap.id }}
+                nome={cap.nome}
+                Icon={Folder}
+                ativo={cap.id === currentChapterId}
+                forte
+              />
               {paginas.length === 0 ? (
-                <p className="ml-5 px-2 py-1 text-xs text-muted-foreground">
-                  Sem páginas neste capítulo.
-                </p>
+                <p className="pl-7 text-xs text-muted-foreground">Sem páginas neste capítulo.</p>
               ) : (
                 paginas.map((p) => (
-                  <PaginaLink
+                  <ItemLink
                     key={p.id}
-                    id={p.id}
+                    to="/paginas/$pageId"
+                    params={{ pageId: p.id }}
                     nome={p.nome}
-                    current={p.id === currentPageId}
+                    Icon={FileText}
+                    ativo={p.id === currentPageId}
                     recuo
                   />
                 ))
@@ -90,11 +112,13 @@ export function LivroArvore({ arvore, currentPageId, className }: LivroArvorePro
         if (item.tipo === "page" && item.page) {
           const p = item.page;
           return (
-            <PaginaLink
+            <ItemLink
               key={p.id}
-              id={p.id}
+              to="/paginas/$pageId"
+              params={{ pageId: p.id }}
               nome={p.nome}
-              current={p.id === currentPageId}
+              Icon={FileText}
+              ativo={p.id === currentPageId}
             />
           );
         }

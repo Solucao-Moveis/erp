@@ -18,6 +18,7 @@ export {
 export {
   useBook,
   useBookConteudo,
+  useTodosLivros,
   useCreateBook,
   useUpdateBook,
   useDeleteBook,
@@ -26,6 +27,8 @@ export {
 } from "./books";
 
 export {
+  useChapter,
+  useChapterConteudo,
   useCreateChapter,
   useUpdateChapter,
   useDeleteChapter,
@@ -34,6 +37,8 @@ export {
 export {
   usePage,
   usePageRevisions,
+  useRevision,
+  useRestaurarRevisao,
   useCreatePage,
   useUpdatePage,
   useMovePage,
@@ -41,9 +46,34 @@ export {
 } from "./pages";
 
 export { useBusca } from "./search";
-export { useTeams } from "./teams";
+
+export {
+  useTeams,
+  useTeamMembers,
+  useCreateTeam,
+  useAddMember,
+  useRemoveMember,
+  useDeleteTeam,
+} from "./teams";
+
 export {
   ensureProfile,
   useEnsureProfile,
   useProfile,
 } from "./profile";
+
+export { useAtividadeRecente, useAtividadeDoLivro } from "./activities";
+
+export {
+  registrarView,
+  useVistosRecentemente,
+  usePopularBooks,
+} from "./views";
+
+export {
+  useMeusFavoritos,
+  useIsFavorito,
+  useToggleFavorito,
+} from "./favorites";
+
+export { useMeusRascunhos, usePaginasAtualizadas } from "./drafts";

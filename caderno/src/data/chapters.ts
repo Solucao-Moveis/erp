@@ -2,15 +2,82 @@
 // Capítulos (chapters) — mutações.
 // Capítulos sempre pertencem a um livro; herdam visibilidade do livro.
 // ============================================================
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type {
+  Book,
   Chapter,
+  ChapterConteudo,
   NovoChapter,
+  Page,
 } from "@/integrations/supabase/types-caderno";
 import { qk } from "./keys";
 import { slugUnico } from "./slug";
 import { getUserId } from "./auth";
+
+// ---------- queries ----------
+
+async function fetchChapter(id: string): Promise<Chapter> {
+  const { data, error } = await supabase
+    .from("chapters")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (error) throw error;
+  return data as Chapter;
+}
+
+/** Um capítulo (metadados). */
+export function useChapter(id: string | undefined) {
+  return useQuery({
+    queryKey: qk.chapter(id ?? ""),
+    queryFn: () => fetchChapter(id as string),
+    enabled: !!id,
+  });
+}
+
+async function fetchChapterConteudo(id: string): Promise<ChapterConteudo> {
+  const { data: chapter, error: chapterErr } = await supabase
+    .from("chapters")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (chapterErr) throw chapterErr;
+  const cap = chapter as Chapter;
+
+  const [pagesRes, bookRes] = await Promise.all([
+    supabase
+      .from("pages")
+      .select("*")
+      .eq("chapter_id", id)
+      .order("ordem", { ascending: true }),
+    supabase.from("books").select("*").eq("id", cap.book_id).single(),
+  ]);
+
+  if (pagesRes.error) throw pagesRes.error;
+  if (bookRes.error) throw bookRes.error;
+
+  return {
+    ...cap,
+    paginas: (pagesRes.data ?? []) as Page[],
+    book: bookRes.data as Book,
+  };
+}
+
+/** Capítulo com suas páginas (na ordem) e o livro pai (para a tela de capítulo). */
+export function useChapterConteudo(id: string | undefined) {
+  return useQuery({
+    queryKey: qk.chapterConteudo(id ?? ""),
+    queryFn: () => fetchChapterConteudo(id as string),
+    enabled: !!id,
+  });
+}
+
+// ---------- mutations ----------
 
 /** Cria um capítulo dentro de um livro. */
 export function useCreateChapter() {
