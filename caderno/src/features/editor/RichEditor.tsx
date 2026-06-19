@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -20,6 +20,13 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { EditorToolbar } from "./EditorToolbar";
 import { uploadCadernoImagem } from "./uploadImage";
+import { Drawio } from "./DrawioNode";
+import { DrawioModal } from "./DrawioModal";
+import {
+  DrawioContext,
+  type DrawioContextValue,
+  type DrawioSalvar,
+} from "./drawio-context";
 import "./editor.css";
 
 interface RichEditorProps {
@@ -98,6 +105,7 @@ export function RichEditor({
       Color,
       Highlight.configure({ multicolor: true }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
+      Drawio,
     ],
     editorProps: {
       attributes: {
@@ -165,18 +173,43 @@ export function RichEditor({
     }
   }, [editable, editor]);
 
+  // ---- Editor de diagramas (draw.io) ----
+  const [drawioOpen, setDrawioOpen] = useState(false);
+  const [drawioXml, setDrawioXml] = useState("");
+  const aoSalvarRef = useRef<((r: DrawioSalvar) => void) | null>(null);
+
+  const drawioCtx = useMemo<DrawioContextValue>(
+    () => ({
+      abrirEditor: (xmlInicial, aoSalvar) => {
+        aoSalvarRef.current = aoSalvar;
+        setDrawioXml(xmlInicial);
+        setDrawioOpen(true);
+      },
+    }),
+    [],
+  );
+
   return (
-    <div className="w-full">
-      {editable && editor && <EditorToolbar editor={editor} />}
-      <div
-        className={cn(
-          "rounded-lg border border-border bg-card",
-          editable && "rounded-t-none",
-        )}
-      >
-        <EditorContent editor={editor} />
+    <DrawioContext.Provider value={drawioCtx}>
+      <div className="w-full">
+        {editable && editor && <EditorToolbar editor={editor} />}
+        <div
+          className={cn(
+            "rounded-lg border border-border bg-card",
+            editable && "rounded-t-none",
+          )}
+        >
+          <EditorContent editor={editor} />
+        </div>
       </div>
-    </div>
+
+      <DrawioModal
+        open={drawioOpen}
+        xmlInicial={drawioXml}
+        onSalvar={(r) => aoSalvarRef.current?.(r)}
+        onFechar={() => setDrawioOpen(false)}
+      />
+    </DrawioContext.Provider>
   );
 }
 

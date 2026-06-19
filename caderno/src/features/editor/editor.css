@@ -18,6 +18,21 @@
   border-radius: 2px;
 }
 
+/* Diagrama (draw.io) — imagem renderizada do desenho */
+.caderno-drawio {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0.75rem 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+}
+.caderno-drawio-wrap[data-selected="true"] .caderno-drawio {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 /* Garante uma altura mínima clicável quando usado dentro do editor */
 .caderno-prose:focus {
   outline: none;

@@ -22,6 +22,7 @@ import {
   Link as LinkIcon,
   Table as TableIcon,
   ImagePlus,
+  Workflow,
   Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -57,6 +58,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { uploadCadernoImagem } from "./uploadImage";
+import { useDrawio } from "./drawio-context";
 
 interface EditorToolbarProps {
   editor: Editor;
@@ -136,6 +138,18 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
   const [linkUrl, setLinkUrl] = useState("");
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { abrirEditor } = useDrawio();
+
+  // --- Diagrama (draw.io) ---
+  function inserirDiagrama() {
+    abrirEditor("", ({ src, xml }) => {
+      editor
+        .chain()
+        .focus()
+        .insertContent({ type: "drawio", attrs: { src, xml } })
+        .run();
+    });
+  }
 
   // --- Formato (parágrafo/título) ---
   function aplicarFormato(v: string) {
@@ -376,6 +390,9 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         </ToolbarButton>
         <ToolbarButton label="Inserir imagem" disabled={uploading} onClick={escolherImagem}>
           {uploading ? <Loader2 className="animate-spin" /> : <ImagePlus />}
+        </ToolbarButton>
+        <ToolbarButton label="Inserir diagrama (draw.io)" onClick={inserirDiagrama}>
+          <Workflow />
         </ToolbarButton>
 
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={aoSelecionarArquivo} />

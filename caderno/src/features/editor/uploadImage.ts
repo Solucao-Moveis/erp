@@ -61,3 +61,52 @@ export async function uploadCadernoImagem(file: File): Promise<string> {
 
   return data.publicUrl;
 }
+
+/** Converte uma dataURL (base64) num Blob para subir no Storage. */
+function dataUrlParaBlob(dataUrl: string): Blob {
+  const virgula = dataUrl.indexOf(",");
+  const cabecalho = dataUrl.slice(0, virgula);
+  const base64 = dataUrl.slice(virgula + 1);
+  const mime = /data:(.*?);base64/.exec(cabecalho)?.[1] || "image/png";
+  const bin = atob(base64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
+}
+
+/**
+ * Sobe o PNG de um diagrama (vindo do draw.io como dataURL) e devolve a URL
+ * pública. Usado pelo editor de diagramas. Caminho:
+ * `${userId}/diagrama-${timestamp}.png`.
+ *
+ * @throws Error se o usuário não estiver autenticado ou o upload falhar.
+ */
+export async function uploadCadernoPng(dataUrl: string): Promise<string> {
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError || !userData.user) {
+    throw new Error("Usuário não autenticado: não foi possível salvar o diagrama.");
+  }
+
+  const userId = userData.user.id;
+  const caminho = `${userId}/diagrama-${Date.now()}.png`;
+  const blob = dataUrlParaBlob(dataUrl);
+
+  const { error: uploadError } = await supabase.storage
+    .from(BUCKET)
+    .upload(caminho, blob, {
+      cacheControl: "3600",
+      upsert: false,
+      contentType: "image/png",
+    });
+
+  if (uploadError) {
+    throw new Error(`Falha ao salvar o diagrama: ${uploadError.message}`);
+  }
+
+  const { data } = supabase.storage.from(BUCKET).getPublicUrl(caminho);
+  if (!data?.publicUrl) {
+    throw new Error("Não foi possível obter a URL do diagrama.");
+  }
+
+  return data.publicUrl;
+}
