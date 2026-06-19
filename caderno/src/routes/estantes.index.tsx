@@ -15,7 +15,7 @@ import { VisibilidadeBadge } from "@/components/caderno/VisibilidadeBadge";
 import { useCreateShelf, useShelves } from "@/data";
 import type { Shelf } from "@/integrations/supabase/types-caderno";
 
-export const Route = createFileRoute("/estantes")({
+export const Route = createFileRoute("/estantes/")({
   component: EstantesPage,
 });
 

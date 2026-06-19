@@ -10,23 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as EstantesRouteImport } from './routes/estantes'
 import { Route as BuscaRouteImport } from './routes/busca'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PaginasPageIdRouteImport } from './routes/paginas.$pageId'
+import { Route as EstantesIndexRouteImport } from './routes/estantes.index'
 import { Route as LivrosBookIdRouteImport } from './routes/livros.$bookId'
 import { Route as EstantesShelfIdRouteImport } from './routes/estantes.$shelfId'
+import { Route as PaginasPageIdIndexRouteImport } from './routes/paginas.$pageId.index'
 import { Route as PaginasPageIdEditarRouteImport } from './routes/paginas.$pageId.editar'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EstantesRoute = EstantesRouteImport.update({
-  id: '/estantes',
-  path: '/estantes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BuscaRoute = BuscaRouteImport.update({
@@ -44,9 +39,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PaginasPageIdRoute = PaginasPageIdRouteImport.update({
-  id: '/paginas/$pageId',
-  path: '/paginas/$pageId',
+const EstantesIndexRoute = EstantesIndexRouteImport.update({
+  id: '/estantes/',
+  path: '/estantes/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LivrosBookIdRoute = LivrosBookIdRouteImport.update({
@@ -55,49 +50,54 @@ const LivrosBookIdRoute = LivrosBookIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const EstantesShelfIdRoute = EstantesShelfIdRouteImport.update({
-  id: '/$shelfId',
-  path: '/$shelfId',
-  getParentRoute: () => EstantesRoute,
+  id: '/estantes/$shelfId',
+  path: '/estantes/$shelfId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaginasPageIdIndexRoute = PaginasPageIdIndexRouteImport.update({
+  id: '/paginas/$pageId/',
+  path: '/paginas/$pageId/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PaginasPageIdEditarRoute = PaginasPageIdEditarRouteImport.update({
-  id: '/editar',
-  path: '/editar',
-  getParentRoute: () => PaginasPageIdRoute,
+  id: '/paginas/$pageId/editar',
+  path: '/paginas/$pageId/editar',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/busca': typeof BuscaRoute
-  '/estantes': typeof EstantesRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/estantes/$shelfId': typeof EstantesShelfIdRoute
   '/livros/$bookId': typeof LivrosBookIdRoute
-  '/paginas/$pageId': typeof PaginasPageIdRouteWithChildren
+  '/estantes/': typeof EstantesIndexRoute
   '/paginas/$pageId/editar': typeof PaginasPageIdEditarRoute
+  '/paginas/$pageId/': typeof PaginasPageIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/busca': typeof BuscaRoute
-  '/estantes': typeof EstantesRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/estantes/$shelfId': typeof EstantesShelfIdRoute
   '/livros/$bookId': typeof LivrosBookIdRoute
-  '/paginas/$pageId': typeof PaginasPageIdRouteWithChildren
+  '/estantes': typeof EstantesIndexRoute
   '/paginas/$pageId/editar': typeof PaginasPageIdEditarRoute
+  '/paginas/$pageId': typeof PaginasPageIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/busca': typeof BuscaRoute
-  '/estantes': typeof EstantesRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/estantes/$shelfId': typeof EstantesShelfIdRoute
   '/livros/$bookId': typeof LivrosBookIdRoute
-  '/paginas/$pageId': typeof PaginasPageIdRouteWithChildren
+  '/estantes/': typeof EstantesIndexRoute
   '/paginas/$pageId/editar': typeof PaginasPageIdEditarRoute
+  '/paginas/$pageId/': typeof PaginasPageIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -105,44 +105,46 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/busca'
-    | '/estantes'
     | '/reset-password'
     | '/estantes/$shelfId'
     | '/livros/$bookId'
-    | '/paginas/$pageId'
+    | '/estantes/'
     | '/paginas/$pageId/editar'
+    | '/paginas/$pageId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/busca'
-    | '/estantes'
     | '/reset-password'
     | '/estantes/$shelfId'
     | '/livros/$bookId'
-    | '/paginas/$pageId'
+    | '/estantes'
     | '/paginas/$pageId/editar'
+    | '/paginas/$pageId'
   id:
     | '__root__'
     | '/'
     | '/auth'
     | '/busca'
-    | '/estantes'
     | '/reset-password'
     | '/estantes/$shelfId'
     | '/livros/$bookId'
-    | '/paginas/$pageId'
+    | '/estantes/'
     | '/paginas/$pageId/editar'
+    | '/paginas/$pageId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   BuscaRoute: typeof BuscaRoute
-  EstantesRoute: typeof EstantesRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
+  EstantesShelfIdRoute: typeof EstantesShelfIdRoute
   LivrosBookIdRoute: typeof LivrosBookIdRoute
-  PaginasPageIdRoute: typeof PaginasPageIdRouteWithChildren
+  EstantesIndexRoute: typeof EstantesIndexRoute
+  PaginasPageIdEditarRoute: typeof PaginasPageIdEditarRoute
+  PaginasPageIdIndexRoute: typeof PaginasPageIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -152,13 +154,6 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/estantes': {
-      id: '/estantes'
-      path: '/estantes'
-      fullPath: '/estantes'
-      preLoaderRoute: typeof EstantesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/busca': {
@@ -182,11 +177,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/paginas/$pageId': {
-      id: '/paginas/$pageId'
-      path: '/paginas/$pageId'
-      fullPath: '/paginas/$pageId'
-      preLoaderRoute: typeof PaginasPageIdRouteImport
+    '/estantes/': {
+      id: '/estantes/'
+      path: '/estantes'
+      fullPath: '/estantes/'
+      preLoaderRoute: typeof EstantesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/livros/$bookId': {
@@ -198,53 +193,38 @@ declare module '@tanstack/react-router' {
     }
     '/estantes/$shelfId': {
       id: '/estantes/$shelfId'
-      path: '/$shelfId'
+      path: '/estantes/$shelfId'
       fullPath: '/estantes/$shelfId'
       preLoaderRoute: typeof EstantesShelfIdRouteImport
-      parentRoute: typeof EstantesRoute
+      parentRoute: typeof rootRouteImport
+    }
+    '/paginas/$pageId/': {
+      id: '/paginas/$pageId/'
+      path: '/paginas/$pageId'
+      fullPath: '/paginas/$pageId/'
+      preLoaderRoute: typeof PaginasPageIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/paginas/$pageId/editar': {
       id: '/paginas/$pageId/editar'
-      path: '/editar'
+      path: '/paginas/$pageId/editar'
       fullPath: '/paginas/$pageId/editar'
       preLoaderRoute: typeof PaginasPageIdEditarRouteImport
-      parentRoute: typeof PaginasPageIdRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
-
-interface EstantesRouteChildren {
-  EstantesShelfIdRoute: typeof EstantesShelfIdRoute
-}
-
-const EstantesRouteChildren: EstantesRouteChildren = {
-  EstantesShelfIdRoute: EstantesShelfIdRoute,
-}
-
-const EstantesRouteWithChildren = EstantesRoute._addFileChildren(
-  EstantesRouteChildren,
-)
-
-interface PaginasPageIdRouteChildren {
-  PaginasPageIdEditarRoute: typeof PaginasPageIdEditarRoute
-}
-
-const PaginasPageIdRouteChildren: PaginasPageIdRouteChildren = {
-  PaginasPageIdEditarRoute: PaginasPageIdEditarRoute,
-}
-
-const PaginasPageIdRouteWithChildren = PaginasPageIdRoute._addFileChildren(
-  PaginasPageIdRouteChildren,
-)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   BuscaRoute: BuscaRoute,
-  EstantesRoute: EstantesRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
+  EstantesShelfIdRoute: EstantesShelfIdRoute,
   LivrosBookIdRoute: LivrosBookIdRoute,
-  PaginasPageIdRoute: PaginasPageIdRouteWithChildren,
+  EstantesIndexRoute: EstantesIndexRoute,
+  PaginasPageIdEditarRoute: PaginasPageIdEditarRoute,
+  PaginasPageIdIndexRoute: PaginasPageIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

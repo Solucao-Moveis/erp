@@ -28,7 +28,7 @@ import { useBookConteudo, useDeletePage, usePage, useProfile } from "@/data";
 import { RichContent, gerarSumario } from "@/features/editor";
 import type { Chapter } from "@/integrations/supabase/types-caderno";
 
-export const Route = createFileRoute("/paginas/$pageId")({
+export const Route = createFileRoute("/paginas/$pageId/")({
   component: PaginaView,
 });
 
