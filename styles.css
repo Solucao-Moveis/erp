@@ -894,11 +894,25 @@ html.dark .theme-toggle .ico-moon { display: none; }
 /* ============================================================
    ENGENHARIA · Assistências (aba interna — overlay + 3 telas)
    ============================================================ */
-.smerp-eng { z-index: 1100; opacity: 0; transition: opacity .2s ease; }
+/* Tela CHEIA dedicada (não é modal): cobre o Hub inteiro, igual abrir um app. */
+.smerp-eng { z-index: 1100; opacity: 0; transition: opacity .18s ease; padding: 0; }
 .smerp-eng.is-open { opacity: 1; }
-.smerp-eng.is-open .smerp-modal__backdrop { opacity: 1; }
-.smerp-eng.is-open .usr { transform: none; }
-.usr.eng { max-width: 1120px; }
+.smerp-eng .smerp-modal__backdrop { display: none; }
+.usr.eng {
+  max-width: none; width: 100vw; height: 100vh; height: 100dvh; max-height: none;
+  margin: 0; border: 0; border-radius: 0; box-shadow: none; transform: none;
+}
+/* botão "Voltar ao ERP" no topo da tela */
+.eng__back {
+  display: inline-flex; align-items: center; gap: 7px;
+  font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer;
+  border: 1px solid var(--border); background: var(--panel); color: var(--ink);
+  border-radius: 999px; padding: 8px 14px 8px 11px; white-space: nowrap;
+  transition: background .18s, color .18s, border-color .18s;
+}
+.eng__back:hover { background: var(--orange-soft); color: var(--orange); border-color: var(--orange); }
+.eng__back svg { width: 18px; height: 18px; }
+.eng__panel { max-width: 1100px; margin: 0 auto; width: 100%; }
 
 /* abas (Nova / Registros / Dashboard) */
 .eng__tabs { display: flex; gap: 6px; padding: 10px 20px 0; border-bottom: 1px solid var(--border); }

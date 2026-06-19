@@ -17,8 +17,8 @@ window.SMERP_NOTAS = [
     mudancas: [
       {
         app: 'Engenharia — Assistências',
-        o_que: 'Nova aba "Engenharia" na barra lateral do ERP (aparece só para quem tem acesso liberado). A tela "Nova assistência" reproduz o Relatório de Não Conformidade campo a campo. Ao salvar, é gerado um número sequencial por ano (RNC-00001/2026, RNC-00002/2026…) e o PDF é baixado automaticamente, no formato do documento. É possível anexar fotos/evidências.',
-        como: 'Na barra lateral, abra "Engenharia". Na aba "Nova assistência", preencha os campos (marque os tipos/causas/ações que se aplicam, escreva as descrições e os responsáveis). Clique em "Salvar e gerar nº + PDF": o número aparece e o PDF é baixado na hora. Para anexar fotos, use o campo "Anexos" antes de salvar.'
+        o_que: 'Novo módulo "Engenharia" no painel do ERP (card no meio dos Setores, aparece só para quem tem acesso liberado). Ao abrir, ele ocupa a tela inteira, como qualquer outro módulo nosso. A tela "Nova assistência" reproduz o Relatório de Não Conformidade campo a campo. Ao salvar, é gerado um número sequencial por ano (RNC-00001/2026, RNC-00002/2026…) e o PDF é baixado automaticamente, no formato do documento. É possível anexar fotos/evidências.',
+        como: 'Na tela inicial do ERP, clique no card "Engenharia" e depois em "Assistências (RNC)". Na aba "Nova assistência", preencha os campos (marque os tipos/causas/ações que se aplicam, escreva as descrições e os responsáveis). Clique em "Salvar e gerar nº + PDF": o número aparece e o PDF é baixado na hora. Para anexar fotos, use o campo "Anexos" antes de salvar. Para sair, use "Voltar ao ERP" no topo.'
       },
       {
         app: 'Engenharia — Registros e filtros',

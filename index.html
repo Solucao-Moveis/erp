@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=23" />
+  <link rel="stylesheet" href="styles.css?v=24" />
 </head>
 <body class="smerp-booting">
   <!-- Botão de tema (sol/lua) — canto superior direito, fixo -->
@@ -267,7 +267,10 @@
             <p class="upd__sub">Relatório de Não Conformidade (RNC): registro, filtros e indicadores</p>
           </div>
         </div>
-        <button class="smerp-modal__close" id="engClose" type="button" aria-label="Fechar" data-close>&times;</button>
+        <button class="eng__back" id="engClose" type="button" data-close aria-label="Voltar ao ERP">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Voltar ao ERP
+        </button>
       </header>
 
       <div class="eng__tabs" role="tablist">
@@ -396,7 +399,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js"></script>
   <script src="config.js?v=11"></script>
-  <script src="notas.js?v=25"></script>
+  <script src="notas.js?v=26"></script>
   <script src="notify.js?v=1"></script>
   <script src="engenharia.js?v=2"></script>
   <script src="script.js?v=18"></script>
