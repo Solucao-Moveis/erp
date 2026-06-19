@@ -21,10 +21,10 @@ EasyPanel (env `PGRST_DB_SCHEMAS`, ex.: `public,compras,...,caderno`) e reinicie
 
 ## 2. Serviço do app no EasyPanel
 
-- Novo serviço apontando para o repositório `caderno-solucao`, build por **Dockerfile**
-  (igual aos outros apps; usa Bun, serve via `server.mjs` na porta 3000).
-- Branch de deploy: `deploy/easypanel-docker` (padrão dos apps). Token CLASSIC com scope
-  `repo` p/ o auto-deploy (ver memória `easypanel-github-token-classic`).
+- O app vive como SUBPASTA do repo `erp` (igual ao ai-service/push-service) — não há repo
+  separado. No EasyPanel, crie um serviço apontando pro repo `Solucao-Moveis/erp`, branch
+  `main`, com **Build/Root path = `caderno`** e build por **Dockerfile** (Bun, serve via
+  `server.mjs` na porta 3000). O auto-deploy usa o token que o repo `erp` já tem.
 - Domínio sugerido: `solucaomoveis-caderno.h5xdag.easypanel.host` (é o que está no
   `erp/config.js` → `APPS.utilitarios`). Se o EasyPanel gerar outro, ajuste lá.
 - Variáveis de ambiente (as MESMAS dos outros apps — mesmo Supabase):
