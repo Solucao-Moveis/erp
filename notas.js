@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.16',
+    data: '19/06/2026',
+    titulo: 'Novo módulo Utilitários: o Caderno (anotações e documentação)',
+    resumo: 'Chegou um novo setor no ERP chamado "Utilitários", e o primeiro item dele é o "Caderno" — um espaço para guardar anotações, procedimentos e documentação, organizados em estantes, livros, capítulos e páginas (como uma wiki). Cada pessoa tem o seu Caderno pessoal (só você vê o que cria) e também pode haver áreas compartilhadas por equipe — por exemplo, a "Base de Conhecimento Técnica" dos equipamentos, que a Manutenção enxerga junto. O login é automático: ao abrir o Caderno pelo ERP, você já entra direto, sem digitar senha de novo.',
+    mudancas: [
+      {
+        app: 'Utilitários — Caderno',
+        o_que: 'Foi adicionado o setor "Utilitários" na tela inicial do ERP, com o módulo "Caderno". É uma wiki/caderno digital: você organiza o conteúdo em estantes, livros, capítulos e páginas, com um editor de texto rico (negrito, títulos, listas, tabelas, imagens). O conteúdo pode ser pessoal (só você vê) ou de uma equipe (todo o time vê e edita). A busca encontra qualquer página pelo conteúdo. A entrada é com o login único do ERP, sem senha extra.',
+        como: 'Na tela inicial do ERP, abra o card "Utilitários" e toque em "Caderno". Crie uma estante, depois livros e páginas dentro dela, e escreva à vontade. Ao criar uma estante ou livro, escolha quem vê: "Pessoal" (só você), "Equipe" (um time, como a Manutenção) ou "Todos". Use a Busca no topo para achar uma página. Para voltar ao ERP, use o atalho "Voltar ao ERP" na barra lateral.'
+      }
+    ]
+  },
+  {
     versao: '6.15',
     data: '18/06/2026',
     titulo: 'Manutenção: acesso da produção limitado às Ordens de Serviço + filtros de busca nas OS; Hora a Hora: Tratamento e Pintura agora separam cadeira e mesa',

@@ -45,7 +45,10 @@ window.SMERP_CONFIG = {
     sobras: 'https://solucaomoveis-sobras.h5xdag.easypanel.host/',
     manutencao: 'https://solucaomoveis-manutencao.h5xdag.easypanel.host/',
     planos_acao: 'https://solucaomoveis-pmo.h5xdag.easypanel.host/',
-    frota: 'https://solucaomoveis-solucaomoveis-frota.h5xdag.easypanel.host/'
+    frota: 'https://solucaomoveis-solucaomoveis-frota.h5xdag.easypanel.host/',
+    // Utilitários: app nativo 'Caderno' (wiki/anotações), SSO padrão do hub
+    // (igual aos outros apps).
+    utilitarios: 'https://solucaomoveis-caderno.h5xdag.easypanel.host/'
   },
 
   // Cards por SETOR. Cada setor tem 1+ módulos; o card mostra o setor e,
@@ -71,6 +74,9 @@ window.SMERP_CONFIG = {
       ] },
     { id: 'frota',          nome: 'Frota / Veículos',      icon: 'truck', cor: '#DC2626', modulos: [
         { system: 'frota', nome: 'Gestor de Frota', desc: 'Veículos: abastecimento, manutenção, consumo e custos' }
+      ] },
+    { id: 'utilitarios',    nome: 'Utilitários',           icon: 'book',  cor: '#0891B2', modulos: [
+        { system: 'utilitarios', nome: 'Caderno', desc: 'Wiki/anotações: documentação pessoal e bases compartilhadas por equipe' }
       ] }
   ],
 
