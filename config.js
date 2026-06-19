@@ -146,6 +146,11 @@ window.SMERP_CONFIG = {
           { value: 'gestor',       label: 'Gestor',        desc: 'Vê tudo, revisa lançamentos, acompanha solicitações e o dashboard' },
           { value: 'motorista',    label: 'Motorista',     desc: 'Abre solicitação e lança abastecimento do seu veículo' },
           { value: 'visualizador', label: 'Visualizador',  desc: 'Só consulta e dashboard, sem editar' }
+        ] },
+      { system: 'engenharia', nome: 'Engenharia (Assistências/RNC)', cor: '#0D9488', icon: 'wrench',
+        papeis: [
+          { value: 'criador', label: 'Criador', desc: 'Cria, edita e exclui assistências e baixa o PDF (RNC)' },
+          { value: 'leitor',  label: 'Leitor',  desc: 'Só consulta a lista/dashboard e baixa o PDF, sem criar/editar' }
         ] }
     ]
   },

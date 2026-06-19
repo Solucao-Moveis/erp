@@ -184,6 +184,15 @@ begin
         insert into frota.user_roles (user_id, role)
           values (new_id, r::frota.app_role) on conflict (user_id, role) do nothing;
       end loop;
+
+    elsif sys = 'engenharia' then
+      -- Modulo interno do Hub (Assistencias/RNC). profiles (id, email, full_name).
+      insert into engenharia.profiles (id, email, full_name)
+        values (new_id, v_email, v_name) on conflict (id) do nothing;
+      for r in select jsonb_array_elements_text(roles) loop
+        insert into engenharia.user_roles (user_id, role)
+          values (new_id, r::engenharia.app_role) on conflict (user_id, role) do nothing;
+      end loop;
     end if;
   end loop;
 
@@ -210,7 +219,7 @@ as $$
     u.id,
     u.email::text,
     coalesce(u.raw_user_meta_data->>'full_name',
-             cp.full_name, fp.full_name, bp.full_name, gp.full_name, sp.full_name, mp.nome, pap.nome, frp.full_name) as full_name,
+             cp.full_name, fp.full_name, bp.full_name, gp.full_name, sp.full_name, mp.nome, pap.nome, frp.full_name, ep.full_name) as full_name,
     u.created_at,
     jsonb_strip_nulls(jsonb_build_object(
       'compras', (select jsonb_agg(role) from compras.user_roles where user_id = u.id),
@@ -220,7 +229,8 @@ as $$
       'sobras',  (select jsonb_agg(role) from sobras.user_roles  where user_id = u.id),
       'manutencao', (select jsonb_agg(role) from manutencao.user_roles where user_id = u.id),
       'planos_acao', (select jsonb_agg(role) from planos_acao.user_roles where user_id = u.id),
-      'frota',   (select jsonb_agg(role) from frota.user_roles   where user_id = u.id)
+      'frota',   (select jsonb_agg(role) from frota.user_roles   where user_id = u.id),
+      'engenharia', (select jsonb_agg(role) from engenharia.user_roles where user_id = u.id)
     )) as systems
   from auth.users u
   left join compras.profiles cp on cp.id = u.id
@@ -231,6 +241,7 @@ as $$
   left join manutencao.profiles mp on mp.id = u.id
   left join planos_acao.profiles pap on pap.user_id = u.id   -- vínculo por user_id (≠ das outras)
   left join frota.profiles   frp on frp.id = u.id
+  left join engenharia.profiles ep on ep.id = u.id
   where public.can_manage_users()   -- só o master recebe a lista
   order by u.created_at desc;
 $$;
@@ -466,6 +477,22 @@ begin
   else
     delete from frota.user_roles where user_id = p_user_id;
     begin delete from frota.profiles where id = p_user_id;
+    exception when foreign_key_violation then null; end;
+  end if;
+
+  -- ENGENHARIA (papéis: criador | leitor) — módulo interno do Hub.
+  desired := coalesce(p_systems->'engenharia', '[]'::jsonb);
+  if jsonb_array_length(desired) > 0 then
+    insert into engenharia.profiles (id, email, full_name)
+      values (p_user_id, v_email, v_name) on conflict (id) do nothing;
+    delete from engenharia.user_roles
+      where user_id = p_user_id and role::text not in (select jsonb_array_elements_text(desired));
+    insert into engenharia.user_roles (user_id, role)
+      select p_user_id, x::engenharia.app_role from jsonb_array_elements_text(desired) as x
+      on conflict (user_id, role) do nothing;
+  else
+    delete from engenharia.user_roles where user_id = p_user_id;
+    begin delete from engenharia.profiles where id = p_user_id;
     exception when foreign_key_violation then null; end;
   end if;
 
