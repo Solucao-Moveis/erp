@@ -27,8 +27,8 @@ window.SMERP_NOTAS = [
       },
       {
         app: 'Hora a Hora',
-        o_que: 'Nos setores Tratamento e Pintura, foram criadas as opções "cadeira" e "mesa" (Máquina de tratamento cadeira/mesa e Máquina de pintura cadeira/mesa), igual ao que já existe na Montagem. As máquinas antigas de Tratamento e de Pintura foram mantidas com todo o histórico; as novas começam zeradas.',
-        como: 'Na página do Hora a Hora, dentro de Tratamento e de Pintura agora aparecem as linhas separadas de "cadeira" e "mesa". Registre a produção e as metas na linha correspondente (cadeira ou mesa). Os números antigos continuam na linha da máquina original.'
+        o_que: 'Os setores Tratamento e Pintura passaram a ser separados em "cadeira" e "mesa" (Máquina de tratamento cadeira/mesa e Máquina de pintura cadeira/mesa), igual ao que já existe na Montagem. As linhas antigas e únicas ("Máquina de tratamento" e "Máquina de pintura") deixaram de aparecer; o histórico delas continua guardado no sistema.',
+        como: 'Na página do Hora a Hora, dentro de Tratamento e de Pintura agora aparecem só as linhas de "cadeira" e "mesa". Registre a produção e as metas na linha correspondente (cadeira ou mesa).'
       }
     ]
   },
