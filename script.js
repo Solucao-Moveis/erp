@@ -457,6 +457,9 @@
 
   // Abre o app na MESMA aba, levando a sessão atual no hash (SSO).
   async function openApp(system, path) {
+    // Engenharia é um MÓDULO INTERNO do Hub (overlay), não um app externo:
+    // abre a tela aqui mesmo em vez de redirecionar.
+    if (system === 'engenharia') { if (engUI && engUI.open) engUI.open(); return; }
     var url = CFG.APPS && CFG.APPS[system];
     if (!url) return;
     // 'path' opcional: abre uma sub-rota do app (ex.: bip em modo celular -> /apontar).

@@ -72,6 +72,9 @@ window.SMERP_CONFIG = {
         { system: 'gestao',      nome: 'Painel Executivo',   desc: 'KPIs consolidados + Quadro/Kanban de projetos' },
         { system: 'planos_acao', nome: 'Gestor de Projeto',  desc: 'Plano de ação 5W2H: projetos, ações e subtarefas' }
       ] },
+    { id: 'engenharia',     nome: 'Engenharia',            icon: 'wrench', cor: '#0D9488', modulos: [
+        { system: 'engenharia', nome: 'Assistências (RNC)', desc: 'Relatório de Não Conformidade: registro, PDF, filtros e dashboard' }
+      ] },
     { id: 'frota',          nome: 'Frota / Veículos',      icon: 'truck', cor: '#DC2626', modulos: [
         { system: 'frota', nome: 'Gestor de Frota', desc: 'Veículos: abastecimento, manutenção, consumo e custos' }
       ] },

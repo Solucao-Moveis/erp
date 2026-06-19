@@ -68,8 +68,7 @@ window.SMERPEngenharia = (function () {
   function init(sb) {
     var $ = function (id) { return document.getElementById(id); };
     var overlay = $('engOverlay');
-    var navBtn = $('btnEng');
-    if (!overlay || !navBtn || typeof sb.schema !== 'function') return null;
+    if (!overlay || typeof sb.schema !== 'function') return null;
 
     var elForm = $('engPanelForm'), elList = $('engPanelList'), elDash = $('engPanelDash');
     var pdfStage = $('engPdfStage');
@@ -594,25 +593,24 @@ window.SMERPEngenharia = (function () {
     }
     function close() { overlay.classList.remove('is-open'); setTimeout(function () { overlay.hidden = true; }, 200); }
 
-    navBtn.addEventListener('click', open);
     overlay.querySelectorAll('[data-close]').forEach(function (el) { el.addEventListener('click', close); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !overlay.hidden) close(); });
 
     // ============================================================
-    //  Gate: mostra a aba só p/ quem tem acesso ao módulo
+    //  Gate: descobre o papel do usuário (o card em si é mostrado pelo
+    //  renderSetores do Hub conforme my_systems()). Aqui só definimos se
+    //  pode criar/editar (criador) ou é só leitor.
     // ============================================================
     async function gate() {
       try {
         var res = await sb.rpc('my_systems');
         var sys = (!res.error && res.data) || {};
         var roles = sys.engenharia; // array de papéis, ou undefined
-        var has = Array.isArray(roles);
-        podeCriar = has && roles.indexOf('criador') !== -1;
-        navBtn.hidden = !has;
-      } catch (e) { navBtn.hidden = true; }
+        podeCriar = Array.isArray(roles) && roles.indexOf('criador') !== -1;
+      } catch (e) { podeCriar = false; }
     }
 
-    return { gate: gate, hide: function () { navBtn.hidden = true; close(); } };
+    return { gate: gate, open: open, hide: function () { close(); } };
   }
 
   return { init: init };
