@@ -77,6 +77,7 @@ window.SMERPEngenharia = (function () {
     var podeCriar = false;   // papel 'criador'
     var editingId = null;    // null = nova; uuid = editando
     var cache = [];          // últimos registros carregados (lista)
+    var linkedDesvio = null; // { id, ref } do desvio (Hora a Hora) vinculado
 
     // ---------- grupos de checkbox a partir do OPC ----------
     function checkGroup(group, name, sel) {
@@ -106,6 +107,7 @@ window.SMERPEngenharia = (function () {
     function renderForm(rec) {
       rec = rec || {};
       editingId = rec.id || null;
+      linkedDesvio = rec.desvio_id ? { id: rec.desvio_id, ref: rec.desvio_ref || 'desvio vinculado' } : null;
       var titulo = editingId
         ? 'Editando ' + esc(rec.numero || 'assistência')
         : 'Nova assistência — o número é gerado ao salvar';
@@ -169,6 +171,10 @@ window.SMERPEngenharia = (function () {
             '<textarea id="eg_corr_desc" class="eng-ta" rows="2" placeholder="Descrever as ações corretivas">' + esc(rec.acao_corretiva_desc || '') + '</textarea>' +
           '</fieldset>' +
 
+          '<fieldset class="eng-fs"><legend>Vínculo com desvio (Hora a Hora)</legend>' +
+            '<div id="engVinculoBox"></div>' +
+          '</fieldset>' +
+
           '<fieldset class="eng-fs"><legend>Observação da assistência</legend>' +
             '<div class="eng-grid2">' +
               '<label class="smerp-field"><span>N° RNC</span><input id="eg_rnc" type="text" value="' + esc(rec.rnc_ref || '') + '" /></label>' +
@@ -208,6 +214,87 @@ window.SMERPEngenharia = (function () {
       var f = $('engForm');
       if (f) f.addEventListener('submit', onSave);
       var nb = $('engNew'); if (nb) nb.addEventListener('click', function () { renderForm(); });
+      renderVinculo();
+    }
+
+    // ---- Vínculo com desvio (Hora a Hora) ----
+    function renderVinculo() {
+      var box = $('engVinculoBox');
+      if (!box) return;
+      if (linkedDesvio && linkedDesvio.id) {
+        box.innerHTML = '<div class="eng-vinc">' +
+            '<span class="eng-vinc__txt">🔗 Vinculado ao desvio: <b>' + esc(linkedDesvio.ref) + '</b></span>' +
+            (podeCriar ? '<span class="eng-vinc__acts">' +
+              '<button type="button" class="eng-btn-ghost" id="engVincTrocar">Trocar</button>' +
+              '<button type="button" class="eng-btn-ghost eng-btn-del" id="engVincRemover">Remover vínculo</button>' +
+            '</span>' : '') +
+          '</div>';
+        if (podeCriar) {
+          $('engVincTrocar').onclick = openDesvioPicker;
+          $('engVincRemover').onclick = function () { linkedDesvio = null; renderVinculo(); };
+        }
+      } else {
+        box.innerHTML = podeCriar
+          ? '<button type="button" class="eng-btn-ghost" id="engVincAdd">＋ Vincular a um desvio</button>' +
+            '<p class="eng-hint">Liga esta assistência a um desvio de produção registrado no Hora a Hora.</p>'
+          : '<p class="eng-hint">Nenhum desvio vinculado.</p>';
+        if (podeCriar) { var a = $('engVincAdd'); if (a) a.onclick = openDesvioPicker; }
+      }
+    }
+
+    function openDesvioPicker() {
+      var m = $('engDesvioPicker');
+      if (!m) {
+        m = document.createElement('div');
+        m.id = 'engDesvioPicker';
+        m.className = 'eng-picker';
+        m.innerHTML =
+          '<div class="eng-picker__card">' +
+            '<div class="eng-picker__hd"><b>Escolher desvio (Hora a Hora)</b>' +
+              '<button type="button" class="smerp-modal__close" id="dp_close" aria-label="Fechar">&times;</button></div>' +
+            '<div class="eng-picker__filters">' +
+              '<label class="eng-f"><span>De</span><input type="date" id="dp_de" /></label>' +
+              '<label class="eng-f"><span>Até</span><input type="date" id="dp_ate" /></label>' +
+              '<label class="eng-f eng-f--grow"><span>Busca (item, setor, texto)</span><input type="text" id="dp_busca" placeholder="Ex.: AB-1234 ou Montagem" /></label>' +
+              '<button type="button" class="eng-btn-ghost" id="dp_go">Buscar</button>' +
+            '</div>' +
+            '<div class="eng-picker__list" id="dp_list"></div>' +
+          '</div>';
+        document.body.appendChild(m);
+        $('dp_close').onclick = function () { m.hidden = true; };
+        m.addEventListener('click', function (e) { if (e.target === m) m.hidden = true; });
+        $('dp_go').onclick = loadDesvios;
+        $('dp_busca').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); loadDesvios(); } });
+      }
+      m.hidden = false;
+      loadDesvios();
+    }
+
+    async function loadDesvios() {
+      var list = $('dp_list'); if (!list) return;
+      list.innerHTML = '<p class="usr__empty">Carregando…</p>';
+      var de = fval('dp_de') || null, ate = fval('dp_ate') || null, busca = fval('dp_busca') || null;
+      try {
+        var res = await db().rpc('listar_desvios', { _de: de, _ate: ate, _busca: busca });
+        if (res.error) throw res.error;
+        var rows = res.data || [];
+        if (!rows.length) { list.innerHTML = '<p class="usr__empty">Nenhum desvio encontrado.</p>'; return; }
+        list.innerHTML = rows.map(function (d) {
+          var ref = fmtData(d.data) + ' · ' + (d.item_code || '—') + ' · ' + (d.area || '—');
+          return '<button type="button" class="eng-picker__item" data-id="' + esc(d.id) + '" data-ref="' + esc(ref) + '">' +
+            '<b>' + esc(ref) + '</b><span>' + esc(d.hora || '') + (d.machine && d.machine !== '—' ? ' · ' + esc(d.machine) : '') + ' — ' + esc((d.desvio || '').slice(0, 100)) + '</span></button>';
+        }).join('');
+        list.querySelectorAll('.eng-picker__item').forEach(function (b) {
+          b.onclick = function () {
+            linkedDesvio = { id: b.getAttribute('data-id'), ref: b.getAttribute('data-ref') };
+            $('engDesvioPicker').hidden = true;
+            renderVinculo();
+          };
+        });
+      } catch (e) {
+        list.innerHTML = '<p class="usr__empty">Não foi possível carregar os desvios.</p>';
+        console.error('[ENG] listar_desvios', e);
+      }
     }
 
     function collectForm() {
@@ -227,7 +314,9 @@ window.SMERPEngenharia = (function () {
         rnc_ref: fval('eg_rnc') || null, nf_numero: fval('eg_nf') || null,
         pedido_numero: fval('eg_pedido') || null, local_entrega: fval('eg_local') || null,
         resp_analise: fval('eg_resp') || null,
-        previsao: fval('eg_previsao') || null, realizado: fval('eg_realizado') || null
+        previsao: fval('eg_previsao') || null, realizado: fval('eg_realizado') || null,
+        desvio_id: (linkedDesvio && linkedDesvio.id) || null,
+        desvio_ref: (linkedDesvio && linkedDesvio.ref) || null
       };
     }
 
@@ -389,6 +478,7 @@ window.SMERPEngenharia = (function () {
           '</div>' +
           '<div class="eng-row__sub">' + esc(alvo) + (r.produto ? ' · ' + esc(r.produto) : '') + '</div>' +
           (tags ? '<div class="eng-row__tags">' + tags + '</div>' : '') +
+          (r.desvio_id ? '<div class="eng-row__link" title="' + esc(r.desvio_ref || '') + '">🔗 Desvio: ' + esc(r.desvio_ref || 'vinculado') + '</div>' : '') +
         '</div>' +
         '<div class="eng-row__acts">' +
           '<button class="eng-btn-ghost" data-pdf="' + esc(r.id) + '" type="button">PDF</button>' +
