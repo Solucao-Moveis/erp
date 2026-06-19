@@ -10,6 +10,29 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.17',
+    data: '19/06/2026',
+    titulo: 'Nova aba "Engenharia": registro de Assistências (Relatório de Não Conformidade) com nº automático, PDF, filtros e dashboard',
+    resumo: 'Chegou no ERP a aba "Engenharia". Dentro dela está a "Assistência", que é o nosso Relatório de Não Conformidade (RNC) feito direto no sistema, sem papel. Você preenche o formulário (origem, cliente/fornecedor, produto, tipo e causa da não conformidade, ações imediata e corretiva, responsáveis, NF/pedido, etc.), e ao salvar o sistema gera um número de assistência automático (ex.: RNC-00001/2026) e baixa um PDF pronto, no mesmo formato do documento. Há também a aba "Registros", para procurar assistências por vários filtros (período, interno/externo, cliente, tipo, causa, ação…), e a aba "Dashboard", que mostra o que MAIS aparece: qual o tipo de não conformidade mais frequente, a causa que mais saiu e a ação imediata mais usada, além de totais e gráficos por mês.',
+    mudancas: [
+      {
+        app: 'Engenharia — Assistências',
+        o_que: 'Nova aba "Engenharia" na barra lateral do ERP (aparece só para quem tem acesso liberado). A tela "Nova assistência" reproduz o Relatório de Não Conformidade campo a campo. Ao salvar, é gerado um número sequencial por ano (RNC-00001/2026, RNC-00002/2026…) e o PDF é baixado automaticamente, no formato do documento. É possível anexar fotos/evidências.',
+        como: 'Na barra lateral, abra "Engenharia". Na aba "Nova assistência", preencha os campos (marque os tipos/causas/ações que se aplicam, escreva as descrições e os responsáveis). Clique em "Salvar e gerar nº + PDF": o número aparece e o PDF é baixado na hora. Para anexar fotos, use o campo "Anexos" antes de salvar.'
+      },
+      {
+        app: 'Engenharia — Registros e filtros',
+        o_que: 'A aba "Registros" lista todas as assistências e tem uma barra de filtros por todos os campos de marcar (menos os textos escritos): período (de/até), origem (interno/externo), onde, status (aberta/previsto/realizado), cliente, fornecedor, tipo de não conformidade, causa e ação imediata. Cada registro pode ser reaberto para editar e tem botão para baixar o PDF de novo.',
+        como: 'Abra "Engenharia" e clique na aba "Registros". Use os filtros no topo para encontrar o que procura; a lista atualiza na hora. Em cada item, use "PDF" para baixar o documento, "Abrir" para editar ou "Excluir" para remover (conforme seu acesso).'
+      },
+      {
+        app: 'Engenharia — Dashboard',
+        o_que: 'A aba "Dashboard" mostra os indicadores das assistências: total no período, quantidade interna x externa, concluídas, e três destaques — o tipo de não conformidade que MAIS saiu, a causa que MAIS saiu e a ação imediata mais usada. Também traz gráficos de barras por tipo, causa, ação imediata, ação corretiva, evolução por mês e top clientes.',
+        como: 'Abra "Engenharia" e clique em "Dashboard". Se quiser, escolha um período (de/até) e clique em "Atualizar". Os destaques e gráficos mostram o que mais aparece, para ajudar a priorizar as ações.'
+      }
+    ]
+  },
+  {
     versao: '6.16',
     data: '19/06/2026',
     titulo: 'Novo módulo Utilitários: o Caderno (anotações e documentação)',

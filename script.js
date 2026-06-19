@@ -439,6 +439,8 @@
     if (usersUI) usersUI.gate();
     // Solicitações: ajusta a visão (master vê "todas") e calcula o aviso (badge)
     if (solUI) { solUI.gate(); solUI.refreshBadge(); solUI.startWatch(); }
+    // Engenharia: mostra a aba só p/ quem tem acesso ao módulo
+    if (engUI) engUI.gate();
     // Avisos no Windows: mostra o botão "Ativar avisos" se ainda não decidiram;
     // se já está permitido, garante a inscrição do Web Push (app fechado).
     if (window.SMERPNotify) {
@@ -602,6 +604,7 @@
       var sidec = $('sideSystems'); if (sidec) sidec.innerHTML = '';
       if (usersUI) usersUI.hide();
       if (solUI) solUI.hide();
+      if (engUI) engUI.hide();
       if (loginPassword) loginPassword.value = '';
       showLoginState();
     });
@@ -1164,6 +1167,10 @@
 
   solUI = initSolicitacoes(sb);
 
+  // Engenharia · Assistências (aba interna; lógica em engenharia.js)
+  var engUI = (window.SMERPEngenharia && window.SMERPEngenharia.init)
+    ? window.SMERPEngenharia.init(sb) : null;
+
   // --- Avisos no Windows: botão "Ativar avisos" + inscrição de Web Push ---
   // Mostra o botão só quando dá pra decidir (permissão 'default'); some quando
   // já concedido/negado ou sem suporte.
@@ -1197,6 +1204,7 @@
     if (event === 'SIGNED_OUT' || !session) {
       if (usersUI) usersUI.hide();
       if (solUI) { solUI.stopWatch(); solUI.hide(); }
+      if (engUI) engUI.hide();
       if (!document.body.classList.contains('smerp-booting')) showLoginState();
     }
   });

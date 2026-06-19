@@ -76,6 +76,20 @@ as $$
               (select jsonb_agg(role) from frota.user_roles where user_id = auth.uid()),
               '[]'::jsonb)
           end
+        ),
+        -- PESSOAL: todo usuario autenticado tem o seu Caderno (Utilitarios).
+        'utilitarios', (
+          select case when auth.uid() is not null
+            then '["usuario"]'::jsonb
+          end
+        ),
+        'engenharia', (
+          -- Modulo interno do Hub (aba "Engenharia" -> Assistencia / RNC).
+          select case when exists (select 1 from engenharia.profiles where id = auth.uid())
+            then coalesce(
+              (select jsonb_agg(role) from engenharia.user_roles where user_id = auth.uid()),
+              '[]'::jsonb)
+          end
         )
       )
     ),

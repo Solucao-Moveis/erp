@@ -90,6 +90,14 @@ as $$
           select case when auth.uid() is not null
             then '["usuario"]'::jsonb
           end
+        ),
+        -- Modulo interno do Hub (aba "Engenharia" -> Assistencia / RNC).
+        'engenharia', (
+          select case when exists (select 1 from engenharia.profiles where id = auth.uid())
+            then coalesce(
+              (select jsonb_agg(role) from engenharia.user_roles where user_id = auth.uid()),
+              '[]'::jsonb)
+          end
         )
       )
     ),

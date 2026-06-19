@@ -255,6 +255,37 @@
     </div>
   </div>
 
+  <!-- ===================== ENGENHARIA · ASSISTÊNCIAS (RNC — aba interna) ===================== -->
+  <div class="smerp-overlay smerp-eng" id="engOverlay" hidden>
+    <div class="smerp-modal__backdrop" data-close></div>
+    <div class="usr eng" role="dialog" aria-modal="true" aria-labelledby="engTitle">
+      <header class="upd__top">
+        <div class="upd__brand">
+          <img class="upd__logo" src="assets/logo-solucao-moveis.png" alt="Solução Móveis" />
+          <div>
+            <h2 class="upd__title" id="engTitle">Engenharia · Assistências</h2>
+            <p class="upd__sub">Relatório de Não Conformidade (RNC): registro, filtros e indicadores</p>
+          </div>
+        </div>
+        <button class="smerp-modal__close" id="engClose" type="button" aria-label="Fechar" data-close>&times;</button>
+      </header>
+
+      <div class="eng__tabs" role="tablist">
+        <button class="eng__tab is-active" data-tab="form" type="button">＋ Nova assistência</button>
+        <button class="eng__tab" data-tab="list" type="button">Registros</button>
+        <button class="eng__tab" data-tab="dash" type="button">Dashboard</button>
+      </div>
+
+      <div class="eng__body">
+        <div class="eng__panel" id="engPanelForm"></div>
+        <div class="eng__panel" id="engPanelList" hidden></div>
+        <div class="eng__panel" id="engPanelDash" hidden></div>
+      </div>
+    </div>
+    <!-- palco invisível usado só para renderizar o PDF -->
+    <div id="engPdfStage" aria-hidden="true" style="position:fixed;left:-99999px;top:0;width:210mm;"></div>
+  </div>
+
   <!-- ===================== APP SHELL (sidebar por sistema + principal por setor) ===================== -->
   <div class="app">
     <!-- TOPO MOBILE: hambúrguer + marca (só aparece no celular) -->
@@ -296,6 +327,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         Solicitações
         <span class="nav__badge" id="solBadge" hidden></span>
+      </button>
+      <button class="nav nav--home" id="btnEng" type="button" title="Engenharia · Assistências" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        Engenharia
       </button>
       <!-- Avisos do Windows (notificações). Aparece só quando dá pra ativar. -->
       <button class="nav nav--home" id="btnNotif" type="button" title="Receber avisos no computador" hidden>
@@ -363,10 +398,12 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js"></script>
   <script src="config.js?v=10"></script>
-  <script src="notas.js?v=24"></script>
+  <script src="notas.js?v=25"></script>
   <script src="notify.js?v=1"></script>
-  <script src="script.js?v=16"></script>
+  <script src="engenharia.js?v=1"></script>
+  <script src="script.js?v=17"></script>
   <script src="mobilenav.js?v=2"></script>
   <script src="pwa.js?v=3"></script>
   <script src="assistant.js?v=8"></script>
