@@ -10,6 +10,24 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.18',
+    data: '19/06/2026',
+    titulo: 'Engenharia: vínculo da assistência com o desvio do Hora a Hora + liberação de acesso pela tela Usuários',
+    resumo: 'Duas melhorias no módulo Engenharia. (1) Agora dá para vincular uma assistência (RNC) a um desvio de produção registrado no Hora a Hora: você escolhe o desvio numa lista com busca por data, código do item e setor. O vínculo é mútuo — na assistência aparece o desvio ligado, e no desvio (no Hora a Hora) aparecem as assistências ligadas a ele. Dá para trocar ou remover o vínculo. (2) O acesso ao módulo Engenharia agora pode ser liberado direto pela tela "Usuários" (antes só dava por dentro do banco), escolhendo entre os perfis Criador (cria/edita) e Leitor (só consulta).',
+    mudancas: [
+      {
+        app: 'Engenharia — Assistências',
+        o_que: 'Na tela de uma assistência apareceu a seção "Vínculo com desvio (Hora a Hora)". Você liga a assistência a um desvio de produção e isso fica visível dos dois lados: aqui mostra qual desvio está ligado; lá no Hora a Hora, ao abrir o desvio, aparecem as assistências (RNC) ligadas a ele. O vínculo pode ser trocado ou removido a qualquer momento.',
+        como: 'Abra "Engenharia" → "Assistências (RNC)" → aba "Nova assistência" (ou abra uma já existente em "Registros"). Na seção "Vínculo com desvio", clique em "Vincular a um desvio", busque por data/item/setor e clique no desvio certo. Salve. Para mudar, use "Trocar"; para desfazer, "Remover vínculo". No Hora a Hora, abra "Desvios" e clique num desvio para ver as assistências ligadas.'
+      },
+      {
+        app: 'Usuários (ERP)',
+        o_que: 'A tela "Usuários" (do administrador) passou a listar o sistema "Engenharia (Assistências/RNC)", com os perfis Criador e Leitor. Assim dá para liberar o acesso ao módulo Engenharia para qualquer pessoa direto pela tela, sem precisar mexer no banco.',
+        como: 'Como administrador, abra "Usuários", clique na pessoa (ou crie um novo usuário), marque "Engenharia (Assistências/RNC)" e escolha o perfil: Criador (cria, edita e exclui assistências) ou Leitor (só consulta e baixa o PDF). Clique em "Salvar permissões".'
+      }
+    ]
+  },
+  {
     versao: '6.17',
     data: '19/06/2026',
     titulo: 'Nova aba "Engenharia": registro de Assistências (Relatório de Não Conformidade) com nº automático, PDF, filtros e dashboard',
