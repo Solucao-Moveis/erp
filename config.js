@@ -46,6 +46,8 @@ window.SMERP_CONFIG = {
     manutencao: 'https://solucaomoveis-manutencao.h5xdag.easypanel.host/',
     planos_acao: 'https://solucaomoveis-pmo.h5xdag.easypanel.host/',
     frota: 'https://solucaomoveis-solucaomoveis-frota.h5xdag.easypanel.host/',
+    // Planejamento de Carga (app próprio; CONFIRME a URL após publicar no EasyPanel)
+    planejamento: 'https://solucaomoveis-planejamento.h5xdag.easypanel.host/',
     // Utilitários: app nativo 'Caderno' (wiki/anotações), SSO padrão do hub
     // (igual aos outros apps).
     utilitarios: 'https://solucaomoveis-caderno.h5xdag.easypanel.host/'
@@ -62,7 +64,8 @@ window.SMERP_CONFIG = {
     { id: 'producao',       nome: 'Fábrica / Produção',    icon: 'clock', cor: '#2E78D2', modulos: [
         { system: 'fabrill',    nome: 'Hora a Hora',      desc: 'Apontamento de produção por hora' },
         { system: 'sobras',     nome: 'Gestor de Sobras',  desc: 'Controle de sobras de produção por setor' },
-        { system: 'manutencao', nome: 'Manutenção', desc: 'Ordens de serviço, preventivas e estoque de peças' }
+        { system: 'manutencao', nome: 'Manutenção', desc: 'Ordens de serviço, preventivas e estoque de peças' },
+        { system: 'planejamento', nome: 'Planejamento de Carga', desc: 'Pedido (PDF) → cargas/embarque: fatiamento por cubagem e indicadores' }
       ] },
     { id: 'logistica',      nome: 'Expedição / Logística', icon: 'bars',  cor: '#1F9D55', modulos: [
         { system: 'bip', nome: 'Gestor de Expedição — Apontamento (Celular)', desc: 'Modo enxuto: criar e bipar carregamentos no celular', path: 'apontar' },
@@ -151,6 +154,12 @@ window.SMERP_CONFIG = {
         papeis: [
           { value: 'criador', label: 'Criador', desc: 'Cria, edita e exclui assistências e baixa o PDF (RNC)' },
           { value: 'leitor',  label: 'Leitor',  desc: 'Só consulta a lista/dashboard e baixa o PDF, sem criar/editar' }
+        ] },
+      { system: 'planejamento', nome: 'Planejamento de Carga', cor: '#2E78D2', icon: 'truck',
+        papeis: [
+          { value: 'admin',    label: 'Administrador', desc: 'Acesso total: configura e gerencia usuários' },
+          { value: 'pcp',      label: 'PCP',           desc: 'Cria/edita pedidos, cargas, lotes e o fatiamento' },
+          { value: 'consulta', label: 'Consulta',      desc: 'Só visualiza a grade e os indicadores, sem editar' }
         ] }
     ]
   },

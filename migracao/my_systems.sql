@@ -90,6 +90,14 @@ as $$
               (select jsonb_agg(role) from engenharia.user_roles where user_id = auth.uid()),
               '[]'::jsonb)
           end
+        ),
+        'planejamento', (
+          -- Modulo Planejamento de Carga (PCP) -> schema proprio.
+          select case when exists (select 1 from planejamento.profiles where id = auth.uid())
+            then coalesce(
+              (select jsonb_agg(role) from planejamento.user_roles where user_id = auth.uid()),
+              '[]'::jsonb)
+          end
         )
       )
     ),
