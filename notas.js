@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.19',
+    data: '25/06/2026',
+    titulo: 'Compras: aviso de solicitações atrasadas no Dashboard',
+    resumo: 'O Dashboard do Compras agora avisa quando há solicitações atrasadas — aquelas que já passaram da data em que eram necessárias ("Necessário em") e cujo item ainda não chegou. No topo do Dashboard aparece um card "Atrasadas" com a quantidade: ele fica vermelho quando há atrasadas e verde com "Nenhuma em atraso" quando está tudo em dia. Clicando no card, abre a lista das solicitações atrasadas com o número da SC, o item, o setor, a data necessária e há quantos dias está atrasada.',
+    mudancas: [
+      {
+        app: 'Compras — Dashboard',
+        o_que: 'Novo card "Atrasadas" no topo do Dashboard. Ele conta as solicitações que passaram da data "Necessário em" e ainda não foram atendidas (o item não chegou e a solicitação não está finalizada, negada nem cancelada). Fica vermelho quando há atrasadas e verde quando não há nenhuma.',
+        como: 'Abra o Compras e vá em "Dashboard". O card "Atrasadas", no topo, mostra quantas solicitações estão atrasadas. Clique nele para abrir a lista detalhada — cada linha traz a SC (clicável), o item, o setor, a data em que o item era necessário e há quantos dias está atrasada. Lembrando: a data "Necessário em" é a que a pessoa preenche ao abrir a solicitação.'
+      }
+    ]
+  },
+  {
     versao: '6.18',
     data: '19/06/2026',
     titulo: 'Engenharia: vínculo da assistência com o desvio do Hora a Hora + liberação de acesso pela tela Usuários',
