@@ -14,13 +14,13 @@ import {
   Clock,
   Info,
   Loader2,
-  MessageSquare,
   MoreVertical,
   Paperclip,
   Pencil,
   Save,
   Tag,
   ListTree,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -49,8 +49,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useUpdatePage, usePage } from "@/data";
+import {
+  useUpdatePage,
+  usePage,
+  usePageRevisions,
+  useProfile,
+} from "@/data";
 import { RichEditor, extractText } from "@/features/editor";
+import { TagsEditor } from "@/components/caderno/Tags";
+import { AnexosEditor } from "@/components/caderno/Anexos";
+import { PainelSumario } from "@/components/caderno/PainelSumario";
+import { tempoRelativo } from "@/lib/tempo";
+import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/paginas/$pageId/editar")({
@@ -59,12 +69,28 @@ export const Route = createFileRoute("/paginas/$pageId/editar")({
 
 type EstadoAutosave = "ocioso" | "salvando" | "salvo";
 
+/** Painéis do trilho lateral do editor. */
+type PainelEditor = "detalhes" | "tags" | "anexos" | "sumario";
+
+const TITULOS_PAINEL: Record<PainelEditor, string> = {
+  detalhes: "Detalhes",
+  tags: "Tags",
+  anexos: "Anexos",
+  sumario: "Sumário",
+};
+
 function EditarPagina() {
   const { pageId } = Route.useParams();
   const navigate = useNavigate();
 
   const { data: page, isLoading, isError } = usePage(pageId);
+  const { data: revisoes } = usePageRevisions(pageId);
+  const { data: criadoPor } = useProfile(page?.created_by);
+  const { data: atualizadoPor } = useProfile(page?.updated_by ?? undefined);
   const updatePage = useUpdatePage();
+
+  // Painel aberto no trilho lateral (null = fechado).
+  const [painel, setPainel] = useState<PainelEditor | null>(null);
 
   const [titulo, setTitulo] = useState("");
   const [html, setHtml] = useState("");
@@ -253,13 +279,68 @@ function EditarPagina() {
             </div>
           </div>
 
-          {/* Trilho fino de ícones (Detalhes/Tags/Anexos/Comentários/Sumário) */}
+          {/* Painel ativo do trilho (Detalhes/Tags/Anexos/Sumário) */}
+          {painel && (
+            <aside className="hidden w-72 shrink-0 lg:block">
+              <div className="sticky top-20 rounded-xl border bg-card p-4 shadow-sm">
+                <div className="mb-3 flex items-center justify-between">
+                  <h2 className="text-sm font-semibold">{TITULOS_PAINEL[painel]}</h2>
+                  <button
+                    type="button"
+                    aria-label="Fechar painel"
+                    className="text-muted-foreground transition-colors hover:text-foreground"
+                    onClick={() => setPainel(null)}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+
+                {painel === "detalhes" && (
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    <p>Revisão #{(revisoes?.length ?? 0) + 1}</p>
+                    <p>
+                      Criado {tempoRelativo(page.created_at)}
+                      {criadoPor && ` por ${criadoPor.full_name || criadoPor.email}`}
+                    </p>
+                    <p>
+                      Atualizado {tempoRelativo(page.updated_at)}
+                      {atualizadoPor && ` por ${atualizadoPor.full_name || atualizadoPor.email}`}
+                    </p>
+                  </div>
+                )}
+                {painel === "tags" && <TagsEditor tipo="page" entidadeId={pageId} />}
+                {painel === "anexos" && <AnexosEditor pageId={pageId} />}
+                {painel === "sumario" && <PainelSumario html={html} />}
+              </div>
+            </aside>
+          )}
+
+          {/* Trilho fino de ícones (clique abre/fecha o painel) */}
           <nav className="hidden w-12 shrink-0 flex-col items-center gap-1 rounded-xl border bg-card py-2 lg:flex">
-            <TrilhoBtn icon={Info} label="Detalhes" />
-            <TrilhoBtn icon={Tag} label="Tags" />
-            <TrilhoBtn icon={Paperclip} label="Anexos" />
-            <TrilhoBtn icon={MessageSquare} label="Comentários" />
-            <TrilhoBtn icon={ListTree} label="Sumário" />
+            <TrilhoBtn
+              icon={Info}
+              label="Detalhes"
+              ativo={painel === "detalhes"}
+              onClick={() => setPainel((p) => (p === "detalhes" ? null : "detalhes"))}
+            />
+            <TrilhoBtn
+              icon={Tag}
+              label="Tags"
+              ativo={painel === "tags"}
+              onClick={() => setPainel((p) => (p === "tags" ? null : "tags"))}
+            />
+            <TrilhoBtn
+              icon={Paperclip}
+              label="Anexos"
+              ativo={painel === "anexos"}
+              onClick={() => setPainel((p) => (p === "anexos" ? null : "anexos"))}
+            />
+            <TrilhoBtn
+              icon={ListTree}
+              label="Sumário"
+              ativo={painel === "sumario"}
+              onClick={() => setPainel((p) => (p === "sumario" ? null : "sumario"))}
+            />
           </nav>
         </div>
 
@@ -286,8 +367,18 @@ function EditarPagina() {
   );
 }
 
-/** Botão do trilho lateral (apenas visual por enquanto). */
-function TrilhoBtn({ icon: Icon, label }: { icon: LucideIcon; label: string }) {
+/** Botão do trilho lateral: abre/fecha um painel; destaca quando ativo. */
+function TrilhoBtn({
+  icon: Icon,
+  label,
+  ativo,
+  onClick,
+}: {
+  icon: LucideIcon;
+  label: string;
+  ativo: boolean;
+  onClick: () => void;
+}) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -295,9 +386,15 @@ function TrilhoBtn({ icon: Icon, label }: { icon: LucideIcon; label: string }) {
           type="button"
           variant="ghost"
           size="icon"
-          className="h-9 w-9 rounded-full text-muted-foreground"
-          onClick={() => toast.info(`${label}: em breve.`)}
+          className={cn(
+            "h-9 w-9 rounded-full",
+            ativo
+              ? "bg-primary/10 text-primary"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+          onClick={onClick}
           aria-label={label}
+          aria-pressed={ativo}
         >
           <Icon className="h-4 w-4" />
         </Button>

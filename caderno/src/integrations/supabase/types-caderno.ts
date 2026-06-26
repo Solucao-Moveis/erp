@@ -234,6 +234,11 @@ export interface MembroEquipe {
   full_name: string | null;
 }
 
+/** Comentário com o nome de quem escreveu (juntado na camada de dados). */
+export interface CommentComAutor extends Comment {
+  autor: string | null; // full_name ou email; null se o perfil sumiu
+}
+
 /** Página com o nome do livro (consulta direta em pages + embed). */
 export interface PaginaComLivro extends Page {
   book?: { nome: string } | null;

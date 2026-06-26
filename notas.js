@@ -10,6 +10,34 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.20',
+    data: '26/06/2026',
+    titulo: 'Caderno: etiquetas (tags), anexos e comentários nas páginas',
+    resumo: 'Os ícones que apareciam ao lado da página do Caderno agora funcionam de verdade. Você pode colocar etiquetas (tags) nas páginas para organizar e achar mais fácil, anexar arquivos (PDF, planilha, foto…) ou links, e conversar nos comentários no rodapé de cada página — inclusive respondendo uns aos outros. Enquanto edita, os painéis "Detalhes" (revisão e quem mexeu) e "Sumário" (lista de títulos para pular direto) também passaram a funcionar. Tudo no mesmo estilo do Caderno, respeitando quem pode ver cada página.',
+    mudancas: [
+      {
+        app: 'Utilitários — Caderno (Tags)',
+        o_que: 'Agora dá para colocar etiquetas (tags) nas páginas, no formato Nome ou Nome: Valor (por exemplo, "Setor: Manutenção"). As etiquetas aparecem num quadro "Tags" ao lado da página quando alguém a abre para ler, ajudando a organizar e identificar o conteúdo.',
+        como: 'Abra a página e clique em "Editar". No trilho de ícones à direita, clique no ícone de etiqueta. Digite o nome (e, se quiser, um valor) e clique em "Add". Para tirar uma etiqueta, clique no x dela. Pronto: ela já aparece no quadro "Tags" para quem ler a página.'
+      },
+      {
+        app: 'Utilitários — Caderno (Anexos)',
+        o_que: 'As páginas passaram a aceitar anexos: você pode enviar um arquivo do computador (PDF, planilha, imagem…) ou adicionar um link externo. Os anexos ficam listados num quadro "Anexos" ao lado da página, prontos para abrir ou baixar.',
+        como: 'Na página, clique em "Editar" e, no trilho à direita, clique no ícone de clipe (Anexos). Use "Enviar arquivo" para subir um documento, ou preencha o link (com um nome opcional) e confirme. Para remover, clique na lixeira ao lado do anexo. Quem abrir a página vê o quadro "Anexos" e clica para abrir ou baixar.'
+      },
+      {
+        app: 'Utilitários — Caderno (Comentários)',
+        o_que: 'Cada página do Caderno agora tem comentários no rodapé. Quem enxerga a página pode comentar, responder a um comentário (formando uma conversa) e editar ou apagar os próprios comentários.',
+        como: 'Abra a página e role até o fim, na seção "Comentários". Escreva no campo e clique em "Comentar". Para responder a alguém, clique em "Responder" embaixo do comentário. Nos seus próprios comentários aparecem os botões "Editar" e "Excluir".'
+      },
+      {
+        app: 'Utilitários — Caderno (Detalhes e Sumário)',
+        o_que: 'Enquanto você edita uma página, o trilho de ícones à direita virou útil: "Detalhes" mostra o número da revisão e quem criou/atualizou; "Sumário" lista os títulos da página e leva direto a cada trecho.',
+        como: 'Com a página aberta em "Editar", clique nos ícones do trilho à direita: o "i" abre os Detalhes; o ícone de lista abre o Sumário (clique num título para pular até ele no texto). Clique de novo no mesmo ícone para fechar o painel.'
+      }
+    ]
+  },
+  {
     versao: '6.19',
     data: '25/06/2026',
     titulo: 'Compras: aviso de solicitações atrasadas no Dashboard',

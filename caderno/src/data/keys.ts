@@ -34,6 +34,13 @@ export const qk = {
   /** Busca full-text por termo. */
   busca: (termo: string) => ["busca", termo] as const,
 
+  /** Tags de uma entidade (página, livro, etc.). */
+  tags: (tipo: string, id: string) => ["tags", tipo, id] as const,
+  /** Anexos de uma página. */
+  attachments: (pageId: string) => ["attachments", pageId] as const,
+  /** Comentários de uma página. */
+  comments: (pageId: string) => ["comments", pageId] as const,
+
   /** Itens vistos recentemente (por usuário). */
   recentes: ["recentes"] as const,
   /** Favoritos (por usuário). */

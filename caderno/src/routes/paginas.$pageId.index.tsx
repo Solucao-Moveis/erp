@@ -32,6 +32,9 @@ import { LivroArvore } from "@/components/caderno/LivroArvore";
 import { MoverPaginaDialog } from "@/components/caderno/MoverPaginaDialog";
 import { RailAcoes, type AcaoRail } from "@/components/caderno/RailAcoes";
 import { RailDetalhes } from "@/components/caderno/RailDetalhes";
+import { TagsView } from "@/components/caderno/Tags";
+import { AnexosView } from "@/components/caderno/Anexos";
+import { Comentarios } from "@/components/caderno/Comentarios";
 import {
   registrarView,
   useBookConteudo,
@@ -224,7 +227,7 @@ function PaginaView() {
     </div>
   );
 
-  // ---- Rail direita: detalhes + ações ----
+  // ---- Rail direita: detalhes + tags + anexos + ações ----
   const direita = (
     <>
       <RailDetalhes
@@ -234,6 +237,8 @@ function PaginaView() {
         atualizadoEm={page.updated_at}
         atualizadoPor={nomeAtualizador}
       />
+      <TagsView tipo="page" entidadeId={page.id} />
+      <AnexosView pageId={page.id} />
       <RailAcoes acoes={acoes} />
     </>
   );
@@ -267,6 +272,9 @@ function PaginaView() {
           ) : (
             <p className="text-muted-foreground">Esta página ainda está vazia.</p>
           )}
+
+          {/* Comentários da página (estilo BookStack: no rodapé do conteúdo) */}
+          <Comentarios pageId={page.id} />
         </Layout3Col>
       </div>
 

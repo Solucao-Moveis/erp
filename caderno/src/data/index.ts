@@ -77,3 +77,21 @@ export {
 } from "./favorites";
 
 export { useMeusRascunhos, usePaginasAtualizadas } from "./drafts";
+
+export { useTags, useAddTag, useRemoveTag } from "./tags";
+
+export {
+  useAttachments,
+  useUploadAttachment,
+  useAddLinkAttachment,
+  useRemoveAttachment,
+  urlDoAnexo,
+} from "./attachments";
+
+export {
+  useComments,
+  useAddComment,
+  useUpdateComment,
+  useDeleteComment,
+  useUsuarioId,
+} from "./comments";
