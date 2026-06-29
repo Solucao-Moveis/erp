@@ -10,6 +10,24 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.22',
+    data: '29/06/2026',
+    titulo: 'Planejamento de Carga: indicador OTIF e recálculo automático ao fatiar',
+    resumo: 'Duas novidades no Planejamento de Carga. (1) Nos Indicadores, na aba "Lead time", aparece agora o OTIF — quanto dos pedidos saiu no prazo E completo —, com três números separados (OTIF, No prazo e Completos) e quantos pedidos foram avaliados; ele compara a saída real com a previsão de entrega e fica verde quando está bom (95%+). (2) No Assistente de fatiar, ao mexer na quantidade de uma fatia o sistema reequilibra sozinho as outras fatias do mesmo pedido para o total bater certinho, e cada fatia mostra "fatiado X / pedido Y".',
+    mudancas: [
+      {
+        app: 'Planejamento de Carga — Indicadores (OTIF)',
+        o_que: 'Na aba "Lead time" dos Indicadores entrou um bloco "OTIF — confiabilidade de embarque" com quatro cartões: OTIF (pedidos que saíram no prazo e completos), No prazo (On-Time), Completos (In-Full) e Pedidos avaliados. O cálculo considera os pedidos que tinham previsão de entrega no período escolhido; quem atrasou ou nem embarcou conta como falha. "No prazo" significa que a saída da fábrica aconteceu até a data de previsão; "Completo" significa que saiu toda a quantidade do pedido. O cartão de OTIF fica verde a partir de 95%.',
+        como: 'Abra o Planejamento de Carga e vá em "Indicadores". Na aba "Lead time", os cartões de OTIF ficam no topo. Use o filtro de período (no canto) para mudar o intervalo — os números de OTIF olham para a previsão de entrega no período. Observação: pedidos sem previsão de entrega preenchida ficam de fora desse cálculo.'
+      },
+      {
+        app: 'Planejamento de Carga — Assistente de fatiar',
+        o_que: 'Ao fatiar um pedido em várias cargas, agora cada fatia mostra "fatiado X / pedido Y" e o total nunca passa do que falta planejar. Quando você aumenta a quantidade de uma fatia, o sistema desconta automaticamente das outras fatias do mesmo pedido (começando pela última carga); se uma fatia zera, ela some — e se a carga ficar vazia, ela some também. Quando você diminui uma fatia, a sobra volta para "Falta distribuir".',
+        como: 'No Planejamento de Carga, abra "Assistente de fatiar", escolha o pedido e clique em "Sugerir cargas". Edite a quantidade de qualquer fatia: por exemplo, num pedido de 20 dividido em 10 + 10, se você colocar 15 na primeira, a outra vira 5 sozinha; se colocar 20, a outra some. O texto "fatiado / pedido" embaixo de cada item mostra se já bateu o total (fica verde quando fecha certinho).'
+      }
+    ]
+  },
+  {
     versao: '6.21',
     data: '29/06/2026',
     titulo: 'Manutenção: Programação Mensal (planilha por máquina) e exportar em PDF',
