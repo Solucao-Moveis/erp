@@ -10,6 +10,24 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.21',
+    data: '29/06/2026',
+    titulo: 'Manutenção: Programação Mensal (planilha por máquina) e exportar em PDF',
+    resumo: 'Na tela de Preventivas agora dá para alternar entre o Calendário (do jeito que já era, com Agendar e registrar execução) e a nova "Programação Mensal": uma planilha igual à da manutenção, onde cada linha é uma máquina e cada coluna é um dia do mês. Os dias com preventiva ficam coloridos conforme a situação (Programada, No prazo, Antecipada, Atrasada, Prorrogada, Cancelada), os fins de semana aparecem destacados, e há um botão "Exportar para PDF" que abre a impressão já em paisagem para salvar ou imprimir o quadro do mês.',
+    mudancas: [
+      {
+        app: 'Manutenção — Preventivas',
+        o_que: 'Novo botão de alternância "Calendário | Programação Mensal" no topo da tela de Preventivas. A Programação Mensal mostra todas as máquinas em linhas (na ordem do código 01, 02, 03…, inclusive as que não têm preventiva no mês) contra os dias do mês nas colunas. Cada dia com preventiva fica pintado com a cor da situação; sábados e domingos ficam destacados. Tem legenda das cores.',
+        como: 'Abra "Preventivas". Use as setas para escolher o mês. Clique em "Programação Mensal" para ver a planilha (ou "Calendário" para voltar à visão de antes). Passe o mouse sobre um quadradinho colorido para ver a máquina e a situação.'
+      },
+      {
+        app: 'Manutenção — Preventivas (PDF)',
+        o_que: 'Botão "Exportar para PDF" na Programação Mensal. Ele abre a janela de impressão do navegador já em paisagem (A4), com as cores preservadas, mostrando só a planilha (sem o menu lateral). O PDF sempre sai com o que estiver na agenda no momento.',
+        como: 'Na "Programação Mensal", clique em "Exportar para PDF". Na janela de impressão, escolha "Salvar como PDF" e confirme. Dica: deixe "Gráficos de plano de fundo" ligado para o quadro sair colorido.'
+      }
+    ]
+  },
+  {
     versao: '6.20',
     data: '26/06/2026',
     titulo: 'Caderno: etiquetas (tags), anexos e comentários nas páginas',
