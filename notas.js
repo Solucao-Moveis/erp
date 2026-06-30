@@ -24,6 +24,11 @@ window.SMERP_NOTAS = [
         app: 'Planejamento de Carga — Motoristas',
         o_que: 'Nova aba "Motoristas": um cadastro simples com nome, telefone, placa, CNH e se está ativo. É dessa lista que você escolhe o motorista na hora de montar uma rota.',
         como: 'Vá em "Motoristas", clique em "Novo motorista", preencha os dados e salve. Dá para editar (lápis) ou excluir (lixeira) — se excluir, as rotas daquele motorista apenas ficam sem motorista, sem perder nada. Quem tem acesso só de consulta vê a lista, mas não edita.'
+      },
+      {
+        app: 'Planejamento de Carga — Grade (cor por motorista)',
+        o_que: 'Na Grade dá pra escolher se as cargas são coloridas por destino (como já era) ou por MOTORISTA. Colorindo por motorista, todas as cargas do mesmo motorista ficam com a mesma cor — fica fácil enxergar de relance quais cargas são da mesma viagem.',
+        como: 'Abra a Grade e, na barra de filtros, use o seletor "Cor por destino / Cor por motorista". Trocando para "motorista", as linhas se pintam pela cor de cada motorista.'
       }
     ]
   },
