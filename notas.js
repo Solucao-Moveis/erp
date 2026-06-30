@@ -10,6 +10,24 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.23',
+    data: '30/06/2026',
+    titulo: 'Planejamento de Carga: nova aba Rota (com mapa) e cadastro de Motoristas',
+    resumo: 'Duas novidades no Planejamento de Carga. (1) Uma aba "Rota": você escolhe um motorista, vai jogando os pedidos que ele deve levar e o sistema mostra num mapa o trajeto — saindo da fábrica (Santana do Paraíso/MG) e passando pelas cidades de entrega, já na melhor ordem (caminho mais curto). Cada pedido fica em uma rota só, e dá pra mover um pedido de um motorista para outro. (2) Uma aba "Motoristas", um cadastro simples (nome, telefone, placa, CNH) de onde você escolhe o motorista ao montar a rota.',
+    mudancas: [
+      {
+        app: 'Planejamento de Carga — Rota',
+        o_que: 'Nova aba "Rota". Você cria uma rota (nome + motorista + data), e do lado fica a lista de "Pedidos disponíveis" (os que ainda não estão em nenhuma rota), cada um com a cidade de entrega. Ao jogar um pedido na rota, a cidade aparece num mapa e o sistema sugere sozinho a melhor ordem das paradas (o caminho mais curto a partir da fábrica). Um pedido só pode estar em uma rota por vez; dá pra remover um pedido ou movê-lo para a rota de outro motorista. O mapa é em nível de cidade (não de rua) e mostra a distância estimada da viagem.',
+        como: 'Abra o Planejamento de Carga e vá em "Rota". Clique em "Nova rota", dê um nome, escolha o motorista e a data, e confirme. Na coluna "Pedidos disponíveis", clique no + para jogar um pedido na rota — ele vira uma parada no mapa e a ordem é calculada automaticamente. Para tirar um pedido, use a lixeira; para passar para outra rota, use o seletor "Mover p/…". O botão "Sugerir melhor ordem" recalcula o caminho quando quiser. (As cidades são localizadas no mapa automaticamente na primeira vez que aparecem.)'
+      },
+      {
+        app: 'Planejamento de Carga — Motoristas',
+        o_que: 'Nova aba "Motoristas": um cadastro simples com nome, telefone, placa, CNH e se está ativo. É dessa lista que você escolhe o motorista na hora de montar uma rota.',
+        como: 'Vá em "Motoristas", clique em "Novo motorista", preencha os dados e salve. Dá para editar (lápis) ou excluir (lixeira) — se excluir, as rotas daquele motorista apenas ficam sem motorista, sem perder nada. Quem tem acesso só de consulta vê a lista, mas não edita.'
+      }
+    ]
+  },
+  {
     versao: '6.22',
     data: '29/06/2026',
     titulo: 'Planejamento de Carga: indicador OTIF e recálculo automático ao fatiar',
