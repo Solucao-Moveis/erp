@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.24',
+    data: '01/07/2026',
+    titulo: 'Manutenção: arquivar máquinas (tira da lista sem perder o histórico)',
+    resumo: 'No módulo de Manutenção agora dá para ARQUIVAR uma máquina em vez de apagar. A máquina arquivada some das listas do dia a dia (abertura de OS, preventivas, estoque, dashboard e indicadores), mas todo o histórico dela — ordens de serviço, preventivas e documentos — continua guardado, e ela pode ser trazida de volta a qualquer momento. Aproveitando: a pedido, foram arquivadas todas as parafusadeiras, rebitadeiras, esmerilhadeiras e máquinas de solda.',
+    mudancas: [
+      {
+        app: 'Manutenção — Máquinas',
+        o_que: 'Novo botão "Arquivar" em cada máquina: em vez de apagar de vez, você tira a máquina de circulação sem perder nada. A máquina arquivada deixa de aparecer na hora de abrir uma Ordem de Serviço, agendar preventiva, vincular peça de estoque, e some do Dashboard e dos Indicadores — mas o histórico dela fica intacto e ela pode ser restaurada quando quiser. O botão de apagar de vez continua existindo, mas agora pede confirmação (porque apagar remove junto as preventivas e documentos da máquina).',
+        como: 'Abra Manutenção > Máquinas. Para tirar uma máquina da lista, clique no ícone de caixa (Arquivar). Para ver as que já estão arquivadas, clique em "Ver arquivadas" no topo — elas aparecem em cinza com a etiqueta "Arquivada"; ali dá para "Restaurar" e trazê-la de volta. Só quem edita (Manutenção/Admin) faz isso.'
+      }
+    ]
+  },
+  {
     versao: '6.23',
     data: '30/06/2026',
     titulo: 'Planejamento de Carga: nova aba Rota (com mapa) e cadastro de Motoristas',
