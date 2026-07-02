@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.25',
+    data: '02/07/2026',
+    titulo: 'Novo sistema: Segurança do Trabalho (SST)',
+    resumo: 'O SMERP ganhou o Programa de Gestão e Desempenho em Segurança: a SESMT lança mensalmente, setor a setor, 11 indicadores de SST. O sistema calcula a nota (Liderança 60 + Equipe 40 = 100), exibe um pódio dos melhores setores, um mural com carinha e cor de cada setor (Excelente 😃 / Bom 🙂 / Atenção 😐 / Crítico ☹️), e um gráfico de evolução ao longo do ano. A premiação trimestral é definida pela média dos 3 meses. Uma ocorrência excepcional (acidente/incidente) zera a nota do setor naquele mês.',
+    mudancas: [
+      {
+        app: 'Segurança do Trabalho (novo)',
+        o_que: 'Novo sistema SST com 4 telas: (1) Painel — pódio top-3, mural dos 8 setores (Marcenaria, Desempeno, Metalurgia, Tratamento, Solda, Pintura, Protótipo, Montagem) com nota/carinha/cor e gráfico de evolução anual; toggle Mês/Trimestre. (2) Lançar — a SESMT escolhe o setor e o mês, marca os 11 critérios um a um, vê a nota calculada na hora; opção de registrar ocorrência excepcional (com descrição), que zera a nota e força "Crítico". (3) Registros — lista de todas as avaliações com filtros por setor, classificação e ano; botão de excluir (só SESMT/admin). (4) Detalhe do Setor — clicando em qualquer card do mural: breakdown dos 11 critérios, ocorrência, média do trimestre atual e premiação correspondente.',
+        como: 'Abra o SMERP e procure o setor "Segurança do Trabalho". O acesso é liberado pela aba "Usuários" (papéis: SESMT lança/edita; Líder e Leitor só visualizam). Dentro do sistema: no Painel veja o ranking e a evolução; no "Lançar" (só SESMT), escolha o setor e o mês, marque os critérios e salve — o banco calcula a nota sozinho; nos Registros veja ou exclua avaliações anteriores; clique em qualquer card do mural para ver o detalhe do setor com o breakdown completo.'
+      }
+    ]
+  },
+  {
     versao: '6.24',
     data: '01/07/2026',
     titulo: 'Manutenção: arquivar máquinas (tira da lista sem perder o histórico)',

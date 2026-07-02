@@ -106,6 +106,14 @@ as $$
               (select jsonb_agg(role) from planejamento.user_roles where user_id = auth.uid()),
               '[]'::jsonb)
           end
+        ),
+        'seguranca', (
+          -- Programa de Gestão e Desempenho em Segurança do Trabalho.
+          select case when exists (select 1 from seguranca.profiles where id = auth.uid())
+            then coalesce(
+              (select jsonb_agg(role) from seguranca.user_roles where user_id = auth.uid()),
+              '[]'::jsonb)
+          end
         )
       )
     ),
