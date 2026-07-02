@@ -52,7 +52,7 @@ window.SMERP_CONFIG = {
     // (igual aos outros apps).
     utilitarios: 'https://solucaomoveis-caderno.h5xdag.easypanel.host/',
     // Segurança do Trabalho — Programa de Gestão e Desempenho em SST
-    seguranca: 'https://solucaomoveis-seguranca.h5xdag.easypanel.host/'
+    seguranca: 'https://solucaomoveis-seguranca-solucao.h5xdag.easypanel.host/'
   },
 
   // Cards por SETOR. Cada setor tem 1+ módulos; o card mostra o setor e,
