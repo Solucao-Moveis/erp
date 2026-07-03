@@ -193,6 +193,16 @@ begin
         insert into engenharia.user_roles (user_id, role)
           values (new_id, r::engenharia.app_role) on conflict (user_id, role) do nothing;
       end loop;
+
+    elsif sys = 'seguranca' then
+      -- SST — Programa de Gestão e Desempenho em Segurança do Trabalho.
+      -- profiles segue (id, email, full_name) como compras/frota.
+      insert into seguranca.profiles (id, email, full_name)
+        values (new_id, v_email, v_name) on conflict (id) do nothing;
+      for r in select jsonb_array_elements_text(roles) loop
+        insert into seguranca.user_roles (user_id, role)
+          values (new_id, r::seguranca.app_role) on conflict (user_id, role) do nothing;
+      end loop;
     end if;
   end loop;
 
@@ -219,7 +229,7 @@ as $$
     u.id,
     u.email::text,
     coalesce(u.raw_user_meta_data->>'full_name',
-             cp.full_name, fp.full_name, bp.full_name, gp.full_name, sp.full_name, mp.nome, pap.nome, frp.full_name, ep.full_name) as full_name,
+             cp.full_name, fp.full_name, bp.full_name, gp.full_name, sp.full_name, mp.nome, pap.nome, frp.full_name, ep.full_name, sgp.full_name) as full_name,
     u.created_at,
     jsonb_strip_nulls(jsonb_build_object(
       'compras', (select jsonb_agg(role) from compras.user_roles where user_id = u.id),
@@ -230,7 +240,8 @@ as $$
       'manutencao', (select jsonb_agg(role) from manutencao.user_roles where user_id = u.id),
       'planos_acao', (select jsonb_agg(role) from planos_acao.user_roles where user_id = u.id),
       'frota',   (select jsonb_agg(role) from frota.user_roles   where user_id = u.id),
-      'engenharia', (select jsonb_agg(role) from engenharia.user_roles where user_id = u.id)
+      'engenharia', (select jsonb_agg(role) from engenharia.user_roles where user_id = u.id),
+      'seguranca', (select jsonb_agg(role) from seguranca.user_roles where user_id = u.id)
     )) as systems
   from auth.users u
   left join compras.profiles cp on cp.id = u.id
@@ -242,6 +253,7 @@ as $$
   left join planos_acao.profiles pap on pap.user_id = u.id   -- vínculo por user_id (≠ das outras)
   left join frota.profiles   frp on frp.id = u.id
   left join engenharia.profiles ep on ep.id = u.id
+  left join seguranca.profiles sgp on sgp.id = u.id
   where public.can_manage_users()   -- só o master recebe a lista
   order by u.created_at desc;
 $$;
@@ -493,6 +505,22 @@ begin
   else
     delete from engenharia.user_roles where user_id = p_user_id;
     begin delete from engenharia.profiles where id = p_user_id;
+    exception when foreign_key_violation then null; end;
+  end if;
+
+  -- SEGURANCA (papéis: admin | sesmt | lider | leitor)
+  desired := coalesce(p_systems->'seguranca', '[]'::jsonb);
+  if jsonb_array_length(desired) > 0 then
+    insert into seguranca.profiles (id, email, full_name)
+      values (p_user_id, v_email, v_name) on conflict (id) do nothing;
+    delete from seguranca.user_roles
+      where user_id = p_user_id and role::text not in (select jsonb_array_elements_text(desired));
+    insert into seguranca.user_roles (user_id, role)
+      select p_user_id, x::seguranca.app_role from jsonb_array_elements_text(desired) as x
+      on conflict (user_id, role) do nothing;
+  else
+    delete from seguranca.user_roles where user_id = p_user_id;
+    begin delete from seguranca.profiles where id = p_user_id;
     exception when foreign_key_violation then null; end;
   end if;
 
