@@ -108,6 +108,23 @@ as $$
   )
 $$;
 
+-- editor = admin | sesmt | master (usa security definer p/ acessar auth.users)
+create or replace function seguranca.is_editor(_user_id uuid)
+returns boolean
+language sql stable security definer set search_path = seguranca, public
+as $$
+  select
+    exists (
+      select 1 from seguranca.user_roles
+      where user_id = _user_id
+        and role in ('admin'::seguranca.app_role, 'sesmt'::seguranca.app_role)
+    )
+    or exists (
+      select 1 from auth.users
+      where id = _user_id and lower(email) = 'master@solucaomoveis.ind.br'
+    )
+$$;
+
 -- ---------- RLS ----------
 alter table seguranca.profiles    enable row level security;
 alter table seguranca.user_roles  enable row level security;
@@ -133,16 +150,8 @@ create policy "Setores read" on seguranca.setores
 -- setores: só admin ou sesmt podem escrever
 create policy "Setores write" on seguranca.setores
   for all to authenticated
-  using (
-    seguranca.has_role(auth.uid(), 'admin') or
-    seguranca.has_role(auth.uid(), 'sesmt') or
-    (select (email = 'master@solucaomoveis.ind.br') from auth.users where id = auth.uid())
-  )
-  with check (
-    seguranca.has_role(auth.uid(), 'admin') or
-    seguranca.has_role(auth.uid(), 'sesmt') or
-    (select (email = 'master@solucaomoveis.ind.br') from auth.users where id = auth.uid())
-  );
+  using (seguranca.is_editor(auth.uid()))
+  with check (seguranca.is_editor(auth.uid()));
 
 -- avaliações: qualquer membro pode ler
 create policy "Avals read" on seguranca.avaliacoes
@@ -152,32 +161,16 @@ create policy "Avals read" on seguranca.avaliacoes
 -- avaliações: só admin ou sesmt (ou master) podem escrever
 create policy "Avals write" on seguranca.avaliacoes
   for insert to authenticated
-  with check (
-    seguranca.has_role(auth.uid(), 'admin') or
-    seguranca.has_role(auth.uid(), 'sesmt') or
-    (select (email = 'master@solucaomoveis.ind.br') from auth.users where id = auth.uid())
-  );
+  with check (seguranca.is_editor(auth.uid()));
 
 create policy "Avals update" on seguranca.avaliacoes
   for update to authenticated
-  using (
-    seguranca.has_role(auth.uid(), 'admin') or
-    seguranca.has_role(auth.uid(), 'sesmt') or
-    (select (email = 'master@solucaomoveis.ind.br') from auth.users where id = auth.uid())
-  )
-  with check (
-    seguranca.has_role(auth.uid(), 'admin') or
-    seguranca.has_role(auth.uid(), 'sesmt') or
-    (select (email = 'master@solucaomoveis.ind.br') from auth.users where id = auth.uid())
-  );
+  using (seguranca.is_editor(auth.uid()))
+  with check (seguranca.is_editor(auth.uid()));
 
 create policy "Avals delete" on seguranca.avaliacoes
   for delete to authenticated
-  using (
-    seguranca.has_role(auth.uid(), 'admin') or
-    seguranca.has_role(auth.uid(), 'sesmt') or
-    (select (email = 'master@solucaomoveis.ind.br') from auth.users where id = auth.uid())
-  );
+  using (seguranca.is_editor(auth.uid()));
 
 -- ---------- GRANTS ----------
 grant usage on schema seguranca to authenticated, service_role;
@@ -186,6 +179,7 @@ grant all on all tables in schema seguranca to service_role;
 grant all on all sequences in schema seguranca to authenticated, service_role;
 grant execute on function seguranca.is_member(uuid) to authenticated;
 grant execute on function seguranca.has_role(uuid, seguranca.app_role) to authenticated;
+grant execute on function seguranca.is_editor(uuid) to authenticated;
 
 -- ---------- RECARREGA PostgREST ----------
 -- Lembrete: adicionar 'seguranca' em PGRST_DB_SCHEMAS no EasyPanel do Supabase antes de rodar.
