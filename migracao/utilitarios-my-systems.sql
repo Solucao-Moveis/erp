@@ -114,6 +114,14 @@ as $$
               (select jsonb_agg(role) from seguranca.user_roles where user_id = auth.uid()),
               '[]'::jsonb)
           end
+        ),
+        'rh', (
+          -- Indicadores de RH (Absenteísmo & Turnover) — acesso restrito a 3 pessoas.
+          select case when exists (select 1 from rh.profiles where id = auth.uid())
+            then coalesce(
+              (select jsonb_agg(role) from rh.user_roles where user_id = auth.uid()),
+              '[]'::jsonb)
+          end
         )
       )
     ),

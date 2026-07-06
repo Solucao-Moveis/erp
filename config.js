@@ -52,7 +52,9 @@ window.SMERP_CONFIG = {
     // (igual aos outros apps).
     utilitarios: 'https://solucaomoveis-caderno.h5xdag.easypanel.host/',
     // Segurança do Trabalho — Programa de Gestão e Desempenho em SST
-    seguranca: 'https://solucaomoveis-seguranca-solucao.h5xdag.easypanel.host/'
+    seguranca: 'https://solucaomoveis-seguranca-solucao.h5xdag.easypanel.host/',
+    // RH — Indicadores de Absenteísmo & Turnover (acesso restrito a 3 pessoas)
+    rh: 'https://solucaomoveis-rh-solucao.h5xdag.easypanel.host/'
   },
 
   // Cards por SETOR. Cada setor tem 1+ módulos; o card mostra o setor e,
@@ -85,6 +87,9 @@ window.SMERP_CONFIG = {
       ] },
     { id: 'seguranca',      nome: 'Segurança do Trabalho', icon: 'shield', cor: '#DC2626', modulos: [
         { system: 'seguranca', nome: 'SST — Gestão de Segurança', desc: 'Programa de Gestão e Desempenho em Segurança: placar mensal por setor, pódio, mural e evolução trimestral' }
+      ] },
+    { id: 'rh',            nome: 'RH / Pessoas',           icon: 'users', cor: '#7C3AED', modulos: [
+        { system: 'rh', nome: 'Indicadores de RH', desc: 'Absenteísmo & turnover: painel, diário de ausentes e lançamentos mensais' }
       ] },
     { id: 'utilitarios',    nome: 'Utilitários',           icon: 'book',  cor: '#0891B2', modulos: [
         { system: 'utilitarios', nome: 'Caderno', desc: 'Wiki/anotações: documentação pessoal e bases compartilhadas por equipe' }
@@ -172,6 +177,10 @@ window.SMERP_CONFIG = {
           { value: 'sesmt',  label: 'SESMT',         desc: 'Lança e edita avaliações mensais de todos os setores' },
           { value: 'lider',  label: 'Líder',         desc: 'Consulta painel, registros e detalhe do setor (somente leitura)' },
           { value: 'leitor', label: 'Leitor',        desc: 'Visualiza o painel e a evolução dos setores (somente leitura)' }
+        ] },
+      { system: 'rh', nome: 'RH — Indicadores', cor: '#7C3AED', icon: 'users',
+        papeis: [
+          { value: 'usuario', label: 'Usuário', desc: 'Acesso completo: painel de KPIs, diário de ausentes e lançamentos' }
         ] }
     ]
   },
