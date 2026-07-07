@@ -7,7 +7,7 @@
 -- ── 1. rh.config — atualiza meta e setores ──────────────────────────────
 UPDATE rh.config SET
   meta = '{"metaAbs":3,"metaTurn":2.5,"absExc":2,"absBom":3,"absAten":4,"absCrit":6,"turnExc":2,"turnBom":3,"turnAten":4,"turnCrit":5}'::jsonb,
-  setores = '["Marcenaria","Metalurgia","Solda","Montagem","Pintura","Tratamento","Inspeção","Protótipo","PCP","Almoxarifado","Engenharia","Qualidade","Manutenção","Administrativo"]'::jsonb
+  setores = '["Marcenaria","Metalurgia","Solda","Montagem","Pintura","Tratamento","Inspeção","Protótipo","PCP","Almoxarifado","Engenharia","Qualidade","Manutenção","Administrativo","Limpeza","Segurança","Transporte"]'::jsonb
 WHERE id = 1;
 
 -- ── 2. rh.meses — 2025 (dados reais) ────────────────────────────────────
