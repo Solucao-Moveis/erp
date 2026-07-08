@@ -29,7 +29,7 @@ DECLARE
   new_ausentes   jsonb;
 BEGIN
   FOR r IN
-    SELECT id, payload
+    SELECT data, payload
     FROM rh.diario
     WHERE payload ? 'ausentes'
   LOOP
@@ -54,7 +54,7 @@ BEGIN
 
     UPDATE rh.diario
     SET payload = jsonb_set(r.payload, '{ausentes}', new_ausentes)
-    WHERE id = r.id;
+    WHERE data = r.data;
   END LOOP;
 
   RAISE NOTICE 'Nomes corrigidos no diario.';
