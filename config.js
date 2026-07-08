@@ -54,7 +54,9 @@ window.SMERP_CONFIG = {
     // Segurança do Trabalho — Programa de Gestão e Desempenho em SST
     seguranca: 'https://solucaomoveis-seguranca-solucao.h5xdag.easypanel.host/',
     // RH — Indicadores de Absenteísmo & Turnover (acesso restrito a 3 pessoas)
-    rh: 'https://solucaomoveis-rh-solucao.h5xdag.easypanel.host/'
+    rh: 'https://solucaomoveis-rh-solucao.h5xdag.easypanel.host/',
+    // Cronoanálise / PCP (repo timestamp, migrado do Lovable data-weave-vault)
+    pcp: 'https://solucaomoveis-timestamp.h5xdag.easypanel.host/'
   },
 
   // Cards por SETOR. Cada setor tem 1+ módulos; o card mostra o setor e,
@@ -69,7 +71,8 @@ window.SMERP_CONFIG = {
         { system: 'fabrill',    nome: 'Hora a Hora',      desc: 'Apontamento de produção por hora' },
         { system: 'sobras',     nome: 'Gestor de Sobras',  desc: 'Controle de sobras de produção por setor' },
         { system: 'manutencao', nome: 'Manutenção', desc: 'Ordens de serviço, preventivas e estoque de peças' },
-        { system: 'planejamento', nome: 'Planejamento de Carga', desc: 'Pedido (PDF) → cargas/embarque: fatiamento por cubagem e indicadores' }
+        { system: 'planejamento', nome: 'Planejamento de Carga', desc: 'Pedido (PDF) → cargas/embarque: fatiamento por cubagem e indicadores' },
+        { system: 'pcp', nome: 'Cronoanálise / PCP', desc: 'Estudos de tempo, roteiros, sequenciamento, kanban de OPs e OEE' }
       ] },
     { id: 'logistica',      nome: 'Expedição / Logística', icon: 'bars',  cor: '#1F9D55', modulos: [
         { system: 'bip', nome: 'Gestor de Expedição — Apontamento (Celular)', desc: 'Modo enxuto: criar e bipar carregamentos no celular', path: 'apontar' },
@@ -181,6 +184,13 @@ window.SMERP_CONFIG = {
       { system: 'rh', nome: 'RH — Indicadores', cor: '#7C3AED', icon: 'users',
         papeis: [
           { value: 'usuario', label: 'Usuário', desc: 'Acesso completo: painel de KPIs, diário de ausentes e lançamentos' }
+        ] },
+      { system: 'pcp', nome: 'Cronoanálise / PCP', cor: '#2E78D2', icon: 'clock',
+        papeis: [
+          { value: 'admin',        label: 'Administrador', desc: 'Acesso total: cadastros, usuários e tudo do analista' },
+          { value: 'analista_pcp', label: 'Analista PCP',  desc: 'Edita cadastros, roteiros, lotes, OPs e cronoanálises' },
+          { value: 'supervisor',   label: 'Supervisor',    desc: 'Consulta tudo e registra produção/paradas do dia' },
+          { value: 'operador',     label: 'Operador',      desc: 'Consulta e registra a própria produção/parada' }
         ] }
     ]
   },

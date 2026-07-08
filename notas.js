@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.26',
+    data: '08/07/2026',
+    titulo: 'Novo sistema: Cronoanálise / PCP (estudos de tempo e sequenciamento)',
+    resumo: 'O setor Fábrica / Produção ganhou o sistema de Cronoanálise / PCP, trazido com todo o histórico que já existia: mais de 137 mil medições de cronoanálise, 39 máquinas, 61 itens com roteiros e as ordens de produção. Nele o PCP registra estudos de tempo (quantos segundos leva cada peça em cada máquina), monta roteiros de produção, acompanha as OPs num kanban por etapa (metalurgia → solda → pintura → montagem), define prioridades por máquina e analisa OEE/eficiência (CODI).',
+    mudancas: [
+      {
+        app: 'Cronoanálise / PCP (novo)',
+        o_que: 'Sistema completo de PCP com: dashboard de carga por máquina; cadastro de setores, máquinas (recursos) e itens; cronoanálise com histórico de medições e importador de planilha; roteiros de tempo (ciclo/setup por máquina); lotes e ordens de produção com kanban por etapa; sequenciamento e prioridades por máquina; registro de paradas e produção diária; análises CODI (OEE); estudos/anexos; e um simulador de solda. Tudo que já estava no sistema antigo veio junto (medições, máquinas, itens, roteiros e OPs).',
+        como: 'Abra o SMERP e, no card "Fábrica / Produção", clique em "Cronoanálise / PCP". O acesso é liberado pela aba "Usuários" (papéis: Administrador e Analista PCP editam tudo; Supervisor e Operador consultam e registram produção/paradas). A entrada é automática com o login do ERP (SSO) — sem senha extra.'
+      }
+    ]
+  },
+  {
     versao: '6.25',
     data: '02/07/2026',
     titulo: 'Novo sistema: Segurança do Trabalho (SST)',

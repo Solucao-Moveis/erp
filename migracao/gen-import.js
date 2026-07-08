@@ -81,6 +81,26 @@ const SCHEMAS = {
       from: "https://yeeckykuvnemweohixak.supabase.co/storage/v1/object/public/avatars/",
       to: "https://supabase-supabase.h5xdag.easypanel.host/storage/v1/object/public/planos-acao-avatars/" }],
   },
+  pcp: {
+    dir: "dados-pcp",
+    // cronoanalises (137k linhas) fica FORA do SQL — importa via
+    // import-crono-pcp.js (REST em lotes); SQL Editor não aguenta ~100MB.
+    order: ["profiles", "user_roles", "setores", "recursos", "itens",
+      "roteiro_tempos", "lotes", "ordens_producao", "op_movimentacoes",
+      "lote_setores", "paradas", "producao_diaria", "prioridades_maquina",
+      "manutencoes", "estudos", "codi_analises"],
+    generated: { producao_diaria: ["producao"] },
+    // dumps dos sistemas anteriores foram apagados desta máquina — dedup de
+    // identidade é 100% via lista viva do SMERP (gerar antes: gen-live-users.js pcp
+    // ou json_agg de auth.users no SQL Editor).
+    liveUsersFile: "dados-pcp/live_users.json",
+    priorSystems: [],
+    userRefs: [["profiles", "id"], ["user_roles", "user_id"],
+      ["lotes", "created_by"], ["producao_diaria", "registrado_por"],
+      ["op_movimentacoes", "movido_por"], ["paradas", "created_by"],
+      ["prioridades_maquina", "created_by"], ["manutencoes", "created_by"],
+      ["estudos", "created_by"], ["codi_analises", "created_by"]],
+  },
 };
 
 const schema = process.argv[2];
