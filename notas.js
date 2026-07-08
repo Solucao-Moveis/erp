@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.28',
+    data: '08/07/2026',
+    titulo: 'Site institucional: modelo visual definitivo escolhido, vídeos da fábrica sem corte',
+    resumo: 'O site institucional público (solucaomoveis-erp.h5xdag.easypanel.host/institucional/modelo-c/) ganhou os vídeos da produção exibidos na íntegra — antes o vídeo era cortado para caber num quadro fixo. O seletor de modelos (A/B/C/D) foi removido e os modelos experimentais B e D foram apagados; o Modelo C ("História & Propósito") é o design oficial.',
+    mudancas: [
+      {
+        app: 'Site institucional — Landing Solução Móveis',
+        o_que: 'Vídeos da seção de produção (Corte a laser, Solda robotizada, Solda manual, Pintura) agora mostram o vídeo completo sem cortar as bordas. Removido o seletor flutuante de modelos (A/B/C/D). Modelos B e D descartados.',
+        como: 'Acesse o site em /institucional/modelo-c/. Role até a seção de processos de produção — os 4 vídeos aparecem no tamanho natural, sem crop.'
+      }
+    ]
+  },
+  {
     versao: '6.27',
     data: '08/07/2026',
     titulo: 'Relatório de PCM com filtro mensal, comparação entre meses e exportação PDF',
