@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.27',
+    data: '08/07/2026',
+    titulo: 'Relatório de PCM com filtro mensal, comparação entre meses e exportação PDF',
+    resumo: 'O Relatório de PCM (Manutenção) ficou muito mais prático: agora é possível consultar qualquer um dos últimos 12 meses, comparar dois meses lado a lado em todos os gráficos e baixar o relatório em PDF direto da tela.',
+    mudancas: [
+      {
+        app: 'Manutenção — Relatório de PCM (Indicadores)',
+        o_que: 'Seletor de mês (últimos 12), modo comparação e botão de exportação PDF. Os 4 KPIs (Disponibilidade, MTTR, OS, MTBF), os 4 gráficos e a tabela comparativa passam a refletir o mês escolhido. Os gráficos anuais destacam o mês selecionado com cor cheia. O cabeçalho do relatório agora mostra empresa, CNPJ, responsável e data de geração. Quando o período não tem dados, aparece aviso amigável em vez de tela em branco.',
+        como: 'Abra o sistema de Manutenção e acesse "Indicadores" na barra lateral. Use o seletor de mês (canto superior direito) para navegar entre os últimos 12 meses — todos os números e gráficos atualizam na hora. Para ver dois meses lado a lado, clique em "Comparar": os gráficos viram 2 barras (mês anterior × selecionado) e os KPIs mostram a variação (↑↓). Para baixar o PDF, clique em "Exportar PDF" — o arquivo gerado reflete exatamente o que está na tela, incluindo o mês e o modo comparação se estiverem ativos.'
+      }
+    ]
+  },
+  {
     versao: '6.26',
     data: '08/07/2026',
     titulo: 'Novo sistema: Cronoanálise / PCP (estudos de tempo e sequenciamento)',
