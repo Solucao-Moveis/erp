@@ -386,20 +386,27 @@
           <h1 class="h1">Seu painel de gestão <span>· SMERP</span></h1>
           <p class="sub" id="introDesc">Escolha um setor e o sistema que quer usar.</p>
         </div>
-        <span class="pill">v2.0</span>
+        <span class="pill" id="versionBadge">v2.0</span>
       </div>
 
       <div class="secttl">Setores</div>
       <section class="tiles" id="systems" aria-label="Setores"></section>
 
-      <div class="main__foot"><span>SMERP</span><i>·</i><span>Solução Móveis</span><i>·</i><span>v2.0</span></div>
+      <div class="main__foot"><span>SMERP</span><i>·</i><span>Solução Móveis</span><i>·</i><span id="versionFoot">v2.0</span></div>
     </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js"></script>
   <script src="config.js?v=12"></script>
-  <script src="notas.js?v=28"></script>
+  <script src="notas.js?v=29"></script>
+  <script>
+    (function () {
+      var v = window.SMERP_NOTAS && window.SMERP_NOTAS[0] ? 'v' + window.SMERP_NOTAS[0].versao : 'v?';
+      var b = document.getElementById('versionBadge'); if (b) b.textContent = v;
+      var f = document.getElementById('versionFoot');  if (f) f.textContent = v;
+    })();
+  </script>
   <script src="notify.js?v=1"></script>
   <script src="engenharia.js?v=3"></script>
   <script src="script.js?v=18"></script>
