@@ -242,6 +242,15 @@ begin
         insert into pcp.user_roles (user_id, role)
           values (new_id, r::pcp.app_role) on conflict (user_id, role) do nothing;
       end loop;
+
+    elsif sys = 'codi' then
+      -- Painel de Produção ao vivo (CODI). profiles (id, full_name, email) como compras/frota.
+      insert into codi.profiles (id, full_name, email)
+        values (new_id, v_name, v_email) on conflict (id) do nothing;
+      for r in select jsonb_array_elements_text(roles) loop
+        insert into codi.user_roles (user_id, role)
+          values (new_id, r::codi.app_role) on conflict (user_id, role) do nothing;
+      end loop;
     end if;
   end loop;
 
@@ -268,7 +277,7 @@ as $$
     u.id,
     u.email::text,
     coalesce(u.raw_user_meta_data->>'full_name',
-             cp.full_name, fp.full_name, bp.full_name, gp.full_name, sp.full_name, mp.nome, pap.nome, frp.full_name, ep.full_name, sgp.full_name, rhp.full_name, xp.full_name, plp.full_name, pcpp.nome) as full_name,
+             cp.full_name, fp.full_name, bp.full_name, gp.full_name, sp.full_name, mp.nome, pap.nome, frp.full_name, ep.full_name, sgp.full_name, rhp.full_name, xp.full_name, plp.full_name, pcpp.nome, cdip.full_name) as full_name,
     u.created_at,
     jsonb_strip_nulls(jsonb_build_object(
       'compras', (select jsonb_agg(role) from compras.user_roles where user_id = u.id),
@@ -284,7 +293,8 @@ as $$
       'rh',      (select jsonb_agg(role) from rh.user_roles      where user_id = u.id),
       'expedicao',    (select jsonb_agg(role) from expedicao.user_roles    where user_id = u.id),
       'planejamento', (select jsonb_agg(role) from planejamento.user_roles where user_id = u.id),
-      'pcp',          (select jsonb_agg(role) from pcp.user_roles          where user_id = u.id)
+      'pcp',          (select jsonb_agg(role) from pcp.user_roles          where user_id = u.id),
+      'codi',         (select jsonb_agg(role) from codi.user_roles         where user_id = u.id)
     )) as systems
   from auth.users u
   left join compras.profiles cp on cp.id = u.id
@@ -301,6 +311,7 @@ as $$
   left join expedicao.profiles    xp   on xp.id = u.id
   left join planejamento.profiles plp  on plp.id = u.id
   left join pcp.profiles          pcpp on pcpp.id = u.id
+  left join codi.profiles         cdip on cdip.id = u.id
   where public.can_manage_users()   -- só o master recebe a lista
   order by u.created_at desc;
 $$;
@@ -633,6 +644,23 @@ begin
   else
     delete from pcp.user_roles where user_id = p_user_id;
     begin delete from pcp.profiles where id = p_user_id;
+    exception when foreign_key_violation then null; end;
+  end if;
+
+  -- CODI — Painel de Produção ao vivo (papéis: gestor | leitor)
+  -- profiles tem (id, full_name, email) como compras/frota.
+  desired := coalesce(p_systems->'codi', '[]'::jsonb);
+  if jsonb_array_length(desired) > 0 then
+    insert into codi.profiles (id, full_name, email)
+      values (p_user_id, v_name, v_email) on conflict (id) do nothing;
+    delete from codi.user_roles
+      where user_id = p_user_id and role::text not in (select jsonb_array_elements_text(desired));
+    insert into codi.user_roles (user_id, role)
+      select p_user_id, x::codi.app_role from jsonb_array_elements_text(desired) as x
+      on conflict (user_id, role) do nothing;
+  else
+    delete from codi.user_roles where user_id = p_user_id;
+    begin delete from codi.profiles where id = p_user_id;
     exception when foreign_key_violation then null; end;
   end if;
 
