@@ -58,7 +58,7 @@ window.SMERP_CONFIG = {
     // Cronoanálise / PCP (repo timestamp, migrado do Lovable data-weave-vault)
     pcp: 'https://solucaomoveis-timestamp.h5xdag.easypanel.host/',
     // Painel de Produção ao vivo — OFs + carga de máquina + gargalos (CODI)
-    codi: 'https://solucaomoveis-painel-producao.h5xdag.easypanel.host/'
+    codi: 'https://solucaomoveis-producao-solucao.h5xdag.easypanel.host/'
   },
 
   // Cards por SETOR. Cada setor tem 1+ módulos; o card mostra o setor e,

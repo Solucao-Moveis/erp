@@ -10,6 +10,37 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.32',
+    data: '09/07/2026',
+    titulo: 'Painel de Produção: app no ar e integrado ao Hub',
+    resumo: 'O Painel de Produção está disponível no Hub, na aba Fábrica / Produção. Mostra em tempo real as OFs abertas, o status de cada máquina e os alertas de parada direto do CODI — sem precisar abrir o CODI.',
+    mudancas: [
+      {
+        app: 'Hub → Fábrica / Produção',
+        o_que: 'Novo tile "Painel de Produção" acessível pelo Hub, com SSO (entra direto sem pedir login de novo).',
+        como: 'No Hub, clique em Fábrica / Produção → Painel de Produção. O acesso é liberado pelo master conforme o papel (Gestor ou Leitor).',
+      },
+    ],
+  },
+  {
+    versao: '6.31',
+    data: '09/07/2026',
+    titulo: 'Painel de Produção: status ao vivo das máquinas via WebSocket CODI',
+    resumo: 'O Painel de Produção agora mostra o estado de cada máquina em tempo real — PRODUZINDO, parada e o motivo — com as mesmas cores do CODI (verde, vermelho, amarelo, preto). Os dados chegam via WebSocket do servidor CODI, sem precisar ficar atualizando a página.',
+    mudancas: [
+      {
+        app: 'Painel de Produção',
+        o_que: 'Cards de máquinas com status ao vivo: cor identica ao CODI (verde=produzindo, vermelho=parada não programada, amarelo=parada programada, preto=desconectado). Barra de produção mostra minutos produzindo vs. parada no turno.',
+        como: 'Abra o Painel de Produção e vá na aba Máquinas. Cada card muda de cor e status em até 30 segundos quando o estado muda no chão de fábrica.',
+      },
+      {
+        app: 'Painel de Produção — Dashboard',
+        o_que: 'Dashboard mostra contador "Produzindo agora" ao vivo e lista de alertas (paradas não programadas em destaque laranja).',
+        como: 'O ícone "Ao vivo" no canto superior direito confirma que o WebSocket está conectado.',
+      },
+    ],
+  },
+  {
     versao: '6.30',
     data: '09/07/2026',
     titulo: 'Novo sistema: Painel de Produção — OFs e carga de máquinas direto do CODI',
