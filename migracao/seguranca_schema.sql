@@ -48,6 +48,7 @@ create table if not exists seguranca.avaliacoes (
   lider           text,
   ocorrencia      boolean     not null default false,
   ocorrencia_desc text,
+  observacao      text,
   -- Liderança
   c_dds           boolean     not null default false,
   c_reun          boolean     not null default false,

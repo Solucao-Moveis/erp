@@ -1,0 +1,1023 @@
+type: collection.insomnia.rest/5.0
+name: Scratch Pad
+meta:
+  id: wrk_scratchpad
+  created: 1747921374559
+  modified: 1747921374559
+collection:
+  - name: Pedido
+    meta:
+      id: fld_b130909bf70946609f722f543d43acf5
+      created: 1744748369445
+      modified: 1745848132254
+      sortKey: -1744748369445
+  - name: Produto
+    meta:
+      id: fld_298451bd8e1844618d4d3e62ee9fcc5c
+      created: 1745848101560
+      modified: 1745848101560
+      sortKey: -1745848101560
+    children:
+      - name: ListaPlana
+        meta:
+          id: fld_6d6c86f5907645ad8a8a3833199a5c14
+          created: 1761747330924
+          modified: 1761747330924
+          sortKey: -1761747330924
+        children:
+          - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+              }}/Core/API_Produto/ListarSaldoProduto"
+            name: Lista de Saldo de Produto
+            meta:
+              id: req_f7806059572a408da2e3427964f42e61
+              created: 1761747348342
+              modified: 1764954631151
+              isPrivate: false
+              sortKey: -1761747353094
+            method: GET
+            body:
+              mimeType: application/json
+              text: >-
+                {
+                    "ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+                    "DataAlteracao":"20/03/2023",
+                    "Codigo":"",
+                    "Deposito":0,
+                    "Grupo": [{"CodigoGrupo": 200, "Subgrupos":"123,500,999"},{"CodigoGrupo": 10, "Subgrupos":""}],
+                    "Origem":"",
+                		"SaldoZerado": "N"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+              }}/Core/API_Produto/ConsultaEstruturaProdutoLista"
+            name: LISTA da Estrutura do Produto
+            meta:
+              id: req_d97943b32bd24e08b02dbbafbfb2851d
+              created: 1764686636217
+              modified: 1764694371196
+              isPrivate: false
+              sortKey: -1761747353194
+            method: GET
+            body:
+              mimeType: application/json
+              text: |
+                {
+                	"ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+                	"DataEstrutura":"01/01/2024",
+                	"CodigoPai":""	
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+          }}/Core/API_Produto/ConsultarProduto"
+        name: Consulta de Produto
+        meta:
+          id: req_c3d826ebcbfa42e0ae0ce1110f214701
+          created: 1742304513105
+          modified: 1764962461631
+          isPrivate: false
+          sortKey: -1745859386339
+        method: GET
+        body:
+          mimeType: application/json
+          text: |
+            {
+            	"Apitoken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+            	Produto:[
+            		{
+            			"Codigo":"",
+            			"DataAlteracao":"01/11/2025"
+            		}
+            	]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial }}/Core/API_Produto/SaldoProduto"
+        name: Saldo de Produto
+        meta:
+          id: req_14719aae147241a7aef524ff304f332d
+          created: 1746211795849
+          modified: 1764158434081
+          isPrivate: false
+          sortKey: -1745859386289
+        method: GET
+        body:
+          mimeType: application/json
+          text: |-
+            {
+                "ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+                "DataAlteracao":"asdasdad",
+                "Codigo":"118010000007",
+                "Deposito":1,
+                "Grupo":180,
+                "SubGrupo":100,
+                "Origem":""
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+          }}/Core/API_Produto/ConsultaEstruturaProduto"
+        name: Consulta da Estrutura do Produto
+        meta:
+          id: req_0f963eb3eedc49faad55f8fdf853c535
+          created: 1752262515678
+          modified: 1764694338230
+          isPrivate: false
+          sortKey: -1745859386239
+        method: GET
+        body:
+          mimeType: application/json
+          text: |
+            {
+            	"ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+            	"DataEstrutura":"01/01/2023",
+            	"CodigoPai":""	
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Ordem de Fabricação
+    meta:
+      id: fld_9aa5ec72e61f42f995635762a5880915
+      created: 1745858918401
+      modified: 1745858918401
+      sortKey: -1745858918401
+    children:
+      - name: OF Listas Planas
+        meta:
+          id: fld_c290959acae5455584f9d92773dbeac2
+          created: 1761672043982
+          modified: 1761672142616
+          sortKey: -1761672043982
+        children:
+          - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+              }}/Core/API_OrdemFabricacao/ListarOrdemFabricacao"
+            name: Lista de Ordem de Fabricação
+            meta:
+              id: req_7161855a52ab4b1098857e118d7a1cb0
+              created: 1761672130570
+              modified: 1764853964818
+              isPrivate: false
+              sortKey: -1761672138039
+            method: GET
+            body:
+              mimeType: application/json
+              text: "{
+
+                \t\"ApiToken\":\"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4\",
+
+                \t\"DataAlteracao\":\"26/05/2024\",
+
+                \t\"Ordem\":0,
+
+                \t\"Produto\":\"\",
+
+                \t\"Tipo\":\"OF\",
+
+                \t\"Deposito\":0,
+
+                \t\"Lote\":\"\",
+
+                \t\"OrdemEncerrada\":\"S\",
+
+                \t\"IndustrializacaoTerceiros\":\"\",
+
+                \t\"EstruturaProduto\":\"S\"
+
+                }
+
+                \ "
+            headers:
+              - name: Content-Type
+                value: application/json
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+              }}/Core/API_OrdemFabricacao/ListarReservaTempo"
+            name: Listar Reserva de Tempo
+            meta:
+              id: req_8b97c9edab5a4a18ad1c18bf1e836f73
+              created: 1761673361540
+              modified: 1765197715080
+              isPrivate: false
+              sortKey: -1761672137939
+            method: GET
+            body:
+              mimeType: application/json
+              text: |
+                {
+                	"ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+                	"OrdemFabricacao":0,
+                	"Lote":"",
+                	"Requisicao":0,
+                	"Fase":0,
+                	"Quantidade":0,
+                	"Maquina":"",
+                	"Processo":""
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+              }}/Core/API_OrdemFabricacao/ListarReservaMaterial"
+            name: Listar Reserva de Material
+            meta:
+              id: req_705e50c8d7b540e5a8c78509b7b1eec7
+              created: 1761673494157
+              modified: 1764963244112
+              isPrivate: false
+              sortKey: -1761672137839
+            method: GET
+            body:
+              mimeType: application/json
+              text: |
+                {
+                	"ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+                	"DataAlteracaoReserva":"2025-08-26",
+                	"OrdemFabricacao":808862,
+                	"Produto":"",
+                	"Deposito":0
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+              }}/Core/API_OrdemFabricacao/ListarProcesso"
+            name: Listar Processos da OF
+            meta:
+              id: req_0defc7f008a14f69a944b7208ee57eba
+              created: 1761673553297
+              modified: 1764963362540
+              isPrivate: false
+              sortKey: -1761672137739
+            method: GET
+            body:
+              mimeType: application/json
+              text: |
+                {
+                	"ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+                	"DataAlteracaoProcesso":"05/06/2025",
+                	"OrdemFabricacao":0,
+                	"Produto":"",
+                	"Deposito":0,
+                	"TipoProcesso":""
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+          }}/Core/API_OrdemFabricacao/GravarProcesso "
+        name: GravarProcesso
+        meta:
+          id: req_5f10f002a05e4b00ba5e5000f3c3e3c3
+          created: 1666015873222
+          modified: 1757425307055
+          isPrivate: false
+          sortKey: -1745853509843
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"p_ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+            	"p_ProdutoCodigo":"1100078",
+            	"p_Processo":"010",
+            	"p_OperacaoCodigo":"LIXAR",
+            	"p_NumRepet":2.4597,
+            	"p_FaseCodigo":0,
+            	"p_MaquinaCodigo":"05",
+            	"p_Horas":"1.00",
+            	"p_Setup":1,
+            	"p_Homens":2,
+            	"p_UltFase":"N",
+            	"p_Apon":"N",
+            	"p_id_externo": "25644"
+            	
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+          }}/Core/API_OrdemFabricacao/GravarOrdemFabricacao"
+        name: GravarOrdemFabricacao
+        meta:
+          id: req_4e70bed4a36d4da587590fdaf590a54d
+          created: 1667303977397
+          modified: 1757425296617
+          isPrivate: false
+          sortKey: -1745853509902.375
+        method: POST
+        body:
+          mimeType: application/json
+          text: |+
+            [
+            {
+                "ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+                "Quantidade":1.6561,
+                "DataAbertura":"2022-10-17",
+                "DataPrevisao":"2022-10-20",
+                "Deposito":1,
+                "Produto":"1100078",
+                "CodigoLote":"1",
+                "CodigoPlano":1,
+            		"id_externo": "2566445"
+            },
+            {
+                "ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+                "Quantidade":1.6561,
+                "DataAbertura":"2022-10-17",
+                "DataPrevisao":"2022-10-20",
+                "Deposito":1,
+                "Produto":"1100078",
+                "CodigoLote":"1",
+                "CodigoPlano":1,
+            		"id_externo": "2566445"
+            },
+            {
+                "ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+                "Quantidade":1.6561,
+                "DataAbertura":"2022-10-17",
+                "DataPrevisao":"2022-10-20",
+                "Deposito":1,
+                "Produto":"1100078",
+                "CodigoLote":"1",
+                "CodigoPlano":1,
+            		"id_externo": "2566445"
+            },{
+                "ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+                "Quantidade":1.6561,
+                "DataAbertura":"2022-10-17",
+                "DataPrevisao":"2022-10-20",
+                "Deposito":1,
+                "Produto":"1100078",
+                "CodigoLote":"1",
+                "CodigoPlano":1,
+            		"id_externo": "2566445"
+            }
+            ]
+
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+          }}/Core/API_OrdemFabricacao/GravarReservaProcesso"
+        name: GravarReservaProcesso
+        meta:
+          id: req_0704e11eddc443b9b380ce6f4d9f83b7
+          created: 1667592569690
+          modified: 1757425301528
+          isPrivate: false
+          sortKey: -1745853509893
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"p_ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+            	"p_OrdemFab":2333,
+            	"p_Quantidade":1.00	,
+            	"p_Processo":"2",
+            	"p_Opercacao":"6",
+            	"p_Fase":1,
+            	"p_Maquina":"1",
+            	"p_TempoReservado":1.5,
+            	"p_TempoRequisitado":1.6,
+            	"p_TempoStatus":2.4
+
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+          }}/Core/API_OrdemFabricacao/IncluirOrdemFabricacao"
+        name: Incluir Ordem de Fabricação
+        meta:
+          id: req_5c7a7b9a2dc449aa9dff38b06d0e68de
+          created: 1667938068097
+          modified: 1765200696766
+          isPrivate: false
+          sortKey: -1745853510005.5
+        method: POST
+        body:
+          mimeType: application/json
+          text: |
+            [
+            	{
+              	"ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+            	  "Quantidade":1.6561,
+            	  "DataAbertura":"2023-06-13",
+            	  "DataPrevisao":"2023-07-08",
+            	  "Deposito":1,
+            		"Produto":"77701",
+            		"Lote":"",
+            		"Plano":"",
+            		"Pedido":0,
+            		"PedidoSeq":0,
+            		"PedidoQtd":0,		
+            		"IDIntegracao":0
+            	}
+            ]
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+          }}/Core/API_OrdemFabricacao/IncluirReservaProcesso"
+        name: Incluir Reserva de Processo
+        meta:
+          id: req_48cfee54e74a4938bde3700733481e17
+          created: 1669146786446
+          modified: 1757425283308
+          isPrivate: false
+          sortKey: -1745853509911.75
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            [
+            	{
+              	"ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+            		"OrdemFabricacao":808867,
+            	  "Quantidade":1.0096,
+            	  "Processo":"010",
+            		"Operacao":"CORTA",
+            		"Fase":14,
+            		"Maquina":"29",
+            		"TempoReservado":1.25,
+            		"TempoRequisitado":2.56,
+            		"TempoSetup":0.50,
+            		"IDIntegracao":25599
+            	}
+            	
+            ]
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+          }}/Core/API_OrdemFabricacao/IncluirReservaMaterial"
+        name: Incluir Reserva de Material
+        meta:
+          id: req_9374266f5138493eb3a292034bef0145
+          created: 1670073080779
+          modified: 1757425277188
+          isPrivate: false
+          sortKey: -1745853509930.5
+        method: POST
+        body:
+          mimeType: application/json
+          text: |+
+            [
+            	{
+              	"ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+            		"OrdemFabricacao":24026,
+            		"Produto":"000561",
+            	  "Quantidade":1.0096,
+            	  "Deposito":1,
+            		"Fase":1,
+            		"IDIntegracao":26257
+            	},
+            	{
+              	"ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+            		"OrdemFabricacao":24026,
+            		"Produto":"000561",
+            	  "Quantidade":1.0096,
+            	  "Deposito":1,
+            		"Fase":2,
+            		"IDIntegracao":26258
+            	},
+            	{
+              	"ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+            		"OrdemFabricacao":24026,
+            		"Produto":"000561",
+            	  "Quantidade":1.0096,
+            	  "Deposito":1,
+            		"Fase":3,
+            		"IDIntegracao":26259
+            	}
+            ]
+
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+          }}/Core/API_OrdemFabricacao/AlterarDtReplOrdFabricacao"
+        name: Alterar a Data de Replanejamento da Ordem de Fabricação
+        meta:
+          id: req_93680d30ca9a4b26a00419f87fe61c97
+          created: 1670674750600
+          modified: 1764963314897
+          isPrivate: false
+          sortKey: -1745853510080.5
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |
+            [
+            	{
+              	"ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+            		"OrdemFabricacao":1,
+            		"DataReplanejamento":"2025-12-04"
+            	}
+            ]
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+          }}/Core/API_OrdemFabricacao/IncluirOrdemFabricacaoLote"
+        name: Incluir Ordem de Fabricação por Lote
+        meta:
+          id: req_6726b7ba4447405d8818657891831000
+          created: 1689018698627
+          modified: 1757425264300
+          isPrivate: false
+          sortKey: -1745853510030.5
+        method: POST
+        body:
+          mimeType: application/json
+          text: |
+            [
+            	{
+              	"ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+            	  "Quantidade":1.6561,
+            	  "DataAbertura":"2023-08-11",
+            	  "DataPrevisao":"2023-09-15",
+            	  "Deposito":1,
+            		"Produto":"000561",
+            		"Lote":"",
+            		"Plano":"11030205",
+            		"Pedido":0,
+            		"PedidoSeq":1,
+            		"PedidoQtd":1.00,		
+            		"IDIntegracao":26303
+            	}
+            ]
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+          }}/Core/API_OrdemFabricacao/ConsultarOrdemFabricacao"
+        name: Consulta de Ordem de Fabricação
+        meta:
+          id: req_4a8ab588bfd0446e93c72b57307f6336
+          created: 1742992748690
+          modified: 1765200596553
+          isPrivate: false
+          sortKey: -1745853509980.5
+        method: GET
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+            	"DataAlteracao":"26/05/2024",
+            	"Ordem":0,
+            	"Produto":"",
+            	"Tipo":"OF",
+            	"Deposito":0,
+            	"Lote":"",
+            	"OrdemEncerrada":"S",
+            	"IndustrializacaoTerceiros":"",
+            	"EstruturaProduto":"S"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+          }}/Core/API_OrdemFabricacao/ConsultarReservaMaterial"
+        name: Consulta de Reserva de Material
+        meta:
+          id: req_84a301f64d3b4bda9e03cea38ae44a34
+          created: 1747059629717
+          modified: 1757425310515
+          isPrivate: false
+          sortKey: -1745853509793
+        method: POST
+        body:
+          mimeType: application/json
+          text: |
+            {
+            	"ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+            	"DataAlteracaoReserva":"2025-08-26",
+            	"OrdemFabricacao":808862,
+            	"Produto":"",
+            	"Deposito":0
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+          }}/Core/API_OrdemFabricacao/ConsultarProcesso"
+        name: Consulta de Processos da OF
+        meta:
+          id: req_6f4747011a734df6b4622f66215af73e
+          created: 1747916381238
+          modified: 1757425325887
+          isPrivate: false
+          sortKey: -1745853509743
+        method: POST
+        body:
+          mimeType: application/json
+          text: |
+            {
+            	"ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+            	"DataAlteracaoProcesso":"",
+            	"OrdemFabricacao":808868,
+            	"Produto":"",
+            	"Deposito":0,
+            	"TipoProcesso":""
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{_.BASE_URL}}{{ _.deploy_api_industrial
+          }}/Core/API_OrdemFabricacao/ConsultarReservaTempo"
+        name: Consulta de Reserva de Tempo
+        meta:
+          id: req_97effad5dcbf4da086eea90a722cec78
+          created: 1756993858388
+          modified: 1757425318544
+          isPrivate: false
+          sortKey: -1745853509768
+        method: POST
+        body:
+          mimeType: application/json
+          text: |
+            {
+            	"ApiToken":"38b4d4f8-8bcd-40b6-86aa-f3a3c3c7d5e4",
+            	"OrdemFabricacao":808881,
+            	"Lote":"",
+            	"Requisicao":10847,
+            	"Fase":0,
+            	"Quantidade":0,
+            	"Maquina":"",
+            	"Processo":""
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Ordem de Compra
+    meta:
+      id: fld_d3a0d1a2d3ec4a13982595155311b1fa
+      created: 1745858935848
+      modified: 1745858935848
+      sortKey: -1745858935848
+  - name: IntegraCAD
+    meta:
+      id: fld_1d8e8773983a43b687cd53c051ef1e5d
+      created: 1745858947632
+      modified: 1745858947632
+      sortKey: -1745858947632
+  - name: Diversos
+    meta:
+      id: fld_44c5012a201247658e3d55b677602771
+      created: 1745861462157
+      modified: 1745861511655
+      sortKey: -1706417418934.5
+  - name: Dinabox
+    meta:
+      id: fld_76cc994de980476fbc79ae02e92517f5
+      created: 1745861487670
+      modified: 1745861487670
+      sortKey: -1745861487670
+  - name: Cadastro
+    meta:
+      id: fld_d2c1098fb0e9432d99fc8f1fac6bcaca
+      created: 1756382816892
+      modified: 1765200007133
+      sortKey: -1756382816892
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_99d30891da4bdcebc63947a8fc17f076de878684
+    created: 1747921431765
+    modified: 1765200673131
+  cookies:
+    - key: GX_CLIENT_ID
+      value: 589258b9-7076-4fe7-b56a-827fe5b75226
+      domain: 10.7.10.166
+      path: /
+      httpOnly: true
+      hostOnly: true
+      creation: 2025-10-28T18:07:59.430Z
+      lastAccessed: 2025-10-28T18:07:59.430Z
+      id: 8a7b08ae-423d-42c0-a951-b2c0be66d42f
+    - key: GX_CLIENT_ID
+      value: 0320386c-9d87-4b76-b8c8-b80b564d4536
+      domain: 10.7.10.234
+      path: /
+      httpOnly: true
+      hostOnly: true
+      creation: 2025-10-28T20:10:09.257Z
+      lastAccessed: 2025-10-28T20:10:09.257Z
+      id: c668d2f6-0001-45ec-a717-5567fd51bf06
+    - key: GX_CLIENT_ID
+      value: 86a8f33a-0d01-4924-a496-bb9f87eb5522
+      maxAge: 1017938138
+      domain: 10.7.10.239
+      path: /
+      httpOnly: true
+      hostOnly: true
+      creation: 2025-12-08T13:31:13.131Z
+      lastAccessed: 2025-12-08T13:31:13.131Z
+      id: 7e93b97b-452b-4ce2-9ae3-79fbbe56d7c6
+environments:
+  name: Base Environment
+  meta:
+    id: env_99d30891da4bdcebc63947a8fc17f076de878684
+    created: 1747921431394
+    modified: 1761682169149
+    isPrivate: false
+  data:
+    BASE_URL: http://10.7.10.234:8080/
+    deploy_api_industrial: API_Industrial_Desenv
+  subEnvironments:
+    - name: Ricardo Tomcat 9 Desenv 17
+      meta:
+        id: env_921a60b00f244a3ca894a766ebe56811
+        created: 1764101549373
+        modified: 1764108519323
+        isPrivate: false
+        sortKey: 1764101549373
+      data:
+        BASE_URL: http://10.7.10.166:8099/
+        deploy_api_industrial: API_Industrial_Desenv
+    - name: Ricardo Tomcat 9 Desenv 17
+      meta:
+        id: env_d9a6c4aeaf3140558e1c3a4d8f9085af
+        created: 1764101549373
+        modified: 1764108519323
+        isPrivate: false
+        sortKey: 1764101549373
+      data:
+        BASE_URL: http://10.7.10.166:8099/
+        deploy_api_industrial: API_Industrial_Desenv
+    - name: Produção Tomcat 9 Desenv 17
+      meta:
+        id: env_1618c320bd234ee7adad3b326244268f
+        created: 1764101637363
+        modified: 1764101685507
+        isPrivate: false
+        sortKey: 1764101549423
+      data:
+        BASE_URL: http://10.7.10.239:8080/
+        deploy_api_industrial: API_Industrial_Producao
+    - name: Produção Tomcat 9 Desenv 17
+      meta:
+        id: env_5ad0cee64f00450e8863581a8e79a5f8
+        created: 1764101637363
+        modified: 1764101685507
+        isPrivate: false
+        sortKey: 1764101549423
+      data:
+        BASE_URL: http://10.7.10.239:8080/
+        deploy_api_industrial: API_Industrial_Producao
+    - name: Ricardo Tomcat 9 Desenv 18
+      meta:
+        id: env_44d10a851d774b62b29085420b3088fa
+        created: 1764101661169
+        modified: 1764101667696
+        isPrivate: false
+        sortKey: 1764101549398
+      data:
+        BASE_URL: http://10.7.10.166:8099/
+        deploy_api_industrial: API_Industrial18_Desenv
+    - name: Ricardo Tomcat 9 Desenv 18
+      meta:
+        id: env_5cb243a831ca45fdbbfacb13435f86e5
+        created: 1764101661169
+        modified: 1764101667696
+        isPrivate: false
+        sortKey: 1764101549398
+      data:
+        BASE_URL: http://10.7.10.166:8099/
+        deploy_api_industrial: API_Industrial18_Desenv
+    - name: "Ricardo Tomcat 9 Prod 17 "
+      meta:
+        id: env_935a96b17cea4ebe9c85574a860a67f0
+        created: 1764108509912
+        modified: 1764108534824
+        isPrivate: false
+        sortKey: 1764101549385.5
+      data:
+        BASE_URL: http://10.7.10.166:8099/
+        deploy_api_industrial: API_Industrial_Producao
+    - name: "Ricardo Tomcat 9 Prod 17 "
+      meta:
+        id: env_dd0f615de4f04d0abdf98a02e797d00b
+        created: 1764108509912
+        modified: 1764108534824
+        isPrivate: false
+        sortKey: 1764101549385.5
+      data:
+        BASE_URL: http://10.7.10.166:8099/
+        deploy_api_industrial: API_Industrial_Producao
+    - name: Produção Tomcat 9 Prod 18
+      meta:
+        id: env_04864f22c53c4493a9bd8df53a3a010a
+        created: 1764110320247
+        modified: 1764110341174
+        isPrivate: false
+        sortKey: 1764101549473
+      data:
+        BASE_URL: http://10.7.10.239:8080/
+        deploy_api_industrial: API_Industrial18_Producao
+    - name: Produção Tomcat 9 Prod 18
+      meta:
+        id: env_3f75a51f2ca44be8b644912f3143470a
+        created: 1764110320247
+        modified: 1764110341174
+        isPrivate: false
+        sortKey: 1764101549473
+      data:
+        BASE_URL: http://10.7.10.239:8080/
+        deploy_api_industrial: API_Industrial18_Producao
+    - name: AN Produção Tomcat 7 Prod 18
+      meta:
+        id: env_7d4254f9ecc641f0a9d0201600a173fb
+        created: 1764338492556
+        modified: 1764338522014
+        isPrivate: false
+        sortKey: 1764101549523
+      data:
+        BASE_URL: http://10.7.10.234:8080/
+        deploy_api_industrial: API_Industrial18_Producao
+    - name: AN Produção Tomcat 7 Prod 18
+      meta:
+        id: env_a2cc5ad3e99a4b2e9bd50eaad4d0ff6a
+        created: 1764338492556
+        modified: 1764338522014
+        isPrivate: false
+        sortKey: 1764101549523
+      data:
+        BASE_URL: http://10.7.10.234:8080/
+        deploy_api_industrial: API_Industrial18_Producao
