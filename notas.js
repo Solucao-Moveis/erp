@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.29',
+    data: '09/07/2026',
+    titulo: 'PCP: lista de equipamentos e operadores atualizada com todos os dados oficiais',
+    resumo: 'A Folha de Apontamentos do PCP agora tem a lista completa de máquinas e funcionários da empresa. Antes havia apenas 20 equipamentos e 23 operadores; agora são 248 equipamentos (incluindo todas as ferramentas do patrimônio) e 137 funcionários ativos, exatamente conforme os relatórios do sistema Lógica.',
+    mudancas: [
+      {
+        app: 'PCP — Folha de Apontamentos',
+        o_que: 'Campo "Equipamento" substituído: de 20 máquinas para 248 (máquinas fixas 100–165 + ferramentas P0001–PO291). Campo "Operador" substituído: de 23 para 137 funcionários ativos. Dados extraídos dos relatórios oficiais 57605 e 57607.',
+        como: 'Abra o PCP e acesse "Folha de Apontamentos". Nos campos Equipamento e Operador, comece a digitar o nome ou código — a lista filtrada aparece automaticamente. Os equipamentos estão agrupados por setor (Metalurgia, Solda, Marcenaria etc.) e os operadores por função.'
+      }
+    ]
+  },
+  {
     versao: '6.28',
     data: '08/07/2026',
     titulo: 'Site institucional: modelo visual definitivo escolhido, vídeos da fábrica sem corte',
