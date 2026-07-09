@@ -393,73 +393,46 @@ async function setSyncState(recurso, ok, mensagem = null) {
   );
 }
 
-// ─── REST: Detalhe por máquina (produção/hora + estado atual) ─
+// ─── REST: Detalhe por máquina (OEE + produção/hora) ──────────
+// Endpoint real: GET /apis/codi-glue/chart/mobileApp
+// Response: { data: [{ oeeTotal, oeeByPeriod, shiftStart, shiftEnd, ordemMultiplaAtual }] }
 
 async function pollDetalheMaquina(maqId) {
   const hoje = new Date().toISOString().slice(0, 10);
 
-  // 1. Estado atual: operador, item, tempo/peça (mobileApp simples ~1 kB)
-  let dadosAtuais = null;
+  let chartData = null;
   try {
-    const resp = await codiGet('mobileApp', { idProductiveResources: maqId });
-    const item = resp?.data?.[0] ?? (Array.isArray(resp) ? resp[0] : null);
-    dadosAtuais = item;
-    if (cicloNum === 1 && maqId === MAQUINAS_IDS[0]) {
-      console.log('[detalhe] mobileApp simples campos:', JSON.stringify(Object.keys(item ?? {})));
-    }
-  } catch (e) {
-    console.warn(`[detalhe] mobileApp simples ${maqId}:`, e.message);
-  }
-
-  // 2. Histórico do turno: graphValues → producao_hora (~3,8 kB)
-  let graphValues = [];
-  try {
-    const resp = await codiGet('mobileApp', {
+    const resp = await codiGet('chart/mobileApp', {
       idProductiveResources: maqId,
-      daysQty: 0,
-      consolidate: false,
+      daysQty:           0,
+      consolidatedData:  false,
+      downtimesQty:      5,
+      currentShift:      true,
+      previousShift:     false,
     });
-    graphValues = resp?.data?.[0]?.graphValues ?? [];
+    chartData = resp?.data?.[0] ?? null;
   } catch (e) {
-    console.warn(`[detalhe] mobileApp hist ${maqId}:`, e.message);
+    console.warn(`[detalhe] chart/mobileApp ${maqId}:`, e.message);
   }
 
-  // Agrega por hora (fuso do processo = fuso local do PC da fábrica)
-  const byHour = {};
-  for (const gv of graphValues) {
-    if ((gv.value ?? 0) <= 0) continue;
-    const hora = new Date(gv.date).getHours();
-    if (!byHour[hora]) byHour[hora] = { qtd: 0, sumPerf: 0, cntPerf: 0, meta: gv.standardPerformance };
-    byHour[hora].qtd += gv.value;
-    if (gv.currentPerformance > 0) {
-      byHour[hora].sumPerf += gv.currentPerformance;
-      byHour[hora].cntPerf++;
-    }
-    byHour[hora].meta = gv.standardPerformance; // meta mais recente dessa hora
-  }
+  if (!chartData) return;
 
-  const horaRows = Object.entries(byHour).map(([hora, h]) => {
-    const avgPerf = h.cntPerf > 0 ? h.sumPerf / h.cntPerf : null;
-    return {
+  const oee      = chartData.oeeTotal;
+  const periodos = chartData.oeeByPeriod ?? [];
+  const ordem    = chartData.ordemMultiplaAtual ?? null;
+
+  // producao_hora: uma linha por hora (data ISO "2026-07-09T14:00:00" → hora = 14)
+  const horaRows = periodos
+    .filter(p => p.qty > 0)
+    .map(p => ({
       maquina_id:        parseInt(maqId),
       turno_data:        hoje,
-      hora:              parseInt(hora),
-      quantidade:        h.qtd,
-      performance_media: avgPerf && h.meta > 0 ? +(avgPerf / h.meta * 100).toFixed(1) : null,
-      meta_ppm:          h.meta,
-    };
-  });
+      hora:              parseInt(p.date.substring(11, 13), 10),
+      quantidade:        p.qty,
+      performance_media: p.perf != null ? +p.perf.toFixed(1) : null,
+      meta_ppm:          null, // não vem neste endpoint
+    }));
 
-  // Performance média do turno (horas com produção)
-  const horasAtivas = Object.values(byHour).filter(h => h.qtd > 0 && h.cntPerf > 0);
-  const perfTurno = horasAtivas.length
-    ? horasAtivas.reduce((s, h) => s + (h.sumPerf / h.cntPerf / h.meta), 0) / horasAtivas.length * 100
-    : null;
-
-  const producaoTotal = graphValues.reduce((s, gv) => s + (gv.value ?? 0), 0);
-  const metaAtual = graphValues.filter(g => g.standardPerformance > 0).at(-1)?.standardPerformance ?? null;
-
-  // Replace producao_hora do dia para esta máquina
   await sb.from('producao_hora').delete()
     .eq('maquina_id', parseInt(maqId))
     .eq('turno_data', hoje);
@@ -468,27 +441,30 @@ async function pollDetalheMaquina(maqId) {
     if (error) console.error(`[detalhe] insert producao_hora ${maqId}:`, error.message);
   }
 
-  // Upsert maquinas_detalhe (snapshot geral do turno)
+  // maquinas_detalhe: snapshot do turno
   const detalhe = {
     maquina_id:     parseInt(maqId),
-    producao_turno: producaoTotal || null,
-    performance:    perfTurno != null ? +perfTurno.toFixed(1) : null,
-    meta_ppm:       metaAtual,
+    producao_turno: oee?.qty           ?? null,
+    boas:           oee?.qty           ?? null,
+    oee:            oee?.oee  != null  ? +oee.oee.toFixed(1)  : null,
+    disponibilidade:oee?.disp != null  ? +oee.disp.toFixed(1) : null,
+    performance:    oee?.perf != null  ? +oee.perf.toFixed(1) : null,
+    qualidade:      oee?.qual != null  ? +oee.qual.toFixed(1) : null,
     turno_data:     hoje,
+    turno_inicio:   chartData.shiftStart ?? null,
+    turno_fim:      chartData.shiftEnd   ?? null,
     atualizado_em:  new Date().toISOString(),
   };
 
-  // Extrai campos do mobileApp simples — nomes reais confirmados quando response disponível
-  if (dadosAtuais) {
-    detalhe.of_numero      = dadosAtuais.orderNumber       ?? dadosAtuais.code              ?? null;
-    detalhe.of_operacao    = dadosAtuais.operationCode     ?? dadosAtuais.operation         ?? null;
-    detalhe.operador_nome  = dadosAtuais.employeeName      ?? dadosAtuais.employee?.name    ?? dadosAtuais.operatorName ?? null;
-    detalhe.item_name      = dadosAtuais.itemName          ?? dadosAtuais.item?.name        ?? null;
-    detalhe.item_code      = dadosAtuais.itemCode          ?? dadosAtuais.item?.code        ?? null;
-    detalhe.tempo_item_min = dadosAtuais.itemTime          ?? dadosAtuais.cycleTime         ?? null;
-    detalhe.boas           = dadosAtuais.goodParts         ?? dadosAtuais.goodQuantity      ?? null;
-    detalhe.ruins          = dadosAtuais.rejectParts       ?? dadosAtuais.rejectQuantity    ?? null;
-    detalhe.total_previsto = dadosAtuais.plannedQuantity   ?? dadosAtuais.quantity          ?? null;
+  // ordemMultiplaAtual — preenchido quando há OF ativa na máquina
+  if (ordem) {
+    detalhe.of_numero     = ordem.orderCode      ?? ordem.code        ?? null;
+    detalhe.of_operacao   = ordem.operationCode  ?? ordem.operation   ?? null;
+    detalhe.item_name     = ordem.itemName        ?? ordem.item?.name  ?? null;
+    detalhe.item_code     = ordem.itemCode        ?? ordem.item?.code  ?? null;
+    detalhe.operador_nome = ordem.employeeName    ?? ordem.employee?.name ?? null;
+    detalhe.tempo_item_min= ordem.itemTime        ?? ordem.cycleTime   ?? null;
+    detalhe.total_previsto= ordem.plannedQuantity ?? ordem.quantity    ?? null;
   }
 
   const { error } = await sb.from('maquinas_detalhe').upsert(detalhe, { onConflict: 'maquina_id' });
