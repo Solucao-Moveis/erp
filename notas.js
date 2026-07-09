@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.34',
+    data: '09/07/2026',
+    titulo: 'Painel de Produção: novo visual do dashboard e detalhe por máquina',
+    resumo: 'O dashboard ganhou um visual novo — medidor circular de produção, barra de status em tempo real, mini-grid do chão de fábrica clicável e alertas de paradas não programadas em destaque.',
+    mudancas: [
+      {
+        app: 'Painel de Produção → Visão Geral',
+        o_que: 'Dashboard redesenhado com medidor, barra de status e grid de máquinas.',
+        como: 'O painel agora mostra um círculo com quantas máquinas estão produzindo (ex: "8 de 12"), uma barra colorida verde/laranja, mini-chips de cada máquina clicáveis e um bloco de alertas separado para paradas não programadas.',
+      },
+    ],
+  },
+  {
     versao: '6.33',
     data: '09/07/2026',
     titulo: 'Painel de Produção: detalhe por máquina com gráfico de produção por hora',
