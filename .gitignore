@@ -1,6 +1,12 @@
 # Documentação interna com credenciais — NÃO versionar
 *.docx
 
+# ===== CODI — NÃO versionar (contém token real e service_role key) =====
+# Pasta com os PDFs de API e a collection Insomnia do CODI (token exposto)
+apis codi/
+# Env do coletor: CODI_TOKEN + SUPABASE_SERVICE_ROLE_KEY — NUNCA commitar
+codi-coletor/.env
+
 # ===== Migração (migracao/) — NÃO versionar segredos nem dumps =====
 # service_role key hardcoded (acesso total ao banco, ignora RLS)
 migracao/migrate-storage.js

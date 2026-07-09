@@ -130,6 +130,14 @@ as $$
               (select jsonb_agg(role) from pcp.user_roles where user_id = auth.uid()),
               '[]'::jsonb)
           end
+        ),
+        'codi', (
+          -- Painel de Produção ao vivo — espelho do CODI (ordens de fab. + carga máquinas).
+          select case when exists (select 1 from codi.profiles where id = auth.uid())
+            then coalesce(
+              (select jsonb_agg(role) from codi.user_roles where user_id = auth.uid()),
+              '[]'::jsonb)
+          end
         )
       )
     ),

@@ -1,0 +1,15 @@
+{
+  "name": "codi-coletor",
+  "version": "1.0.0",
+  "description": "Coletor CODI → Supabase (schema codi). Roda num PC dentro da rede da fábrica.",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.105.4",
+    "dotenv": "^16.4.7"
+  }
+}

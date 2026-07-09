@@ -10,6 +10,29 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.30',
+    data: '09/07/2026',
+    titulo: 'Novo sistema: Painel de Produção — OFs e carga de máquinas direto do CODI',
+    resumo: 'O ERP ganhou um novo módulo em Fábrica/Produção que mostra, em tempo real, as Ordens de Fabricação abertas, quantas estão atrasadas, o percentual produzido e a carga de cada máquina (dias de fila). Os dados vêm do CODI (sistema legado da fábrica) via um coletor que roda internamente e atualiza a cada 5 minutos.',
+    mudancas: [
+      {
+        app: 'Painel de Produção (novo)',
+        o_que: 'Dashboard com KPIs ao vivo: total de OFs abertas, quantidade atrasadas, horas em fila e % médio produzido. Gráfico de barras com as 10 máquinas de maior carga (dias de fila). Lista das OFs mais atrasadas com barra de progresso.',
+        como: 'Acesse pelo Hub em Fábrica/Produção → "Painel de Produção". O tile aparece só para quem tiver perfil no sistema (papel Gestor ou Leitor). Ao entrar, o SSO é automático — não pede login de novo.'
+      },
+      {
+        app: 'Painel de Produção — Ordens de Fabricação',
+        o_que: 'Tela /ofs com lista completa das OFs abertas: busca por produto, filtro "só atrasadas", atraso em dias, barra de progresso (produzido/pedido) e status.',
+        como: 'Na barra lateral, clique em "Ordens de Fab.". Use o campo de busca para filtrar por produto ou número de OF. O switch "Só atrasadas" filtra as que já passaram da previsão.'
+      },
+      {
+        app: 'Painel de Produção — Máquinas',
+        o_que: 'Tela /maquinas com lista de máquinas ordenada por dias de fila; ao clicar, painel lateral mostra a fila de operações daquela máquina com progresso por operação.',
+        como: 'Na barra lateral, clique em "Máquinas". Clique em qualquer máquina para expandir a fila de OFs/operações. A cor do badge indica urgência: azul (ok), laranja (>5 dias), vermelho (>10 dias).'
+      }
+    ]
+  },
+  {
     versao: '6.29',
     data: '09/07/2026',
     titulo: 'PCP: lista de equipamentos e operadores atualizada com todos os dados oficiais',

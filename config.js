@@ -56,7 +56,9 @@ window.SMERP_CONFIG = {
     // RH — Indicadores de Absenteísmo & Turnover (acesso restrito a 3 pessoas)
     rh: 'https://solucaomoveis-rh-solucao.h5xdag.easypanel.host/',
     // Cronoanálise / PCP (repo timestamp, migrado do Lovable data-weave-vault)
-    pcp: 'https://solucaomoveis-timestamp.h5xdag.easypanel.host/'
+    pcp: 'https://solucaomoveis-timestamp.h5xdag.easypanel.host/',
+    // Painel de Produção ao vivo — OFs + carga de máquina + gargalos (CODI)
+    codi: 'https://solucaomoveis-painel-producao.h5xdag.easypanel.host/'
   },
 
   // Cards por SETOR. Cada setor tem 1+ módulos; o card mostra o setor e,
@@ -72,7 +74,8 @@ window.SMERP_CONFIG = {
         { system: 'sobras',     nome: 'Gestor de Sobras',  desc: 'Controle de sobras de produção por setor' },
         { system: 'manutencao', nome: 'Manutenção', desc: 'Ordens de serviço, preventivas e estoque de peças' },
         { system: 'planejamento', nome: 'Planejamento de Carga', desc: 'Pedido (PDF) → cargas/embarque: fatiamento por cubagem e indicadores' },
-        { system: 'pcp', nome: 'Cronoanálise / PCP', desc: 'Estudos de tempo, roteiros, sequenciamento, kanban de OPs e OEE' }
+        { system: 'pcp',  nome: 'Cronoanálise / PCP', desc: 'Estudos de tempo, roteiros, sequenciamento, kanban de OPs e OEE' },
+        { system: 'codi', nome: 'Painel de Produção', desc: 'OFs abertas, carga por máquina e gargalos direto do CODI — ao vivo' }
       ] },
     { id: 'logistica',      nome: 'Expedição / Logística', icon: 'bars',  cor: '#1F9D55', modulos: [
         { system: 'bip', nome: 'Gestor de Expedição — Apontamento (Celular)', desc: 'Modo enxuto: criar e bipar carregamentos no celular', path: 'apontar' },
@@ -191,6 +194,11 @@ window.SMERP_CONFIG = {
           { value: 'analista_pcp', label: 'Analista PCP',  desc: 'Edita cadastros, roteiros, lotes, OPs e cronoanálises' },
           { value: 'supervisor',   label: 'Supervisor',    desc: 'Consulta tudo e registra produção/paradas do dia' },
           { value: 'operador',     label: 'Operador',      desc: 'Consulta e registra a própria produção/parada' }
+        ] },
+      { system: 'codi', nome: 'Painel de Produção (CODI)', cor: '#2E78D2', icon: 'factory',
+        papeis: [
+          { value: 'gestor', label: 'Gestor', desc: 'Vê tudo, incluindo a tela de sincronização e status do coletor' },
+          { value: 'leitor', label: 'Leitor', desc: 'Consulta OFs, carga de máquina e dashboard (somente leitura)' }
         ] }
     ]
   },
