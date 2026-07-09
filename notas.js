@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.33',
+    data: '09/07/2026',
+    titulo: 'Painel de Produção: detalhe por máquina com gráfico de produção por hora',
+    resumo: 'Cada card de máquina agora é clicável e abre uma tela de detalhe com funcionário, item, performance e gráfico de barras de produção por hora.',
+    mudancas: [
+      {
+        app: 'Painel de Produção → Máquinas',
+        o_que: 'Cards de máquina agora abrem a tela de detalhe ao clicar.',
+        como: 'Clique em qualquer card de máquina para ver: nome do funcionário, item em produção, performance do turno (%), disponibilidade (%), total de peças e gráfico de barras por hora com linha de meta.',
+      },
+    ],
+  },
+  {
     versao: '6.32',
     data: '09/07/2026',
     titulo: 'Painel de Produção: app no ar e integrado ao Hub',

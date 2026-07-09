@@ -2,84 +2,390 @@
  * Coletor CODI → Supabase (schema "codi")
  * ─────────────────────────────────────────────────────────────
  * Roda num PC dentro da rede da fábrica.
- * Lê a API REST do CODI a cada INTERVALO_MIN minutos, normaliza
- * os dados e faz upsert no Supabase via service_role.
+ *
+ * Dois canais em paralelo:
+ *   1. WebSocket  (/action/monitorRecurso/webSocket) — status ao vivo das máquinas
+ *      Usa sessão Spring Security (JSESSIONID via login HTTP).
+ *   2. REST API   (codi-glue / Kong + OAuth2)        — OFs, cadastros
+ *      Usa refresh_token rotativo salvo em .token
  *
  * Uso:
- *   cp .env.example .env       # preencher credenciais reais
+ *   cp .env.example .env   # preencher credenciais reais
  *   npm install
- *   node index.js              # loop contínuo
- *
- * Primeira execução: detecta tabelas vazias e faz backfill por
- * janelas mensais (sem estourar a resposta do CODI).
+ *   node index.js
  */
 
 import 'dotenv/config';
-import { createClient } from '@supabase/supabase-js';
+import { createClient }       from '@supabase/supabase-js';
+import WebSocket               from 'ws';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { join, dirname }       from 'path';
+import { fileURLToPath }       from 'url';
+
+const __dir = dirname(fileURLToPath(import.meta.url));
+const TOKEN_FILE = join(__dir, '.token');
 
 // ─── Config ───────────────────────────────────────────────────
-const CODI_BASE   = (process.env.CODI_BASE_URL   || '').replace(/\/$/, '');
-const CODI_TOKEN  = process.env.CODI_TOKEN        || '';
-const SB_URL      = process.env.SUPABASE_URL      || '';
-const SB_KEY      = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const INTERVALO   = parseInt(process.env.INTERVALO_MIN  || '5', 10) * 60_000;
-const DELTA_DIAS  = parseInt(process.env.DELTA_DIAS     || '3', 10);
-const BACKFILL_M  = parseInt(process.env.BACKFILL_MESES || '12', 10);
+const CODI_BASE       = (process.env.CODI_BASE_URL     || '').replace(/\/$/, '');
+const CODI_AUTH_URL   = process.env.CODI_AUTH_URL      || '';
+const CODI_CLIENT_ID  = process.env.CODI_CLIENT_ID     || '';
+const CODI_SECRET     = process.env.CODI_CLIENT_SECRET || '';
+const CODI_ACTION_URL = (process.env.CODI_ACTION_URL   || '').replace(/\/$/, '');
+const CODI_WS_USER    = process.env.CODI_WS_USER       || '';
+const CODI_WS_PASS    = process.env.CODI_WS_PASS       || '';
+const CODI_WS_LABEL   = process.env.CODI_WS_LABEL      || '000';
+const CODI_JSESSIONID = process.env.CODI_JSESSIONID    || ''; // fallback manual
+const SB_URL          = process.env.SUPABASE_URL       || '';
+const SB_KEY          = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const INTERVALO       = parseInt(process.env.INTERVALO_MIN || '5', 10) * 60_000;
 
-if (!CODI_BASE || !CODI_TOKEN || !SB_URL || !SB_KEY) {
+// IDs das máquinas monitoradas (em string, como o CODI espera)
+const MAQUINAS_IDS = (
+  process.env.CODI_MAQUINAS_IDS ||
+  '11,12,13,14,10,15,16,19,4,6,5,20,3,1,2,17,7,8,9,18'
+).split(',').map(s => s.trim());
+
+const PARADAS_CENARIO = ['0','1','2','4','5','6','7','8','9','10','11',
+  '12','13','14','15','16','18','19','20','21','22','23','24','25','26','27'];
+
+if (!CODI_BASE || !CODI_AUTH_URL || !CODI_CLIENT_ID || !CODI_SECRET ||
+    !CODI_ACTION_URL || !CODI_WS_USER || !CODI_WS_PASS || !SB_URL || !SB_KEY) {
   console.error('[CODI] Variáveis de ambiente faltando. Verifique o .env');
   process.exit(1);
 }
 
 const sb = createClient(SB_URL, SB_KEY, { db: { schema: 'codi' } });
 
-// ─── Helpers ──────────────────────────────────────────────────
+// ─── OAuth2 (REST API) ────────────────────────────────────────
 
-/** Converte "dd/mm/yyyy" do CODI para "yyyy-mm-dd" (ISO date string) */
-function parseCodiDate(str) {
-  if (!str || str === '  /  /    ') return null;
-  const m = str.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (!m) return null;
-  return `${m[3]}-${m[2]}-${m[1]}`;
+let accessToken = null;
+let tokenExpiry = 0;
+
+function lerRefreshToken() {
+  if (existsSync(TOKEN_FILE)) return readFileSync(TOKEN_FILE, 'utf8').trim();
+  const t = process.env.CODI_REFRESH_TOKEN || '';
+  if (!t) { console.error('[auth] CODI_REFRESH_TOKEN não definido.'); process.exit(1); }
+  return t;
 }
 
-/** Formata Date para "dd/mm/yyyy" (filtros da API CODI) */
-function fmtCodi(date) {
-  const d = String(date.getDate()).padStart(2, '0');
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const y = date.getFullYear();
-  return `${d}/${m}/${y}`;
-}
+function salvarRefreshToken(t) { writeFileSync(TOKEN_FILE, t, 'utf8'); }
 
-/** POST para a API CODI e retorna o array de resultados */
-async function codiPost(endpoint, body) {
-  const url = `${CODI_BASE}/${endpoint}`;
-  const payload = { ApiToken: CODI_TOKEN, ...body };
-  const res = await fetch(url, {
+async function renovarToken() {
+  const res = await fetch(CODI_AUTH_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type:    'refresh_token',
+      refresh_token: lerRefreshToken(),
+      client_id:     CODI_CLIENT_ID,
+      client_secret: CODI_SECRET,
+    }),
   });
-  if (!res.ok) {
-    const txt = await res.text().catch(() => '');
-    throw new Error(`CODI ${endpoint} → ${res.status}: ${txt.slice(0, 200)}`);
-  }
-  const json = await res.json();
-  // A API CODI encapsula a lista em diferentes chaves dependendo do endpoint.
-  // Tentamos as mais comuns; se não achar, retorna o objeto inteiro.
-  return (
-    json.ListaOrdemFabricacao    ||
-    json.ListaReservaTempo       ||
-    json.ListaMotivoParada       ||
-    json.ListaMotivoPerda        ||
-    json.ListaParada             ||
-    json.ListaPerda              ||
-    json.Maquina                 ||  // ConsultarMaquina retorna objeto único
-    json
-  );
+  if (!res.ok) throw new Error(`Auth ${res.status}: ${await res.text().catch(() => '')}`);
+  const data = await res.json();
+  accessToken = data.access_token;
+  tokenExpiry = Date.now() + (data.expires_in - 300) * 1000;
+  salvarRefreshToken(data.refresh_token);
+  console.log('[auth] token renovado');
 }
 
-/** Grava estado de sincronização de um recurso */
+async function garantirToken() {
+  if (!accessToken || Date.now() >= tokenExpiry) await renovarToken();
+}
+
+async function codiGet(endpoint, params = {}) {
+  await garantirToken();
+  const url = new URL(`${CODI_BASE}/${endpoint}`);
+  url.searchParams.set('access_token', accessToken);
+  for (const [k, v] of Object.entries(params)) url.searchParams.set(k, String(v));
+  const res = await fetch(url.toString());
+  if (!res.ok) throw new Error(`CODI ${endpoint} → ${res.status}`);
+  return res.json();
+}
+
+async function codiGetAll(endpoint, params = {}) {
+  const first = await codiGet(endpoint, { ...params, pageSize: 100, page: 1 });
+  const pages = first.totalPages ?? 1;
+  let all = [...(first.data ?? (Array.isArray(first) ? first : []))];
+  for (let p = 2; p <= pages; p++) {
+    const page = await codiGet(endpoint, { ...params, pageSize: 100, page: p });
+    all = all.concat(page.data ?? []);
+    await new Promise(r => setTimeout(r, 100));
+  }
+  return all;
+}
+
+// ─── Login Spring Security (para o WebSocket) ─────────────────
+
+let jsessionid = null;
+
+function extrairJsessionid(headers) {
+  // 'set-cookie' pode vir como string única ou array — getSetCookie() é mais confiável no Node 18+
+  const cookies = headers.getSetCookie
+    ? headers.getSetCookie()
+    : [headers.get('set-cookie') ?? ''];
+  for (const c of cookies) {
+    const m = c.match(/JSESSIONID=([^;,\s]+)/i);
+    if (m) return m[1];
+  }
+  return null;
+}
+
+async function loginAction() {
+  // 1. GET /home → Spring Security redireciona para a tela de login e dá o cookie inicial
+  const r0 = await fetch(`${CODI_ACTION_URL}/home`, {
+    redirect: 'manual',
+    headers: { 'User-Agent': 'Mozilla/5.0 codi-coletor/2.0' },
+  });
+  const initialSession = extrairJsessionid(r0.headers);
+  const loginLocation  = r0.headers.get('location') ?? '';
+  // Resolve a URL do formulário (Spring usa /j_spring_security_check ou /login)
+  const loginCheckUrl  = loginLocation.includes('login')
+    ? `${CODI_ACTION_URL}/j_spring_security_check`
+    : `${CODI_ACTION_URL}/j_spring_security_check`;
+
+  // 2. GET da tela de login para obter possível CSRF token
+  let csrfToken = null;
+  if (initialSession) {
+    const rLogin = await fetch(`${CODI_ACTION_URL}/login`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 codi-coletor/2.0',
+        'Cookie':     `JSESSIONID=${initialSession}`,
+      },
+    });
+    const html = await rLogin.text().catch(() => '');
+    const csrfMatch = html.match(/name="_csrf"[^>]+value="([^"]+)"/i)
+                   ?? html.match(/name="CSRFToken"[^>]+value="([^"]+)"/i);
+    if (csrfMatch) csrfToken = csrfMatch[1];
+  }
+
+  // 3. POST das credenciais com o cookie inicial + CSRF se existir
+  const body = new URLSearchParams({ j_username: CODI_WS_USER, j_password: CODI_WS_PASS });
+  if (csrfToken) body.set('_csrf', csrfToken);
+
+  const cookieEnvio = initialSession
+    ? `org.springframework.web.servlet.i18n.CookieLocaleResolver.LOCALE=pt-BR; JSESSIONID=${initialSession}`
+    : 'org.springframework.web.servlet.i18n.CookieLocaleResolver.LOCALE=pt-BR';
+
+  const r1 = await fetch(loginCheckUrl, {
+    method:   'POST',
+    redirect: 'manual',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'User-Agent':   'Mozilla/5.0 codi-coletor/2.0',
+      'Cookie':       cookieEnvio,
+      'Origin':       CODI_ACTION_URL,
+      'Referer':      `${CODI_ACTION_URL}/login`,
+    },
+    body,
+  });
+
+  // Spring manda 302 para /home em sucesso; 302 para /login?error em falha
+  const location = r1.headers.get('location') ?? '';
+  if (location.includes('error') || location.includes('login?error')) {
+    throw new Error(`Credenciais recusadas pelo CODI. Status: ${r1.status}, Location: ${location}`);
+  }
+
+  // JSESSIONID novo vem no Set-Cookie do POST, senão reusa o inicial
+  const novoSession = extrairJsessionid(r1.headers) ?? initialSession;
+  if (!novoSession) throw new Error(`Login falhou — sem JSESSIONID. Status: ${r1.status}`);
+
+  jsessionid = novoSession;
+  console.log(`[ws-auth] Login ok. JSESSIONID=${jsessionid.substring(0, 8)}…`);
+}
+
+// ─── WebSocket (status ao vivo) ──────────────────────────────
+
+let ws = null;
+let wsConectando = false;
+let ultimaAtualizacao = 0; // timestamp CODI em ms
+
+async function upsertStatus(maq, tsAtualizacao) {
+  const e  = maq.estadoAtual ?? {};
+  const di = maq.DADOS_INDICADORES ?? {};
+  await sb.from('maquinas_status').upsert({
+    maquina_id:          maq.codigoRecursoConjunto,
+    estado:              e.estado             ?? null,
+    cod_parada:          e.codParada          ?? null,
+    nome_parada:         e.nomeParada         ?? null,
+    cod_tipo_parada:     e.codTipoParada      ?? null,
+    nome_tipo_parada:    e.nomeTipoParada     ?? null,
+    cor_tipo_parada:     e.corTipoParada      ?? null,
+    cor_fonte:           e.corFonteTipoParada ?? null,
+    is_in_retrabalho:    e.isInRetrabalho     ?? false,
+    tempo_producao_turno: di.TEMPO_PRODUCAO_TURNO ?? null,
+    tempo_parada_turno:   di.TEMPO_PARADA_TURNO   ?? null,
+    tempo_boas_turno:     di.TEMPO_BOAS_TURNO     ?? null,
+    atualizacao_codi:    tsAtualizacao ?? null,
+    atualizado_em:       new Date().toISOString(),
+  }, { onConflict: 'maquina_id' });
+}
+
+function processarMsgWS(raw) {
+  let msg;
+  try { msg = JSON.parse(raw); } catch { return; }
+  const { command, data } = msg;
+
+  if ((command === 'CONNECT' || command === 'FILTER') && data) {
+    let inner;
+    try { inner = JSON.parse(data); } catch { return; }
+    if (inner.atualizacao) ultimaAtualizacao = inner.atualizacao;
+    for (const maq of inner.data ?? []) upsertStatus(maq, inner.atualizacao).catch(console.error);
+  }
+
+  if (command === 'UPDATE' && data) {
+    let upd;
+    try { upd = JSON.parse(data); } catch { return; }
+    const id = String(upd.codigoRecursoConjunto);
+    if (ws?.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({
+        labelRecursoUsuario: CODI_WS_LABEL,
+        panelType: 'moderno',
+        command: 'FILTER',
+        filter: {
+          codigosRecursoConjunto: [id],
+          paradasCenario: PARADAS_CENARIO,
+          ultimaAtualizacao: String(ultimaAtualizacao),
+        },
+      }));
+    }
+  }
+}
+
+function wsSend(payload) {
+  if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify(payload));
+}
+
+async function conectarWS() {
+  if (wsConectando) return;
+  wsConectando = true;
+
+  try {
+    if (!jsessionid) {
+      if (CODI_JSESSIONID) {
+        jsessionid = CODI_JSESSIONID;
+        console.log(`[ws-auth] Usando JSESSIONID do .env (${jsessionid.substring(0, 8)}…)`);
+      } else {
+        await loginAction();
+      }
+    }
+  } catch (e) {
+    console.error('[ws-auth] Login falhou:', e.message, '— tentando em 60s');
+    jsessionid = null;
+    wsConectando = false;
+    setTimeout(conectarWS, 60_000);
+    return;
+  }
+
+  const wsUrl = CODI_ACTION_URL
+    .replace(/^http:/, 'ws:')
+    .replace(/^https:/, 'wss:') + '/monitorRecurso/webSocket';
+
+  ws = new WebSocket(wsUrl, {
+    headers: {
+      'Cookie':     `org.springframework.web.servlet.i18n.CookieLocaleResolver.LOCALE=pt-BR; JSESSIONID=${jsessionid}`,
+      'User-Agent': 'codi-coletor/2.0',
+    },
+  });
+
+  ws.on('open', () => {
+    wsConectando = false;
+    console.log('[ws] Conectado →', wsUrl);
+    ultimaAtualizacao = 0;
+    wsSend({
+      labelRecursoUsuario: CODI_WS_LABEL,
+      panelType: 'moderno',
+      command: 'CONNECT',
+      filter: {
+        codigosRecursoConjunto: MAQUINAS_IDS,
+        paradasCenario: PARADAS_CENARIO,
+        ultimaAtualizacao: 0,
+      },
+    });
+    setSyncState('ws_status', true, 'Conectado').catch(() => {});
+  });
+
+  ws.on('message', data => processarMsgWS(data.toString()));
+
+  ws.on('close', (code, reason) => {
+    wsConectando = false;
+    jsessionid = null; // força novo login ou re-leitura do .env não acontece; próxima tentativa usa loginAction()
+    console.warn(`[ws] Desconectado (${code}). Reconectando em 30s…`);
+    setSyncState('ws_status', false, `Desconectado ${code}`).catch(() => {});
+    setTimeout(conectarWS, 30_000);
+  });
+
+  ws.on('error', err => {
+    console.error('[ws] Erro:', err.message);
+    setSyncState('ws_status', false, err.message).catch(() => {});
+  });
+}
+
+// ─── REST: OFs ────────────────────────────────────────────────
+
+async function syncOfs() {
+  const items = await codiGetAll('productionOrder', { status: 'STARTED' });
+  const rows = items.map(o => ({
+    id:                o.id,
+    code:              o.code              ?? null,
+    item_id:           o.item?.id          ?? null,
+    item_code:         o.item?.code        ?? null,
+    item_name:         o.item?.name        ?? null,
+    item_context:      o.item?.context     ?? null,
+    item_measure_unit: o.item?.measureUnit?.name ?? null,
+    status:            o.status            ?? 'STARTED',
+    quantity:          o.quantity          ?? null,
+    note:              o.note              ?? null,
+    codi_version:      o.version ? new Date(o.version).toISOString() : null,
+    atualizado_em:     new Date().toISOString(),
+  }));
+  const { error } = await sb.from('ofs').upsert(rows, { onConflict: 'id' });
+  if (error) throw error;
+  console.log(`[ofs] ${rows.length} upserted`);
+}
+
+// ─── REST: Máquinas e grupos ──────────────────────────────────
+
+async function syncMaquinas() {
+  const items = await codiGetAll('productiveResource');
+  const rows = items.map(m => ({
+    id:                 m.id,
+    name:               m.name                ?? null,
+    establishment_name: m.establishment?.name ?? null,
+    name_fixed_assets:  m.nameFixedAssets     ?? null,
+    description:        m.description         ?? null,
+    observation:        m.observation         ?? null,
+    active_system:      m.activeSystem        ?? true,
+    active_monitor:     m.activeMonitor       ?? false,
+    manual_report:      m.manualReport        ?? false,
+    codi_version:       m.version ? new Date(m.version).toISOString() : null,
+    atualizado_em:      new Date().toISOString(),
+  }));
+  const { error } = await sb.from('maquinas').upsert(rows, { onConflict: 'id' });
+  if (error) throw error;
+  console.log(`[maquinas] ${rows.length} upserted`);
+}
+
+async function syncGrupos() {
+  const resp  = await codiGet('productiveResourceGroup', { pageSize: 500, page: 1 });
+  const grupos = resp.data ?? [];
+  const grupoRows = grupos.map(g => ({ id: g.id, name: g.name ?? null, atualizado_em: new Date().toISOString() }));
+  const { error: eg } = await sb.from('grupos_maquina').upsert(grupoRows, { onConflict: 'id' });
+  if (eg) throw eg;
+
+  const links = grupos.flatMap(g =>
+    (g.productiveResources ?? []).map(r => ({ maquina_id: r.id, grupo_id: g.id }))
+  );
+  await sb.from('maquinas_grupos').delete().gte('grupo_id', 0);
+  if (links.length) {
+    const { error: el } = await sb.from('maquinas_grupos').insert(links);
+    if (el) throw el;
+  }
+  console.log(`[grupos] ${grupoRows.length} grupos, ${links.length} vínculos`);
+}
+
+// ─── Sync state ───────────────────────────────────────────────
+
 async function setSyncState(recurso, ok, mensagem = null) {
   await sb.from('sync_state').upsert(
     { recurso, ultimo_sync: new Date().toISOString(), ok, mensagem },
@@ -87,240 +393,142 @@ async function setSyncState(recurso, ok, mensagem = null) {
   );
 }
 
-// ─── Sincronizações por recurso ───────────────────────────────
+// ─── REST: Detalhe por máquina (produção/hora + estado atual) ─
 
-/** Sincroniza Ordens de Fabricação (ListarOrdemFabricacao) */
-async function syncOfs(de, ate) {
-  const endpoint = 'API_OrdemFabricacao/ListarOrdemFabricacao';
-  const lista = await codiPost(endpoint, {
-    DataAlteracao:    fmtCodi(de),
-    DataAlteracaoFim: fmtCodi(ate),
-    EstruturaProduto: 'N',
-    OrdemEncerrada:   'S',  // incluir encerradas (para capturar transições de status)
-  });
+async function pollDetalheMaquina(maqId) {
+  const hoje = new Date().toISOString().slice(0, 10);
 
-  if (!Array.isArray(lista) || lista.length === 0) return 0;
-
-  const rows = lista.map(o => ({
-    ordem:                     String(o.Ordem            || '').trim(),
-    produto:                   o.Produto                 || null,
-    nome_produto:              o.NomeProduto             || null,
-    tipo:                      o.Tipo                    || null,
-    deposito:                  o.Deposito                || null,
-    lote:                      o.Lote                    || null,
-    quantidade:                parseFloat(o.Quantidade          || '0') || 0,
-    quantidade_produzida:      parseFloat(o.QuantidadeProduzida || '0') || 0,
-    status:                    o.Status                  || null,
-    data_previsao:             parseCodiDate(o.DataPrevisao),
-    data_alteracao:            parseCodiDate(o.DataAlteracao),
-    industrializacao_terceiro: o.IndustrializacaoTerceiro || null,
-    atualizado_em:             new Date().toISOString(),
-  })).filter(r => r.ordem);
-
-  const { error } = await sb.from('ofs').upsert(rows, { onConflict: 'ordem' });
-  if (error) throw error;
-  return rows.length;
-}
-
-/** Sincroniza Reservas de Tempo (ListarReservaTempo) */
-async function syncReservas(de, ate) {
-  const endpoint = 'API_OrdemFabricacao/ListarReservaTempo';
-  const lista = await codiPost(endpoint, {
-    DataAlteracao:              fmtCodi(de),
-    DataAlteracaoFim:           fmtCodi(ate),
-    CarregarProcessosAlternativos: 'N',
-    DataEncerramentoOrdemVazia:    'S',
-  });
-
-  if (!Array.isArray(lista) || lista.length === 0) return 0;
-
-  const rows = lista.map(r => ({
-    requisicao:           String(r.Requisicao            || '').trim(),
-    ordem_fabricacao:     String(r.OrdemFabricacao       || '').trim() || null,
-    produto:              r.Produto                      || null,
-    produto_descricao:    r.ProdutoDescricao             || null,
-    processo:             r.Processo                     || null,
-    operacao:             r.Operacao                     || null,
-    operacao_descricao:   r.OperacaoDescricao            || null,
-    fase:                 r.Fase                         || null,
-    fase_descricao:       r.FaseDescricao                || null,
-    maquina:              r.Maquina                      || null,
-    maquina_descricao:    r.MaquinaDescricao             || null,
-    quantidade:           parseFloat(r.Quantidade              || '0') || 0,
-    quantidade_produzida: parseFloat(r.QuantidadeProduzida     || '0') || 0,
-    tempo_reservado:      parseFloat(r.TempoReservado          || '0') || 0,
-    tempo_requisitado:    parseFloat(r.TempoRequisitado        || '0') || 0,
-    tempo_setup:          parseFloat(r.TempoSetup              || '0') || 0,
-    quantidade_operadores:parseInt(r.QuantidadeOperadores      || '1', 10) || 1,
-    tipo_processo:        r.TipoProcesso                 || null,
-    data_alteracao:       parseCodiDate(r.DataAlteracao),
-    data_encerramento_ordem: parseCodiDate(r.DataEncerramentoOrdem),
-    atualizado_em:        new Date().toISOString(),
-  })).filter(r => r.requisicao);
-
-  const { error } = await sb.from('reservas_tempo').upsert(rows, { onConflict: 'requisicao' });
-  if (error) throw error;
-  return rows.length;
-}
-
-/** Sincroniza cadastro de Máquinas (ConsultarMaquina — sem filtro) */
-async function syncMaquinas() {
-  // A API não documenta "listar todas" sem código — tentamos sem código e vemos.
-  // Fallback: derivar lista de máquinas das reservas_tempo já salvas.
-  let lista;
+  // 1. Estado atual: operador, item, tempo/peça (mobileApp simples ~1 kB)
+  let dadosAtuais = null;
   try {
-    const res = await codiPost('API_Cadastro/ConsultarMaquina', {});
-    lista = Array.isArray(res) ? res : (res ? [res] : []);
-  } catch {
-    // Fallback: buscar códigos únicos das reservas e consultar um a um
-    const { data: reservas } = await sb.from('reservas_tempo')
-      .select('maquina, maquina_descricao')
-      .not('maquina', 'is', null);
-
-    const unicas = [...new Map((reservas || []).map(r => [r.maquina, r])).values()];
-    lista = [];
-    for (const { maquina: codigo } of unicas) {
-      try {
-        const m = await codiPost('API_Cadastro/ConsultarMaquina', { Codigo: codigo });
-        if (m && m.Codigo) lista.push(m);
-        else if (Array.isArray(m)) lista.push(...m);
-      } catch { /* ignora máquina individual que falhar */ }
+    const resp = await codiGet('mobileApp', { idProductiveResources: maqId });
+    const item = resp?.data?.[0] ?? (Array.isArray(resp) ? resp[0] : null);
+    dadosAtuais = item;
+    if (cicloNum === 1 && maqId === MAQUINAS_IDS[0]) {
+      console.log('[detalhe] mobileApp simples campos:', JSON.stringify(Object.keys(item ?? {})));
     }
-  }
-
-  if (lista.length === 0) return 0;
-
-  const rows = lista.map(m => ({
-    codigo:            String(m.Codigo            || '').trim(),
-    descricao:         m.Descricao                || null,
-    abreviatura:       m.Abreviatura              || null,
-    grupo:             m.Grupo                    || null,
-    ccusto:            m.CCusto                   || null,
-    horas_disponiveis: parseFloat(m.HorasDisponiveis || '0') || null,
-    valor_hora_padrao: parseFloat(m.ValorHoraPadrao  || '0') || null,
-    status:            m.Status                   || null,
-    atualizado_em:     new Date().toISOString(),
-  })).filter(r => r.codigo);
-
-  const { error } = await sb.from('maquinas').upsert(rows, { onConflict: 'codigo' });
-  if (error) throw error;
-  return rows.length;
-}
-
-/** Sincroniza Motivos de Parada e de Perda (uma vez por dia) */
-async function syncMotivos() {
-  // Parada
-  try {
-    const lista = await codiPost('API_OrdemFabricacao/ListarMotivoParada', {});
-    if (Array.isArray(lista) && lista.length > 0) {
-      const rows = lista.map(m => ({
-        codigo: String(m.Codigo || m.CodigoMotivo || '').trim(),
-        descricao: m.Descricao || m.DescricaoMotivo || null,
-        atualizado_em: new Date().toISOString(),
-      })).filter(r => r.codigo);
-      if (rows.length) await sb.from('motivos_parada').upsert(rows, { onConflict: 'codigo' });
-    }
-  } catch (e) { console.warn('[motivos_parada]', e.message); }
-
-  // Perda
-  try {
-    const lista = await codiPost('API_OrdemFabricacao/ListarMotivoPerda', {});
-    if (Array.isArray(lista) && lista.length > 0) {
-      const rows = lista.map(m => ({
-        codigo: String(m.Codigo || m.CodigoMotivo || '').trim(),
-        descricao: m.Descricao || m.DescricaoMotivo || null,
-        atualizado_em: new Date().toISOString(),
-      })).filter(r => r.codigo);
-      if (rows.length) await sb.from('motivos_perda').upsert(rows, { onConflict: 'codigo' });
-    }
-  } catch (e) { console.warn('[motivos_perda]', e.message); }
-}
-
-// ─── Lógica de backfill vs delta ──────────────────────────────
-
-/** Verifica se as tabelas principais estão vazias (primeira execução) */
-async function precisaBackfill() {
-  const { count } = await sb.from('ofs').select('*', { count: 'exact', head: true });
-  return (count || 0) === 0;
-}
-
-/** Backfill completo: varre mês a mês para não sobrecarregar o CODI */
-async function backfill() {
-  console.log(`[CODI] Primeira execução — backfill de ${BACKFILL_M} meses`);
-  const hoje = new Date();
-  for (let i = BACKFILL_M; i >= 0; i--) {
-    const ini = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
-    const fim = new Date(hoje.getFullYear(), hoje.getMonth() - i + 1, 0);
-    try {
-      const nOfs = await syncOfs(ini, fim);
-      const nRes = await syncReservas(ini, fim);
-      console.log(`[CODI] backfill ${fmtCodi(ini)}–${fmtCodi(fim)}: ${nOfs} OFs, ${nRes} reservas`);
-    } catch (e) {
-      console.error(`[CODI] backfill ${fmtCodi(ini)}–${fmtCodi(fim)} falhou:`, e.message);
-    }
-    // Pausa entre janelas para não sobrecarregar
-    await new Promise(r => setTimeout(r, 500));
-  }
-}
-
-// ─── Ciclo principal ──────────────────────────────────────────
-
-async function ciclo() {
-  const agora = new Date();
-  const ini   = new Date(agora); ini.setDate(ini.getDate() - DELTA_DIAS);
-
-  console.log(`[CODI] Ciclo ${agora.toISOString()} — delta ${DELTA_DIAS} dias`);
-
-  // OFs e Reservas (todo ciclo)
-  try {
-    const nOfs = await syncOfs(ini, agora);
-    await setSyncState('ofs', true);
-    const nRes = await syncReservas(ini, agora);
-    await setSyncState('reservas_tempo', true);
-    console.log(`[CODI] OFs: ${nOfs} | Reservas: ${nRes}`);
   } catch (e) {
-    console.error('[CODI] Erro OFs/Reservas:', e.message);
-    await setSyncState('ofs', false, e.message);
-    await setSyncState('reservas_tempo', false, e.message);
+    console.warn(`[detalhe] mobileApp simples ${maqId}:`, e.message);
   }
 
-  // Máquinas e Motivos: 1x por dia (quando último sync > 23h)
-  const { data: syncMaq } = await sb.from('sync_state')
-    .select('ultimo_sync').eq('recurso', 'maquinas').single();
-  const ultimoMaq = syncMaq?.ultimo_sync ? new Date(syncMaq.ultimo_sync) : null;
-  const sincronizarCadastros = !ultimoMaq || (agora - ultimoMaq) > 23 * 3600_000;
+  // 2. Histórico do turno: graphValues → producao_hora (~3,8 kB)
+  let graphValues = [];
+  try {
+    const resp = await codiGet('mobileApp', {
+      idProductiveResources: maqId,
+      daysQty: 0,
+      consolidate: false,
+    });
+    graphValues = resp?.data?.[0]?.graphValues ?? [];
+  } catch (e) {
+    console.warn(`[detalhe] mobileApp hist ${maqId}:`, e.message);
+  }
 
-  if (sincronizarCadastros) {
-    try {
-      const nMaq = await syncMaquinas();
-      await setSyncState('maquinas', true);
-      await syncMotivos();
-      await setSyncState('motivos_parada', true);
-      await setSyncState('motivos_perda', true);
-      console.log(`[CODI] Máquinas: ${nMaq}`);
-    } catch (e) {
-      console.error('[CODI] Erro Máquinas/Motivos:', e.message);
-      await setSyncState('maquinas', false, e.message);
+  // Agrega por hora (fuso do processo = fuso local do PC da fábrica)
+  const byHour = {};
+  for (const gv of graphValues) {
+    if ((gv.value ?? 0) <= 0) continue;
+    const hora = new Date(gv.date).getHours();
+    if (!byHour[hora]) byHour[hora] = { qtd: 0, sumPerf: 0, cntPerf: 0, meta: gv.standardPerformance };
+    byHour[hora].qtd += gv.value;
+    if (gv.currentPerformance > 0) {
+      byHour[hora].sumPerf += gv.currentPerformance;
+      byHour[hora].cntPerf++;
     }
+    byHour[hora].meta = gv.standardPerformance; // meta mais recente dessa hora
+  }
+
+  const horaRows = Object.entries(byHour).map(([hora, h]) => {
+    const avgPerf = h.cntPerf > 0 ? h.sumPerf / h.cntPerf : null;
+    return {
+      maquina_id:        parseInt(maqId),
+      turno_data:        hoje,
+      hora:              parseInt(hora),
+      quantidade:        h.qtd,
+      performance_media: avgPerf && h.meta > 0 ? +(avgPerf / h.meta * 100).toFixed(1) : null,
+      meta_ppm:          h.meta,
+    };
+  });
+
+  // Performance média do turno (horas com produção)
+  const horasAtivas = Object.values(byHour).filter(h => h.qtd > 0 && h.cntPerf > 0);
+  const perfTurno = horasAtivas.length
+    ? horasAtivas.reduce((s, h) => s + (h.sumPerf / h.cntPerf / h.meta), 0) / horasAtivas.length * 100
+    : null;
+
+  const producaoTotal = graphValues.reduce((s, gv) => s + (gv.value ?? 0), 0);
+  const metaAtual = graphValues.filter(g => g.standardPerformance > 0).at(-1)?.standardPerformance ?? null;
+
+  // Replace producao_hora do dia para esta máquina
+  await sb.from('producao_hora').delete()
+    .eq('maquina_id', parseInt(maqId))
+    .eq('turno_data', hoje);
+  if (horaRows.length) {
+    const { error } = await sb.from('producao_hora').insert(horaRows);
+    if (error) console.error(`[detalhe] insert producao_hora ${maqId}:`, error.message);
+  }
+
+  // Upsert maquinas_detalhe (snapshot geral do turno)
+  const detalhe = {
+    maquina_id:     parseInt(maqId),
+    producao_turno: producaoTotal || null,
+    performance:    perfTurno != null ? +perfTurno.toFixed(1) : null,
+    meta_ppm:       metaAtual,
+    turno_data:     hoje,
+    atualizado_em:  new Date().toISOString(),
+  };
+
+  // Extrai campos do mobileApp simples — nomes reais confirmados quando response disponível
+  if (dadosAtuais) {
+    detalhe.of_numero      = dadosAtuais.orderNumber       ?? dadosAtuais.code              ?? null;
+    detalhe.of_operacao    = dadosAtuais.operationCode     ?? dadosAtuais.operation         ?? null;
+    detalhe.operador_nome  = dadosAtuais.employeeName      ?? dadosAtuais.employee?.name    ?? dadosAtuais.operatorName ?? null;
+    detalhe.item_name      = dadosAtuais.itemName          ?? dadosAtuais.item?.name        ?? null;
+    detalhe.item_code      = dadosAtuais.itemCode          ?? dadosAtuais.item?.code        ?? null;
+    detalhe.tempo_item_min = dadosAtuais.itemTime          ?? dadosAtuais.cycleTime         ?? null;
+    detalhe.boas           = dadosAtuais.goodParts         ?? dadosAtuais.goodQuantity      ?? null;
+    detalhe.ruins          = dadosAtuais.rejectParts       ?? dadosAtuais.rejectQuantity    ?? null;
+    detalhe.total_previsto = dadosAtuais.plannedQuantity   ?? dadosAtuais.quantity          ?? null;
+  }
+
+  const { error } = await sb.from('maquinas_detalhe').upsert(detalhe, { onConflict: 'maquina_id' });
+  if (error) console.error(`[detalhe] upsert ${maqId}:`, error.message);
+}
+
+async function pollDetalhe() {
+  for (const id of MAQUINAS_IDS) {
+    await pollDetalheMaquina(id);
+    await new Promise(r => setTimeout(r, 200));
+  }
+  await setSyncState('detalhe', true);
+  console.log(`[detalhe] ${MAQUINAS_IDS.length} máquinas atualizadas`);
+}
+
+// ─── Ciclo REST ───────────────────────────────────────────────
+
+let cicloNum = 0;
+
+async function cicloREST() {
+  cicloNum++;
+  console.log(`\n[ciclo ${cicloNum}] ${new Date().toISOString()}`);
+
+  try { await syncOfs(); await setSyncState('ofs', true); }
+  catch (e) { console.error('[ofs]', e.message); await setSyncState('ofs', false, e.message); }
+
+  try { await pollDetalhe(); }
+  catch (e) { console.error('[detalhe]', e.message); await setSyncState('detalhe', false, e.message); }
+
+  if (cicloNum === 1 || cicloNum % 288 === 0) {
+    try { await syncMaquinas(); await setSyncState('maquinas', true); }
+    catch (e) { console.error('[maquinas]', e.message); await setSyncState('maquinas', false, e.message); }
+    try { await syncGrupos(); await setSyncState('grupos', true); }
+    catch (e) { console.error('[grupos]', e.message); await setSyncState('grupos', false, e.message); }
   }
 }
 
-// ─── Inicialização ────────────────────────────────────────────
+// ─── Start ────────────────────────────────────────────────────
 
-async function main() {
-  console.log(`[CODI] Coletor iniciado — CODI: ${CODI_BASE} | Intervalo: ${INTERVALO / 60_000}min`);
-
-  if (await precisaBackfill()) {
-    await backfill();
-    await syncMaquinas().then(() => setSyncState('maquinas', true)).catch(console.error);
-    await syncMotivos().then(() => { setSyncState('motivos_parada', true); setSyncState('motivos_perda', true); }).catch(console.error);
-  }
-
-  // Primeiro ciclo imediato
-  await ciclo().catch(console.error);
-
-  // Loop a cada INTERVALO ms
-  setInterval(() => ciclo().catch(console.error), INTERVALO);
-}
-
-main().catch(e => { console.error('[CODI] Fatal:', e); process.exit(1); });
+console.log(`[CODI] Coletor v2 iniciado — REST: ${CODI_BASE} | WS: ${CODI_ACTION_URL}`);
+conectarWS();
+cicloREST().catch(console.error);
+setInterval(() => cicloREST().catch(console.error), INTERVALO);
