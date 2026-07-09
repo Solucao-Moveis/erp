@@ -480,7 +480,50 @@ async function pollDetalhe() {
   console.log(`[detalhe] ${MAQUINAS_IDS.length} máquinas atualizadas`);
 }
 
-// ─── Ciclo REST ───────────────────────────────────────────────
+// ─── Ciclo rápido (1 min): só qty + KPIs, sem producao_hora ───
+// Mantém o número de peças quase em tempo real sem custo do delete+insert de horas
+
+let rapidoRodando = false;
+
+async function cicloRapido() {
+  if (rapidoRodando) return; // evita sobreposição se demorar
+  rapidoRodando = true;
+  const hoje = new Date().toISOString().slice(0, 10);
+  try {
+    for (const maqId of MAQUINAS_IDS) {
+      try {
+        const resp = await codiGet('chart/mobileApp', {
+          idProductiveResources: maqId,
+          daysQty:          0,
+          consolidatedData: false,
+          downtimesQty:     0,
+          currentShift:     true,
+          previousShift:    false,
+        });
+        const oee = resp?.data?.[0]?.oeeTotal;
+        if (!oee) continue;
+        await sb.from('maquinas_detalhe').upsert({
+          maquina_id:      parseInt(maqId),
+          producao_turno:  oee.qty  ?? null,
+          boas:            oee.qty  ?? null,
+          oee:             oee.oee  != null ? +oee.oee.toFixed(1)  : null,
+          disponibilidade: oee.disp != null ? +oee.disp.toFixed(1) : null,
+          performance:     oee.perf != null ? +oee.perf.toFixed(1) : null,
+          qualidade:       oee.qual != null ? +oee.qual.toFixed(1) : null,
+          turno_data:      hoje,
+          atualizado_em:   new Date().toISOString(),
+        }, { onConflict: 'maquina_id' });
+      } catch (e) {
+        // silencioso — o ciclo completo (5 min) resgata
+      }
+      await new Promise(r => setTimeout(r, 150));
+    }
+  } finally {
+    rapidoRodando = false;
+  }
+}
+
+// ─── Ciclo REST (5 min): completo (OFs + hora graph + detalhe completo) ──
 
 let cicloNum = 0;
 
@@ -508,3 +551,9 @@ console.log(`[CODI] Coletor v2 iniciado — REST: ${CODI_BASE} | WS: ${CODI_ACTI
 conectarWS();
 cicloREST().catch(console.error);
 setInterval(() => cicloREST().catch(console.error), INTERVALO);
+
+// Ciclo rápido: atualiza produção a cada 1 minuto (começa após 60s para não colidir com o ciclo inicial)
+setTimeout(() => {
+  cicloRapido().catch(console.error);
+  setInterval(() => cicloRapido().catch(console.error), 60_000);
+}, 60_000);
