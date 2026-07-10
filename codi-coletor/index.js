@@ -421,13 +421,13 @@ async function pollDetalheMaquina(maqId) {
   const periodos = chartData.oeeByPeriod ?? [];
   const ordem    = chartData.ordemMultiplaAtual ?? null;
 
-  // producao_hora: uma linha por hora (data ISO "2026-07-09T14:00:00" → hora = 14)
+  // producao_hora: CODI retorna datas em UTC; converte para Brasília (UTC-3)
   const horaRows = periodos
     .filter(p => p.qty > 0)
     .map(p => ({
       maquina_id:        parseInt(maqId),
       turno_data:        hoje,
-      hora:              parseInt(p.date.substring(11, 13), 10),
+      hora:              (parseInt(p.date.substring(11, 13), 10) - 3 + 24) % 24,
       quantidade:        p.qty,
       performance_media: p.perf != null ? +p.perf.toFixed(1) : null,
       meta_ppm:          null, // não vem neste endpoint
