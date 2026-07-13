@@ -396,6 +396,9 @@ async function setSyncState(recurso, ok, mensagem = null) {
   );
 }
 
+// Converte valor numérico do CODI para 1 casa decimal segura (null se Infinity/NaN)
+function safeNum(v) { if (v == null) return null; const n = +parseFloat(v).toFixed(1); return isFinite(n) ? n : null; }
+
 // ─── REST: Detalhe por máquina (OEE + produção/hora) ──────────
 // Endpoint real: GET /apis/codi-glue/chart/mobileApp
 // Response: { data: [{ oeeTotal, oeeByPeriod, shiftStart, shiftEnd, ordemMultiplaAtual }] }
@@ -432,7 +435,7 @@ async function pollDetalheMaquina(maqId) {
       turno_data:        hoje,
       hora:              (parseInt(p.date.substring(11, 13), 10) - 3 + 24) % 24,
       quantidade:        p.qty,
-      performance_media: p.perf != null ? +p.perf.toFixed(1) : null,
+      performance_media: safeNum(p.perf),
       meta_ppm:          null, // não vem neste endpoint
     }));
 
@@ -449,10 +452,10 @@ async function pollDetalheMaquina(maqId) {
     maquina_id:     parseInt(maqId),
     producao_turno: oee?.qty           ?? null,
     boas:           oee?.qty           ?? null,
-    oee:            oee?.oee  != null  ? +oee.oee.toFixed(1)  : null,
-    disponibilidade:oee?.disp != null  ? +oee.disp.toFixed(1) : null,
-    performance:    oee?.perf != null  ? +oee.perf.toFixed(1) : null,
-    qualidade:      oee?.qual != null  ? +oee.qual.toFixed(1) : null,
+    oee:            safeNum(oee?.oee),
+    disponibilidade:safeNum(oee?.disp),
+    performance:    safeNum(oee?.perf),
+    qualidade:      safeNum(oee?.qual),
     turno_data:     hoje,
     turno_inicio:   chartData.shiftStart ?? null,
     turno_fim:      chartData.shiftEnd   ?? null,
@@ -522,11 +525,13 @@ async function syncProdutos() {
   const data = await industrialPost('API_Produto/ConsultarProduto', {
     Produto: [{ Codigo: '', DataAlteracao: '01/01/2020' }],
   });
-  if (!Array.isArray(data)) {
-    console.warn('[industrial] syncProdutos: resposta inválida');
+  // Resposta: { CodigoRetorno, Produto: [...] } ou array direto
+  const lista = Array.isArray(data) ? data : (data?.Produto ?? null);
+  if (!Array.isArray(lista)) {
+    console.warn('[industrial] syncProdutos: resposta inválida', JSON.stringify(data)?.slice(0, 200));
     return 0;
   }
-  const rows = data.map(p => ({
+  const rows = lista.map(p => ({
     codigo:             String(p.Codigo ?? ''),
     nome:               p.Nome            ?? null,
     grupo_codigo:       p.GrupoProduto    ?? null,
@@ -643,10 +648,10 @@ async function cicloRapido() {
           maquina_id:      parseInt(maqId),
           producao_turno:  oee.qty  ?? null,
           boas:            oee.qty  ?? null,
-          oee:             oee.oee  != null ? +oee.oee.toFixed(1)  : null,
-          disponibilidade: oee.disp != null ? +oee.disp.toFixed(1) : null,
-          performance:     oee.perf != null ? +oee.perf.toFixed(1) : null,
-          qualidade:       oee.qual != null ? +oee.qual.toFixed(1) : null,
+          oee:             safeNum(oee.oee),
+          disponibilidade: safeNum(oee.disp),
+          performance:     safeNum(oee.perf),
+          qualidade:       safeNum(oee.qual),
           turno_data:      hoje,
           atualizado_em:   new Date().toISOString(),
         }, { onConflict: 'maquina_id' });
