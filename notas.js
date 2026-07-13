@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.36',
+    data: '13/07/2026',
+    titulo: 'Painel de Produção: tempo por máquina em cada componente do BOM',
+    resumo: 'Ao abrir a estrutura de um produto, cada componente agora mostra em quais máquinas é fabricado e quanto tempo leva. O cabeçalho exibe o tempo total estimado para fabricar o conjunto inteiro.',
+    mudancas: [
+      {
+        app: 'Painel de Produção → Itens / BOM → detalhe do produto',
+        o_que: 'Colunas "Máquinas" e "Tempo/un" adicionadas a cada linha da BOM, mais card "Tempo estimado" no topo.',
+        como: 'Clique em qualquer produto na aba Itens / BOM. Cada componente na estrutura mostra agora: a(s) máquina(s) onde é processado (ex: LASER VITERBO → BLM) e o tempo médio por peça em minutos, com base nas cronometragens do PCP. No cabeçalho da estrutura aparece o "Tempo estimado" total do produto, calculado somando o tempo de cada componente direto multiplicado pela quantidade.',
+      },
+    ],
+  },
+  {
     versao: '6.35',
     data: '13/07/2026',
     titulo: 'Painel de Produção: nova aba Itens / BOM com estrutura de produto',
