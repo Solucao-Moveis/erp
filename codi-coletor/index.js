@@ -554,10 +554,10 @@ async function syncProdutos() {
 }
 
 async function syncBomProdutos() {
-  // Só sincroniza BOMs de produtos acabados (grupo 110) para manter viável
+  // Sincroniza BOMs de PRODUTO ACABADO e CONJUNTO (grupos com estrutura navegável)
   const { data: pais, error } = await sb.from('produtos')
     .select('codigo')
-    .eq('grupo_codigo', 110)
+    .in('grupo_descricao', ['PRODUTO ACABADO', 'CONJUNTO'])
     .eq('status', 'A');
   if (error || !pais?.length) {
     console.warn('[industrial] syncBomProdutos: sem produtos acabados para sincronizar');
