@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.35',
+    data: '13/07/2026',
+    titulo: 'Painel de Produção: nova aba Itens / BOM com estrutura de produto',
+    resumo: 'O painel ganhou uma nova aba "Itens / BOM" que lista todos os produtos acabados e mostra a estrutura completa de cada um — código, nome e quantidade de cada componente por nível.',
+    mudancas: [
+      {
+        app: 'Painel de Produção → Itens / BOM',
+        o_que: 'Nova aba com catálogo de produtos acabados e estrutura de produto (BOM).',
+        como: 'Clique em "Itens / BOM" na barra lateral. A lista mostra todos os produtos acabados cadastrados. Use a busca para filtrar por nome. Clique em um produto para ver a estrutura completa: cada componente aparece com seu código, descrição e quantidade, recuado conforme o nível na árvore (nível 1 = filho direto, nível 2 = neto, etc.).',
+      },
+    ],
+  },
+  {
     versao: '6.34',
     data: '09/07/2026',
     titulo: 'Painel de Produção: novo visual do dashboard e detalhe por máquina',

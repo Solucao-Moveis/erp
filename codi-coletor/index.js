@@ -18,6 +18,7 @@
 import 'dotenv/config';
 import { createClient }       from '@supabase/supabase-js';
 import WebSocket               from 'ws';
+import http                    from 'http';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname }       from 'path';
 import { fileURLToPath }       from 'url';
@@ -26,18 +27,20 @@ const __dir = dirname(fileURLToPath(import.meta.url));
 const TOKEN_FILE = join(__dir, '.token');
 
 // ─── Config ───────────────────────────────────────────────────
-const CODI_BASE       = (process.env.CODI_BASE_URL     || '').replace(/\/$/, '');
-const CODI_AUTH_URL   = process.env.CODI_AUTH_URL      || '';
-const CODI_CLIENT_ID  = process.env.CODI_CLIENT_ID     || '';
-const CODI_SECRET     = process.env.CODI_CLIENT_SECRET || '';
-const CODI_ACTION_URL = (process.env.CODI_ACTION_URL   || '').replace(/\/$/, '');
-const CODI_WS_USER    = process.env.CODI_WS_USER       || '';
-const CODI_WS_PASS    = process.env.CODI_WS_PASS       || '';
-const CODI_WS_LABEL   = process.env.CODI_WS_LABEL      || '000';
-const CODI_JSESSIONID = process.env.CODI_JSESSIONID    || ''; // fallback manual
-const SB_URL          = process.env.SUPABASE_URL       || '';
-const SB_KEY          = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const INTERVALO       = parseInt(process.env.INTERVALO_MIN || '5', 10) * 60_000;
+const CODI_BASE           = (process.env.CODI_BASE_URL           || '').replace(/\/$/, '');
+const CODI_AUTH_URL       = process.env.CODI_AUTH_URL            || '';
+const CODI_CLIENT_ID      = process.env.CODI_CLIENT_ID           || '';
+const CODI_SECRET         = process.env.CODI_CLIENT_SECRET       || '';
+const CODI_ACTION_URL     = (process.env.CODI_ACTION_URL         || '').replace(/\/$/, '');
+const CODI_WS_USER        = process.env.CODI_WS_USER             || '';
+const CODI_WS_PASS        = process.env.CODI_WS_PASS             || '';
+const CODI_WS_LABEL       = process.env.CODI_WS_LABEL            || '000';
+const CODI_JSESSIONID     = process.env.CODI_JSESSIONID          || ''; // fallback manual
+const INDUSTRIAL_BASE     = (process.env.CODI_INDUSTRIAL_URL     || '').replace(/\/$/, '');
+const INDUSTRIAL_TOKEN    = process.env.CODI_INDUSTRIAL_TOKEN    || '';
+const SB_URL              = process.env.SUPABASE_URL             || '';
+const SB_KEY              = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const INTERVALO           = parseInt(process.env.INTERVALO_MIN || '5', 10) * 60_000;
 
 // IDs das máquinas monitoradas (em string, como o CODI espera)
 const MAQUINAS_IDS = (
@@ -480,6 +483,140 @@ async function pollDetalhe() {
   console.log(`[detalhe] ${MAQUINAS_IDS.length} máquinas atualizadas`);
 }
 
+// ─── API Industrial (Forwood via CODI) ────────────────────────
+// Usa POST (GET com body é rejeitado por Node 18+); autenticação via ApiToken no body.
+
+function industrialPost(endpoint, body) {
+  return new Promise((resolve, reject) => {
+    if (!INDUSTRIAL_BASE || !INDUSTRIAL_TOKEN) {
+      resolve(null);
+      return;
+    }
+    const payload = JSON.stringify({ ApiToken: INDUSTRIAL_TOKEN, ...body });
+    const url = new URL(`${INDUSTRIAL_BASE}/Core/${endpoint}`);
+    const req = http.request({
+      hostname: url.hostname,
+      port:     parseInt(url.port || '80', 10),
+      method:   'POST',
+      path:     url.pathname,
+      headers:  {
+        'Content-Type':   'application/json',
+        'Content-Length': Buffer.byteLength(payload),
+      },
+    }, res => {
+      let data = '';
+      res.on('data', c => data += c);
+      res.on('end', () => {
+        try { resolve(JSON.parse(data)); }
+        catch { resolve(null); }
+      });
+    });
+    req.on('error', reject);
+    req.setTimeout(30_000, () => { req.destroy(); reject(new Error('industrial timeout')); });
+    req.write(payload);
+    req.end();
+  });
+}
+
+async function syncProdutos() {
+  const data = await industrialPost('API_Produto/ConsultarProduto', {
+    Produto: [{ Codigo: '', DataAlteracao: '01/01/2020' }],
+  });
+  if (!Array.isArray(data)) {
+    console.warn('[industrial] syncProdutos: resposta inválida');
+    return 0;
+  }
+  const rows = data.map(p => ({
+    codigo:             String(p.Codigo ?? ''),
+    nome:               p.Nome            ?? null,
+    grupo_codigo:       p.GrupoProduto    ?? null,
+    grupo_descricao:    p.GrupoDescricao  ?? null,
+    subgrupo_codigo:    p.SubgrupoProduto ?? null,
+    subgrupo_descricao: p.SubgrupoDescricao ?? null,
+    unidade_medida:     p.UnidadeMedida   ?? null,
+    tipo_material:      p.TipoMaterial    ?? null,
+    fantasma:           p.Fantasma        ?? null,
+    status:             p.Status          ?? null,
+    atualizado_em:      new Date().toISOString(),
+  })).filter(r => r.codigo);
+
+  for (let i = 0; i < rows.length; i += 500) {
+    const { error } = await sb.from('produtos').upsert(rows.slice(i, i + 500), { onConflict: 'codigo' });
+    if (error) throw error;
+  }
+  console.log(`[industrial] syncProdutos: ${rows.length} produtos`);
+  return rows.length;
+}
+
+async function syncBomProdutos() {
+  // Só sincroniza BOMs de produtos acabados (grupo 110) para manter viável
+  const { data: pais, error } = await sb.from('produtos')
+    .select('codigo')
+    .eq('grupo_codigo', 110)
+    .eq('status', 'A');
+  if (error || !pais?.length) {
+    console.warn('[industrial] syncBomProdutos: sem produtos acabados para sincronizar');
+    return;
+  }
+
+  let ok = 0, falha = 0;
+  for (const pai of pais) {
+    try {
+      const data = await industrialPost('API_Produto/ConsultaEstruturaProduto', {
+        DataEstrutura: '01/01/2020',
+        CodigoPai:     pai.codigo,
+      });
+      if (!Array.isArray(data) || !data.length) {
+        await new Promise(r => setTimeout(r, 100));
+        continue;
+      }
+
+      const rows = data.map(e => ({
+        produto_raiz:  pai.codigo,
+        codigo_pai:    String(e.CodigoPai   ?? ''),
+        codigo_filho:  String(e.CodigoFilho ?? ''),
+        nivel:         e.Nivel      ?? null,
+        quantidade:    e.Quantidade ?? null,
+        contador:      e.Contador   ?? 0,
+        fantasma:      e.Fantasma   ?? null,
+        atualizado_em: new Date().toISOString(),
+      })).filter(r => r.codigo_pai && r.codigo_filho);
+
+      // Substitui a BOM do produto por completo
+      await sb.from('bom_estrutura').delete().eq('produto_raiz', pai.codigo);
+      if (rows.length) {
+        const { error: ie } = await sb.from('bom_estrutura').insert(rows);
+        if (ie) console.error(`[industrial] bom insert ${pai.codigo}:`, ie.message);
+      }
+      ok++;
+    } catch (e) {
+      console.warn(`[industrial] bom ${pai.codigo}:`, e.message);
+      falha++;
+    }
+    await new Promise(r => setTimeout(r, 200)); // ~5 req/s — gentil com o Tomcat
+  }
+  console.log(`[industrial] syncBomProdutos: ${ok} ok, ${falha} falha (de ${pais.length})`);
+}
+
+async function cicloIndustrial() {
+  if (!INDUSTRIAL_BASE || !INDUSTRIAL_TOKEN) return;
+  try {
+    await syncProdutos();
+    await setSyncState('produtos', true);
+  } catch (e) {
+    console.error('[produtos]', e.message);
+    await setSyncState('produtos', false, e.message);
+    return; // BOM depende de produtos — aborta
+  }
+  try {
+    await syncBomProdutos();
+    await setSyncState('bom', true);
+  } catch (e) {
+    console.error('[bom]', e.message);
+    await setSyncState('bom', false, e.message);
+  }
+}
+
 // ─── Ciclo rápido (1 min): só qty + KPIs, sem producao_hora ───
 // Mantém o número de peças quase em tempo real sem custo do delete+insert de horas
 
@@ -542,6 +679,8 @@ async function cicloREST() {
     catch (e) { console.error('[maquinas]', e.message); await setSyncState('maquinas', false, e.message); }
     try { await syncGrupos(); await setSyncState('grupos', true); }
     catch (e) { console.error('[grupos]', e.message); await setSyncState('grupos', false, e.message); }
+    // Produtos + BOM (API Industrial) — só roda se CODI_INDUSTRIAL_URL estiver configurado
+    cicloIndustrial().catch(e => console.error('[industrial]', e.message));
   }
 }
 
