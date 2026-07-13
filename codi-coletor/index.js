@@ -571,18 +571,20 @@ async function syncBomProdutos() {
         DataEstrutura: '01/01/2020',
         CodigoPai:     pai.codigo,
       });
-      if (!Array.isArray(data) || !data.length) {
+      // Resposta: { CodigoRetorno, Estrutura: [...] } ou array direto
+      const lista = Array.isArray(data) ? data : (data?.Estrutura ?? null);
+      if (!Array.isArray(lista) || !lista.length) {
         await new Promise(r => setTimeout(r, 100));
         continue;
       }
 
-      const rows = data.map(e => ({
+      const rows = lista.map((e, i) => ({
         produto_raiz:  pai.codigo,
         codigo_pai:    String(e.CodigoPai   ?? ''),
         codigo_filho:  String(e.CodigoFilho ?? ''),
         nivel:         e.Nivel      ?? null,
         quantidade:    e.Quantidade ?? null,
-        contador:      e.Contador   ?? 0,
+        contador:      e.Contador   ?? i,   // fallback: índice da posição
         fantasma:      e.Fantasma   ?? null,
         atualizado_em: new Date().toISOString(),
       })).filter(r => r.codigo_pai && r.codigo_filho);
