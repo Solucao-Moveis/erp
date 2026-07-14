@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.37',
+    data: '14/07/2026',
+    titulo: 'BOM: tempo total corrigido + ocultar/mostrar matéria-prima',
+    resumo: 'O tempo estimado agora soma corretamente todos os sub-componentes da estrutura. Um novo botão permite ocultar ou mostrar os itens de matéria-prima para deixar a lista mais limpa.',
+    mudancas: [
+      {
+        app: 'Painel de Produção → Itens / BOM → detalhe do produto',
+        o_que: 'Correção do tempo total estimado + toggle de matéria-prima.',
+        como: 'No cabeçalho da estrutura, o "Tempo estimado" agora soma os tempos de todos os níveis (antes só somava o nível 1, mostrando zero quando os tempos estavam em sub-componentes). Ao lado dos níveis, há um botão "+ Matéria-prima (N)" que mostra quantos itens de matéria-prima estão ocultos — clique para exibi-los. Clique em "Ocultar matéria-prima" para voltar à visão limpa.',
+      },
+    ],
+  },
+  {
     versao: '6.36',
     data: '13/07/2026',
     titulo: 'Painel de Produção: tempo por máquina em cada componente do BOM',
