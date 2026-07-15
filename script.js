@@ -272,7 +272,8 @@
           b.type = 'button';
           b.setAttribute('data-system', m.system);
           b.setAttribute('data-path', m.path || '');
-          b.innerHTML = '<span class="nav__dot" style="background:' + cor + '">' + icon + '</span>' + escapeHtml(m.nome);
+          b.innerHTML = '<span class="nav__dot" style="background:' + cor + '">' + icon + '</span>' + escapeHtml(m.nome) +
+            '<span class="nav__badge" data-badge-for="' + escapeHtml(m.system) + '" hidden></span>';
           b.addEventListener('click', function () { openApp(m.system, m.path || ''); });
           sideEl.appendChild(b);
         });
@@ -442,6 +443,9 @@
     if (usersUI) usersUI.gate();
     // Solicitações: ajusta a visão (master vê "todas") e calcula o aviso (badge)
     if (solUI) { solUI.gate(); solUI.refreshBadge(); solUI.startWatch(); }
+    // Inovação/Desenvolvimento: badge no atalho + aviso quando muda (módulo
+    // em si mora fora do Hub — ver /desenvolvimento/)
+    if (invBadgeUI) { await invBadgeUI.gate(); invBadgeUI.refreshBadge(); invBadgeUI.startWatch(); }
     // Engenharia: mostra a aba só p/ quem tem acesso ao módulo
     if (engUI) engUI.gate();
     // Avisos no Windows: mostra o botão "Ativar avisos" se ainda não decidiram;
@@ -610,6 +614,7 @@
       var sidec = $('sideSystems'); if (sidec) sidec.innerHTML = '';
       if (usersUI) usersUI.hide();
       if (solUI) solUI.hide();
+      if (invBadgeUI) invBadgeUI.hide();
       if (engUI) engUI.hide();
       if (loginPassword) loginPassword.value = '';
       showLoginState();
@@ -1172,6 +1177,64 @@
   }
 
   solUI = initSolicitacoes(sb);
+
+  // ============================================================
+  //  INOVAÇÃO · DESENVOLVIMENTO — aviso automático de um módulo que
+  //  agora mora numa página própria (fora do Hub). Não tem overlay
+  //  aqui: só um badge no atalho do "Sistemas" (criado por renderSetores)
+  //  + notificação do navegador/SO quando o número sobe.
+  // ============================================================
+  function initInovacaoBadge(client) {
+    var db = function () { return client.schema('inovacao'); };
+    var isGestor = false, lastBadge = null, watchTimer = null;
+
+    function updateBadge(n) {
+      n = n || 0;
+      var el = document.querySelector('[data-badge-for="inovacao"]');
+      var btn = document.querySelector('[data-system="inovacao"]');
+      if (!el) return;
+      if (n > 0) { el.textContent = n > 99 ? '99+' : String(n); el.hidden = false; if (btn) btn.classList.add('has-badge'); }
+      else { el.hidden = true; if (btn) btn.classList.remove('has-badge'); }
+    }
+
+    async function gate() {
+      try { var r = await db().rpc('is_gestor'); isGestor = !r.error && r.data === true; }
+      catch (e) { isGestor = false; }
+    }
+
+    async function refreshBadge() {
+      var n = 0;
+      try { var res = await db().rpc('badge'); n = !res.error ? (res.data || 0) : 0; }
+      catch (e) { n = 0; }
+      updateBadge(n);
+      if (lastBadge !== null && n > lastBadge && window.SMERPNotify) {
+        window.SMERPNotify.notify(
+          isGestor ? '💡 Nova solicitação de desenvolvimento' : '💡 Sua solicitação foi atualizada',
+          isGestor ? 'Abra o SMERP e veja o Desenvolvimento.' : 'Veja a mudança em Desenvolvimento → Minhas solicitações.',
+          { tag: 'inov', url: (CFG.HUB_URL || '/') }
+        );
+      }
+      lastBadge = n;
+      return n;
+    }
+
+    function startWatch() {
+      stopWatch();
+      var ms = (CFG.NOTIFY_POLL_MS && CFG.NOTIFY_POLL_MS > 5000) ? CFG.NOTIFY_POLL_MS : 45000;
+      watchTimer = setInterval(function () { refreshBadge(); }, ms);
+    }
+    function stopWatch() { if (watchTimer) { clearInterval(watchTimer); watchTimer = null; } }
+
+    return {
+      gate: gate,
+      refreshBadge: refreshBadge,
+      startWatch: startWatch,
+      stopWatch: stopWatch,
+      hide: function () { stopWatch(); lastBadge = null; updateBadge(0); }
+    };
+  }
+
+  var invBadgeUI = initInovacaoBadge(sb);
 
   // Engenharia · Assistências (aba interna; lógica em engenharia.js)
   var engUI = (window.SMERPEngenharia && window.SMERPEngenharia.init)

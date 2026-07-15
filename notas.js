@@ -18,7 +18,7 @@ window.SMERP_NOTAS = [
       {
         app: 'Inovação → Desenvolvimento (novo)',
         o_que: 'Kanban de solicitações de desenvolvimento (Solicitação → Em Análise/Priorizado → Em Desenvolvimento → Finalizado ou Recusado) + Dashboard de solicitações resolvidas, numa tela própria.',
-        como: 'Clique no card do setor "Inovação → Desenvolvimento" no ERP. Preencha título, o que você quer, como gostaria que funcionasse e a finalidade do pedido — os quatro são obrigatórios. Se quiser, cole um print da tela com Ctrl+V ou arraste a imagem pro quadro de anexo (opcional). Depois de enviar, acompanhe o status em "Minhas solicitações": entrou em análise, começou o desenvolvimento (com a previsão de entrega), foi finalizado ou recusado (com o motivo).',
+        como: 'Clique no card do setor "Inovação → Desenvolvimento" no ERP (ou no atalho "Desenvolvimento" na barra lateral). Preencha título, o que você quer, como gostaria que funcionasse e a finalidade do pedido — os quatro são obrigatórios. Se quiser, cole um print da tela com Ctrl+V ou arraste a imagem pro quadro de anexo (opcional). Depois de enviar, acompanhe o status em "Minhas solicitações" — você recebe um aviso (badge na barra + notificação do navegador) a cada mudança: entrou em análise, começou o desenvolvimento (com a previsão de entrega), foi finalizado ou recusado (com o motivo).',
       },
     ],
   },
