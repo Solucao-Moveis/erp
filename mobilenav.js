@@ -48,15 +48,20 @@
     });
   }
 
-  // Espelha o aviso de "Solicitações" (#solBadge) num pontinho vermelho
-  // no hambúrguer, pra a pessoa ver que há novidade sem abrir a gaveta.
-  var solBadge = document.getElementById('solBadge');
+  // Espelha o aviso de "Desenvolvimento" ([data-badge-for="inovacao"]) num
+  // pontinho vermelho no hambúrguer, pra a pessoa ver que há novidade sem
+  // abrir a gaveta. O badge é injetado pelo script.js depois do login —
+  // por isso observa o container (delegação), não o elemento em si.
   var dot = document.getElementById('navDot');
-  if (solBadge && dot) {
-    var sync = function () { dot.hidden = solBadge.hidden; };
+  var sideEl = document.querySelector('.side');
+  if (dot && sideEl) {
+    var sync = function () {
+      var b = sideEl.querySelector('[data-badge-for="inovacao"]');
+      dot.hidden = !b || b.hidden;
+    };
     sync();
     try {
-      new MutationObserver(sync).observe(solBadge, { attributes: true, attributeFilter: ['hidden'] });
+      new MutationObserver(sync).observe(sideEl, { attributes: true, attributeFilter: ['hidden'], subtree: true, childList: true });
     } catch (e) { /* navegador sem MutationObserver: ignora */ }
   }
 })();

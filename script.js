@@ -22,7 +22,6 @@
   var btnLogout = $('btnLogout');
   var userEmail = $('userEmail');
   var usersUI = null; // inicializado depois de criar o client (sb)
-  var solUI = null;   // aba "Solicitações" — idem
 
   function show(el) { if (el) el.hidden = false; }
   function hide(el) { if (el) el.hidden = true; }
@@ -441,8 +440,6 @@
     }
     // libera (ou esconde) a aba "Usuários" conforme a permissão de quem entrou
     if (usersUI) usersUI.gate();
-    // Solicitações: ajusta a visão (master vê "todas") e calcula o aviso (badge)
-    if (solUI) { solUI.gate(); solUI.refreshBadge(); solUI.startWatch(); }
     // Inovação/Desenvolvimento: badge no atalho + aviso quando muda (módulo
     // em si mora fora do Hub — ver /desenvolvimento/)
     if (invBadgeUI) { await invBadgeUI.gate(); invBadgeUI.refreshBadge(); invBadgeUI.startWatch(); }
@@ -613,7 +610,6 @@
       var sysc = $('systems'); if (sysc) sysc.innerHTML = '';
       var sidec = $('sideSystems'); if (sidec) sidec.innerHTML = '';
       if (usersUI) usersUI.hide();
-      if (solUI) solUI.hide();
       if (invBadgeUI) invBadgeUI.hide();
       if (engUI) engUI.hide();
       if (loginPassword) loginPassword.value = '';
@@ -887,298 +883,6 @@
   usersUI = initUsers(sb);
 
   // ============================================================
-  //  SOLICITAÇÕES — chamados pro desenvolvedor (todos abrem).
-  //  O botão aparece pra todo mundo; só o master vê "todas" e muda
-  //  o status. Quem abriu recebe um aviso (badge) quando é resolvido.
-  // ============================================================
-  function initSolicitacoes(client) {
-    var overlay = $('solOverlay');
-    var navBtn  = $('btnSolic');
-    var form    = $('solForm');
-    if (!overlay || !navBtn || !form) return null;
-
-    var elTipo = $('solTipo'), elUrg = $('solUrgencia'), elTit = $('solTitulo'), elDesc = $('solDescricao');
-    var elWhats = $('solWhats');
-    var elErr = $('solError'), elOk = $('solOk'), elSubmit = $('solSubmit');
-    var elMyList = $('solMyList'), elMaster = $('solMaster'), elAllList = $('solAllList');
-    var elBadge = $('solBadge');
-    var cfg = CFG.SOLICITACOES || {};
-    var TIPOS = cfg.TIPOS || [], URGS = cfg.URGENCIAS || [], STATUS = cfg.STATUS || {};
-    var built = false, isMaster = false;
-    var lastBadge = null;   // último número conhecido (null = ainda não medido)
-    var watchTimer = null;  // timer do "vigia" (poll periódico p/ avisar)
-
-    function setErr(msg) { if (!elErr) return; if (msg) { elErr.textContent = msg; elErr.hidden = false; } else { elErr.hidden = true; } }
-    function setOk(msg)  { if (!elOk) return;  if (msg) { elOk.textContent = msg;  elOk.hidden = false; }  else { elOk.hidden = true; } }
-
-    function labelTipo(v) { for (var i = 0; i < TIPOS.length; i++) if (TIPOS[i].value === v) return TIPOS[i].label; return v; }
-    function infoUrg(v)   { for (var i = 0; i < URGS.length; i++)  if (URGS[i].value === v)  return URGS[i];  return { label: v, cor: '#6B7280' }; }
-    function infoStatus(v){ return STATUS[v] || { label: v, cor: '#6B7280' }; }
-
-    function urgPill(v)    { var u = infoUrg(v);    return '<span class="sol__urg" style="--c:' + escapeHtml(u.cor) + '">' + escapeHtml(u.label) + '</span>'; }
-    function statusBadge(v){ var s = infoStatus(v); return '<span class="sol__status" style="--c:' + escapeHtml(s.cor) + '">' + escapeHtml(s.label) + '</span>'; }
-
-    function fmtDate(iso) {
-      if (!iso) return '';
-      try { var d = new Date(iso); return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
-      catch (e) { return ''; }
-    }
-
-    // Monta os <select> de tipo e urgência a partir do config (1ª vez).
-    function build() {
-      if (built) return;
-      built = true;
-      if (elTipo) elTipo.innerHTML = TIPOS.map(function (t) {
-        return '<option value="' + escapeHtml(t.value) + '">' + escapeHtml(t.label) + '</option>';
-      }).join('');
-      if (elUrg) {
-        elUrg.innerHTML = URGS.map(function (u) {
-          return '<option value="' + escapeHtml(u.value) + '">' + escapeHtml(u.label) + '</option>';
-        }).join('');
-        // urgência padrão = "media" se existir na lista
-        for (var i = 0; i < URGS.length; i++) if (URGS[i].value === 'media') elUrg.value = 'media';
-      }
-    }
-
-    // Render de um chamado na visão "minhas".
-    function myItemHtml(s) {
-      var resp = (s.status === 'concluida' || s.status === 'recusada') && s.resposta
-        ? '<div class="sol__resp"><b>Resposta do dev:</b> ' + escapeHtml(s.resposta) + '</div>' : '';
-      var novo = (s.status === 'concluida' || s.status === 'recusada') && !s.visto_em
-        ? ' <span class="sol__new">novo</span>' : '';
-      return '<div class="sol__item">' +
-        '<div class="sol__item-head">' +
-          '<span class="sol__item-title">' + escapeHtml(s.titulo) + '</span>' +
-          statusBadge(s.status) + novo +
-        '</div>' +
-        '<div class="sol__item-meta">' + urgPill(s.urgencia) +
-          '<span class="sol__item-tipo">' + escapeHtml(labelTipo(s.tipo)) + '</span>' +
-          '<span class="sol__item-date">' + escapeHtml(fmtDate(s.created_at)) + '</span>' +
-        '</div>' +
-        '<div class="sol__item-desc">' + escapeHtml(s.descricao) + '</div>' +
-        resp +
-      '</div>';
-    }
-
-    async function loadMyList() {
-      if (!elMyList) return;
-      elMyList.innerHTML = '<p class="usr__empty">Carregando…</p>';
-      try {
-        var res = await client.rpc('list_my_solicitacoes');
-        if (res.error) throw res.error;
-        var rows = res.data || [];
-        // "lembra o último": pré-preenche o WhatsApp com o mais recente já usado.
-        if (elWhats && !elWhats.value) {
-          for (var i = 0; i < rows.length; i++) {
-            if (rows[i].whatsapp) { elWhats.value = rows[i].whatsapp; break; }
-          }
-        }
-        elMyList.innerHTML = rows.length
-          ? rows.map(myItemHtml).join('')
-          : '<p class="usr__empty">Você ainda não abriu nenhuma solicitação.</p>';
-      } catch (e) {
-        elMyList.innerHTML = '<p class="usr__empty">Não foi possível carregar.</p>';
-        console.warn('[SMERP] list_my_solicitacoes:', e && e.message);
-      }
-    }
-
-    // Render de um chamado na visão "todas" (master): com controles de status.
-    function allItemHtml(s) {
-      var who = escapeHtml(s.requester_name || '') +
-        (s.requester_email ? ' <span class="sol__item-mail">' + escapeHtml(s.requester_email) + '</span>' : '');
-      var opts = Object.keys(STATUS).map(function (k) {
-        return '<option value="' + escapeHtml(k) + '"' + (k === s.status ? ' selected' : '') + '>' + escapeHtml(STATUS[k].label) + '</option>';
-      }).join('');
-      return '<div class="sol__item" data-id="' + escapeHtml(s.id) + '">' +
-        '<div class="sol__item-head">' +
-          '<span class="sol__item-title">' + escapeHtml(s.titulo) + '</span>' +
-          statusBadge(s.status) +
-        '</div>' +
-        '<div class="sol__item-meta">' + urgPill(s.urgencia) +
-          '<span class="sol__item-tipo">' + escapeHtml(labelTipo(s.tipo)) + '</span>' +
-          '<span class="sol__item-date">' + escapeHtml(fmtDate(s.created_at)) + '</span>' +
-        '</div>' +
-        '<div class="sol__item-who">' + who + '</div>' +
-        '<div class="sol__item-desc">' + escapeHtml(s.descricao) + '</div>' +
-        '<div class="sol__ctrl">' +
-          '<select class="sol__ctrl-status">' + opts + '</select>' +
-          '<input class="sol__ctrl-resp" type="text" maxlength="2000" placeholder="Resposta (opcional)" value="' + escapeHtml(s.resposta || '') + '" />' +
-          '<button type="button" class="sol__ctrl-save">Salvar</button>' +
-          '<button type="button" class="sol__ctrl-del" title="Excluir solicitação">Excluir</button>' +
-        '</div>' +
-      '</div>';
-    }
-
-    async function loadAllList() {
-      if (!elAllList || !isMaster) return;
-      elAllList.innerHTML = '<p class="usr__empty">Carregando…</p>';
-      try {
-        var res = await client.rpc('list_all_solicitacoes');
-        if (res.error) throw res.error;
-        var rows = res.data || [];
-        elAllList.innerHTML = rows.length
-          ? rows.map(allItemHtml).join('')
-          : '<p class="usr__empty">Nenhuma solicitação ainda.</p>';
-        elAllList.querySelectorAll('.sol__item').forEach(function (node) {
-          var btn = node.querySelector('.sol__ctrl-save');
-          if (!btn) return;
-          btn.addEventListener('click', async function () {
-            var id = node.getAttribute('data-id');
-            var st = node.querySelector('.sol__ctrl-status').value;
-            var rp = node.querySelector('.sol__ctrl-resp').value;
-            btn.disabled = true; var prev = btn.textContent; btn.textContent = 'Salvando…';
-            try {
-              var r = await client.rpc('set_solicitacao_status', { p_id: id, p_status: st, p_resposta: rp });
-              if (r.error) { alert(r.error.message || 'Não foi possível salvar.'); return; }
-              await loadAllList();
-              refreshBadge();
-            } catch (err) {
-              console.error(err); alert('Falha ao salvar. Tente novamente.');
-            } finally {
-              btn.disabled = false; btn.textContent = prev;
-            }
-          });
-
-          // Excluir (só o master vê esta lista) — ação definitiva, pede confirmação.
-          var del = node.querySelector('.sol__ctrl-del');
-          if (del) del.addEventListener('click', async function () {
-            var id = node.getAttribute('data-id');
-            if (!confirm('Excluir esta solicitação? Essa ação não pode ser desfeita.')) return;
-            del.disabled = true; var prevD = del.textContent; del.textContent = 'Excluindo…';
-            try {
-              var rd = await client.rpc('delete_solicitacao', { p_id: id });
-              if (rd.error) { alert(rd.error.message || 'Não foi possível excluir.'); return; }
-              await loadAllList();
-              refreshBadge();
-            } catch (err) {
-              console.error(err); alert('Falha ao excluir. Tente novamente.');
-            } finally {
-              del.disabled = false; del.textContent = prevD;
-            }
-          });
-        });
-      } catch (e) {
-        elAllList.innerHTML = '<p class="usr__empty">Não foi possível carregar.</p>';
-        console.warn('[SMERP] list_all_solicitacoes:', e && e.message);
-      }
-    }
-
-    function updateBadge(n) {
-      n = n || 0;
-      if (!elBadge) return;
-      if (n > 0) { elBadge.textContent = n > 99 ? '99+' : String(n); elBadge.hidden = false; navBtn.classList.add('has-badge'); }
-      else { elBadge.hidden = true; navBtn.classList.remove('has-badge'); }
-    }
-    async function refreshBadge() {
-      var n = 0;
-      try { var res = await client.rpc('solicitacoes_badge'); n = !res.error ? (res.data || 0) : 0; }
-      catch (e) { n = 0; }
-      updateBadge(n);
-      // Aviso no Windows quando o número SOBE (e já havia uma medição anterior).
-      // master: chegou solicitação nova. comum: um chamado meu foi resolvido.
-      if (lastBadge !== null && n > lastBadge && window.SMERPNotify) {
-        var nova = n - lastBadge;
-        if (isMaster) {
-          window.SMERPNotify.notify(
-            nova > 1 ? ('🔔 ' + nova + ' novas solicitações') : '🔔 Nova solicitação',
-            'Abra o SMERP para ver e responder.',
-            { tag: 'sol-nova', url: (CFG.HUB_URL || '/') }
-          );
-        } else {
-          window.SMERPNotify.notify(
-            '✅ Sua solicitação foi respondida',
-            'O desenvolvedor atualizou um chamado seu.',
-            { tag: 'sol-resolvida', url: (CFG.HUB_URL || '/') }
-          );
-        }
-      }
-      lastBadge = n;
-      return n;
-    }
-
-    // "Vigia": confere periodicamente se entrou/resolveu solicitação (app aberto).
-    function startWatch() {
-      stopWatch();
-      var ms = (CFG.NOTIFY_POLL_MS && CFG.NOTIFY_POLL_MS > 5000) ? CFG.NOTIFY_POLL_MS : 45000;
-      watchTimer = setInterval(function () { refreshBadge(); }, ms);
-    }
-    function stopWatch() { if (watchTimer) { clearInterval(watchTimer); watchTimer = null; } }
-
-    async function open() {
-      build();
-      setErr(''); setOk('');
-      overlay.hidden = false;
-      requestAnimationFrame(function () { overlay.classList.add('is-open'); });
-      loadMyList();
-      if (isMaster) loadAllList();
-      try { await client.rpc('mark_my_solicitacoes_seen'); } catch (e) {}
-      refreshBadge();
-    }
-    function close() {
-      overlay.classList.remove('is-open');
-      setTimeout(function () { overlay.hidden = true; }, 200);
-    }
-
-    navBtn.addEventListener('click', open);
-    overlay.querySelectorAll('[data-close]').forEach(function (el) { el.addEventListener('click', close); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !overlay.hidden) close(); });
-
-    // Enviar um novo chamado.
-    form.addEventListener('submit', async function (e) {
-      e.preventDefault();
-      setErr(''); setOk('');
-      var tipo = elTipo ? elTipo.value : '';
-      var urg = elUrg ? elUrg.value : '';
-      var tit = (elTit.value || '').trim();
-      var desc = (elDesc.value || '').trim();
-      var wpp = elWhats ? (elWhats.value || '').trim() : '';
-      if (!tit) { setErr('Informe um título.'); return; }
-      if (!desc) { setErr('Descreva a solicitação.'); return; }
-      // WhatsApp é opcional; se preenchido, confere a quantidade de dígitos antes de enviar.
-      if (wpp) {
-        var dig = wpp.replace(/\D/g, '');
-        if (dig.length < 10 || dig.length > 13) {
-          setErr('Confira o WhatsApp — use DDD + número, ex.: 54 9 9999-9999.'); return;
-        }
-      }
-
-      elSubmit.disabled = true; var prev = elSubmit.textContent; elSubmit.textContent = 'Enviando…';
-      try {
-        var res = await client.rpc('create_solicitacao', { p_tipo: tipo, p_urgencia: urg, p_titulo: tit, p_descricao: desc, p_whatsapp: wpp });
-        if (res.error) { setErr(res.error.message || 'Não foi possível enviar.'); return; }
-        setOk('Solicitação enviada! O desenvolvedor já pode ver.');
-        if (elTit) elTit.value = ''; if (elDesc) elDesc.value = '';
-        loadMyList();
-        if (isMaster) { loadAllList(); refreshBadge(); }
-      } catch (err) {
-        setErr('Falha ao enviar. Tente novamente.');
-        console.error(err);
-      } finally {
-        elSubmit.disabled = false; elSubmit.textContent = prev;
-      }
-    });
-
-    // Descobre se quem entrou é o master (mostra/oculta a seção "todas").
-    async function gate() {
-      try {
-        var res = await client.rpc('is_master');
-        isMaster = !res.error && res.data === true;
-      } catch (e) { isMaster = false; }
-      if (elMaster) elMaster.hidden = !isMaster;
-    }
-
-    return {
-      gate: gate,
-      refreshBadge: refreshBadge,
-      startWatch: startWatch,
-      stopWatch: stopWatch,
-      hide: function () { stopWatch(); lastBadge = null; close(); updateBadge(0); }
-    };
-  }
-
-  solUI = initSolicitacoes(sb);
-
-  // ============================================================
   //  INOVAÇÃO · DESENVOLVIMENTO — aviso automático de um módulo que
   //  agora mora numa página própria (fora do Hub). Não tem overlay
   //  aqui: só um badge no atalho do "Sistemas" (criado por renderSetores)
@@ -1261,7 +965,7 @@
         btn.hidden = true;
         try { await window.SMERPNotify.subscribePush(sb); } catch (e) {}
         window.SMERPNotify.notify('Avisos ativados ✅',
-          'Você vai receber as solicitações por aqui.', { url: (CFG.HUB_URL || '/') });
+          'Você vai receber os avisos do SMERP por aqui.', { url: (CFG.HUB_URL || '/') });
       } else {
         alert('Não foi possível ativar os avisos — confira a permissão de notificações do navegador.');
       }
@@ -1272,7 +976,7 @@
   sb.auth.onAuthStateChange(function (event, session) {
     if (event === 'SIGNED_OUT' || !session) {
       if (usersUI) usersUI.hide();
-      if (solUI) { solUI.stopWatch(); solUI.hide(); }
+      if (invBadgeUI) invBadgeUI.hide();
       if (engUI) engUI.hide();
       if (!document.body.classList.contains('smerp-booting')) showLoginState();
     }

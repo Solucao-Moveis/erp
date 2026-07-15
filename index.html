@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=25" />
+  <link rel="stylesheet" href="styles.css?v=26" />
 </head>
 <body class="smerp-booting">
   <!-- Botão de tema (sol/lua) — canto superior direito, fixo -->
@@ -188,73 +188,6 @@
     </div>
   </div>
 
-  <!-- ===================== SOLICITAÇÕES (chamados pro dev — todos veem) ===================== -->
-  <div class="smerp-overlay smerp-solic" id="solOverlay" hidden>
-    <div class="smerp-modal__backdrop" data-close></div>
-    <div class="usr sol" role="dialog" aria-modal="true" aria-labelledby="solTitle">
-      <header class="upd__top">
-        <div class="upd__brand">
-          <img class="upd__logo" src="assets/logo-solucao-moveis.png" alt="Solução Móveis" />
-          <div>
-            <h2 class="upd__title" id="solTitle">Solicitações ao desenvolvedor</h2>
-            <p class="upd__sub">Peça uma melhoria nova ou relate um problema do sistema</p>
-          </div>
-        </div>
-        <button class="smerp-modal__close" id="solClose" type="button" aria-label="Fechar" data-close>&times;</button>
-      </header>
-
-      <div class="usr__body sol__body">
-        <!-- COLUNA: abrir um chamado + os meus chamados -->
-        <div class="sol__left">
-          <form class="usr__form sol__form" id="solForm" autocomplete="off">
-            <div class="usr__row2">
-              <label class="smerp-field">
-                <span>Tipo</span>
-                <select id="solTipo" required></select>
-              </label>
-              <label class="smerp-field">
-                <span>Urgência</span>
-                <select id="solUrgencia" required></select>
-              </label>
-            </div>
-
-            <label class="smerp-field">
-              <span>Título</span>
-              <input id="solTitulo" type="text" maxlength="160" placeholder="Resumo curto do pedido" required autocomplete="off" />
-            </label>
-
-            <label class="smerp-field">
-              <span>Descrição</span>
-              <textarea id="solDescricao" rows="4" maxlength="4000" placeholder="Explique o que precisa ou o que está acontecendo" required></textarea>
-            </label>
-
-            <label class="smerp-field">
-              <span>WhatsApp (opcional)</span>
-              <input id="solWhats" type="tel" inputmode="numeric" maxlength="20" placeholder="DDD + número, ex.: 54 9 9999-9999" autocomplete="off" />
-            </label>
-            <p class="sol__hint">Quer ser avisado(a) no WhatsApp quando seu pedido for concluído? É só deixar seu número aqui.</p>
-
-            <p class="smerp-login__error" id="solError" hidden></p>
-            <p class="usr__ok" id="solOk" hidden></p>
-
-            <button class="smerp-login__btn" id="solSubmit" type="submit">Enviar solicitação</button>
-          </form>
-
-          <div class="sol__mine">
-            <div class="usr__side-top"><span class="usr__lbl">Minhas solicitações</span></div>
-            <div class="usr__list sol__list" id="solMyList"></div>
-          </div>
-        </div>
-
-        <!-- COLUNA: todas as solicitações (só o master) -->
-        <aside class="usr__side sol__all" id="solMaster" hidden aria-label="Todas as solicitações">
-          <div class="usr__side-top"><span class="usr__lbl">Todas as solicitações</span></div>
-          <div class="usr__list sol__list" id="solAllList"></div>
-        </aside>
-      </div>
-    </div>
-  </div>
-
   <!-- ===================== ENGENHARIA · ASSISTÊNCIAS (RNC — aba interna) ===================== -->
   <div class="smerp-overlay smerp-eng" id="engOverlay" hidden>
     <div class="smerp-modal__backdrop" data-close></div>
@@ -326,11 +259,6 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
         Usuários
       </button>
-      <button class="nav nav--home" id="btnSolic" type="button" title="Solicitações">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Solicitações
-        <span class="nav__badge" id="solBadge" hidden></span>
-      </button>
       <!-- Avisos do Windows (notificações). Aparece só quando dá pra ativar. -->
       <button class="nav nav--home" id="btnNotif" type="button" title="Receber avisos no computador" hidden>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -398,7 +326,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js"></script>
-  <script src="config.js?v=12"></script>
+  <script src="config.js?v=13"></script>
   <script src="notas.js?v=29"></script>
   <script>
     (function () {
@@ -409,8 +337,8 @@
   </script>
   <script src="notify.js?v=1"></script>
   <script src="engenharia.js?v=3"></script>
-  <script src="script.js?v=20"></script>
-  <script src="mobilenav.js?v=2"></script>
+  <script src="script.js?v=21"></script>
+  <script src="mobilenav.js?v=3"></script>
   <script src="pwa.js?v=3"></script>
   <script src="assistant.js?v=8"></script>
 </body>

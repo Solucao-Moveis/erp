@@ -207,26 +207,5 @@ window.SMERP_CONFIG = {
           { value: 'leitor', label: 'Leitor', desc: 'Consulta OFs, carga de máquina e dashboard (somente leitura)' }
         ] }
     ]
-  },
-
-  // Aba "Solicitações" (chamados pro desenvolvedor). Todos veem o botão.
-  // 'value' precisa casar EXATO com os CHECK do banco (migracao/solicitacoes.sql).
-  SOLICITACOES: {
-    TIPOS: [
-      { value: 'desenvolvimento_novo', label: 'Desenvolvimento novo' },
-      { value: 'manutencao',           label: 'Manutenção do sistema' }
-    ],
-    URGENCIAS: [
-      { value: 'baixa',   label: 'Baixa',   cor: '#6B7280' },
-      { value: 'media',   label: 'Média',   cor: '#2E78D2' },
-      { value: 'alta',    label: 'Alta',    cor: '#E8722A' },
-      { value: 'urgente', label: 'Urgente', cor: '#DC2626' }
-    ],
-    STATUS: {
-      aberta:       { label: 'Aberta',       cor: '#6B7280' },
-      em_andamento: { label: 'Em andamento', cor: '#2E78D2' },
-      concluida:    { label: 'Feito',        cor: '#1F9D55' },
-      recusada:     { label: 'Não feito',    cor: '#DC2626' }
-    }
   }
 };

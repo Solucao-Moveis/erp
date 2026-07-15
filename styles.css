@@ -725,83 +725,13 @@ body.smerp-booting .side { visibility: hidden; }
   .usr__roles { padding-left: 24px; }
 }
 
-/* ===================== SOLICITAÇÕES (chamados pro dev) ===================== */
-.smerp-solic { z-index: 1100; opacity: 0; transition: opacity .2s ease; }
-.smerp-solic.is-open { opacity: 1; }
-.smerp-solic.is-open .smerp-modal__backdrop { opacity: 1; }
-.smerp-solic.is-open .sol { transform: none; }
-
-.sol__body { display: flex; min-height: 0; flex: 1; }
-.sol__left { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow-y: auto; }
-.sol__form { flex: none; overflow: visible; border-bottom: 1px solid var(--border); }
-.sol__form select, .sol__form textarea {
-  font: inherit; width: 100%; color: var(--ink);
-  border: 1px solid var(--border); border-radius: 10px; background: var(--panel); padding: 10px 12px;
-}
-.sol__form textarea { resize: vertical; min-height: 84px; }
-.sol__hint { font-size: 12px; color: var(--ink-soft); margin: -2px 0 2px; }
-
-.sol__mine { padding: 16px 16px 10px; display: flex; flex-direction: column; gap: 8px; }
-.sol__mine .usr__side-top { padding: 0; }
-.sol__left .sol__list { flex: none; overflow: visible; padding: 0; }
-
-.sol__all { width: 380px; }
-
-.sol__item {
-  background: var(--panel); border: 1px solid var(--border); border-radius: 11px;
-  padding: 11px 13px; display: flex; flex-direction: column; gap: 7px;
-}
-.sol__item-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.sol__item-title { font-size: 14px; font-weight: 700; color: var(--ink); flex: 1; min-width: 0; }
-.sol__item-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.sol__item-tipo { font-size: 11px; font-weight: 700; color: var(--ink-soft); background: var(--surface-hi); border-radius: 6px; padding: 2px 8px; }
-.sol__item-date { font-size: 11px; color: var(--ink-soft); }
-.sol__item-who { font-size: 12px; font-weight: 700; color: var(--ink); }
-.sol__item-mail { font-weight: 500; color: var(--ink-soft); }
-.sol__item-desc { font-size: 13px; color: var(--ink); white-space: pre-wrap; word-break: break-word; }
-
-.sol__urg, .sol__status {
-  font-size: 10px; font-weight: 800; color: #fff; background: var(--c, #6B7280);
-  border-radius: 999px; padding: 2px 9px; letter-spacing: .3px; text-transform: uppercase; white-space: nowrap;
-}
-.sol__new { font-size: 10px; font-weight: 800; color: #fff; background: #DC2626; border-radius: 999px; padding: 2px 8px; text-transform: uppercase; }
-
-.sol__resp {
-  font-size: 12.5px; color: var(--ink); background: var(--surface);
-  border: 1px solid var(--border); border-left: 3px solid #1F9D55; border-radius: 8px; padding: 8px 10px;
-}
-
-.sol__ctrl { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 2px; }
-.sol__ctrl-status, .sol__ctrl-resp {
-  font: inherit; font-size: 12px; color: var(--ink);
-  border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; background: var(--panel);
-}
-.sol__ctrl-resp { flex: 1; min-width: 120px; }
-.sol__ctrl-save {
-  font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
-  border: 1px solid var(--orange); background: var(--orange-soft); color: var(--orange);
-  border-radius: 8px; padding: 6px 12px; transition: background .15s ease, color .15s ease;
-}
-.sol__ctrl-save:hover { background: var(--orange); color: #fff; }
-.sol__ctrl-del {
-  font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
-  border: 1px solid #DC2626; background: #FEECEC; color: #DC2626;
-  border-radius: 8px; padding: 6px 12px; transition: background .15s ease, color .15s ease;
-}
-.sol__ctrl-del:hover { background: #DC2626; color: #fff; }
-
-/* aviso (badge) no botão "Solicitações" da sidebar */
+/* aviso (badge) nos atalhos da sidebar (ex.: Desenvolvimento) */
 .nav__badge {
   margin-left: auto; min-width: 18px; height: 18px; padding: 0 5px;
   border-radius: 999px; background: #DC2626; color: #fff;
   font-size: 11px; font-weight: 800; line-height: 18px; text-align: center;
 }
 .nav__badge[hidden] { display: none; }
-
-@media (max-width: 760px) {
-  .sol__body { flex-direction: column; }
-  .sol__all { width: auto; border-left: none; border-top: 1px solid var(--border); max-height: 42vh; }
-}
 
 /* ============================================================
    MODO ESCURO — só redefine os tokens (o resto do CSS já usa var()).
@@ -822,9 +752,6 @@ html.dark {
   --shadow-hover:  0 18px 44px rgba(0,0,0,0.60);
   --shadow-panel:  0 8px 28px rgba(0,0,0,0.55);
 }
-/* botão de excluir (vermelho suave) fica legível no escuro */
-html.dark .sol__ctrl-del { background: rgba(220,38,38,0.14); border-color: rgba(220,38,38,0.5); color: #FCA5A5; }
-html.dark .sol__ctrl-del:hover { background: #DC2626; color: #fff; }
 /* splash: aura um pouco mais contida no escuro */
 html.dark .smerp-loading {
   background:
