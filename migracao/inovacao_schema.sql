@@ -11,8 +11,9 @@
 -- board só, não multi-projeto: evita a fragilidade de nome de coluna
 -- livre (problema visto no Kanban de Projetos do Gerencial).
 --
--- O módulo mora DENTRO do Hub (site estático 'erp'), como o
--- "engenharia" (RNC) — não é um app satélite.
+-- O front mora numa página separada (/desenvolvimento/, dentro do mesmo
+-- deploy estático do Hub, igual /institucional/) — o Hub só linka pra lá
+-- via SSO, não é mais um overlay nativo (isso é só o backend/schema).
 --
 -- Idempotente: roda do começo ao fim várias vezes no SQL Editor do Supabase.
 --
@@ -72,9 +73,13 @@ create table if not exists inovacao.solicitacoes (
   created_by_email text,
   moved_by         uuid references auth.users(id), -- auditoria: quem moveu por último
 
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now(),
+  resolved_at timestamptz -- setado quando entra em 'finalizado'/'recusado' (pro Dashboard)
 );
+-- (schema já existia em produção sem esta coluna — garante que ela apareça)
+alter table inovacao.solicitacoes add column if not exists resolved_at timestamptz;
+
 create index if not exists idx_inov_sol_coluna     on inovacao.solicitacoes (coluna, created_at);
 create index if not exists idx_inov_sol_created_by on inovacao.solicitacoes (created_by, created_at desc);
 
@@ -262,7 +267,8 @@ begin
      set coluna        = p_coluna,
          moved_by       = auth.uid(),
          data_prevista  = case when p_coluna = 'desenvolvimento' then p_data_prevista else data_prevista end,
-         motivo_recusa  = case when p_coluna = 'recusado' then v_motivo else motivo_recusa end
+         motivo_recusa  = case when p_coluna = 'recusado' then v_motivo else motivo_recusa end,
+         resolved_at    = case when p_coluna in ('finalizado','recusado') then now() else null end
    where id = p_id;
   if not found then raise exception 'Solicitação não encontrada.'; end if;
 
@@ -314,6 +320,55 @@ as $$
 $$;
 revoke all on function inovacao.marcar_notificacoes_vistas() from public, anon;
 grant execute on function inovacao.marcar_notificacoes_vistas() to authenticated;
+
+-- Dashboard (só gestor): funil por coluna, resolvidas no período, tempo
+-- médio de resolução e ranking de quem mais pediu.
+create or replace function inovacao.dashboard(_de date default null, _ate date default null)
+returns jsonb
+language plpgsql stable security definer set search_path = inovacao, public
+as $$
+begin
+  if not inovacao.is_gestor() then
+    raise exception 'Sem permissão para ver o dashboard.' using errcode = '42501';
+  end if;
+
+  return (
+    with base as (
+      select * from inovacao.solicitacoes s
+       where (_de  is null or s.created_at::date >= _de)
+         and (_ate is null or s.created_at::date <= _ate)
+    ),
+    por_coluna as (
+      select coluna, count(*)::int as n from base group by coluna
+    ),
+    por_mes as (
+      select to_char(date_trunc('month', resolved_at), 'YYYY-MM') as mes, count(*)::int as n
+        from base where coluna = 'finalizado' and resolved_at is not null
+       group by 1 order by 1
+    ),
+    ranking as (
+      select coalesce(nullif(btrim(created_by_nome), ''), created_by_email, '(sem nome)') as nome, count(*)::int as n
+        from base group by 1 order by n desc, nome limit 8
+    )
+    select jsonb_build_object(
+      'total',           (select count(*)::int from base),
+      'solicitacao',     coalesce((select n from por_coluna where coluna = 'solicitacao'), 0),
+      'analise',         coalesce((select n from por_coluna where coluna = 'analise'), 0),
+      'desenvolvimento', coalesce((select n from por_coluna where coluna = 'desenvolvimento'), 0),
+      'finalizado',      coalesce((select n from por_coluna where coluna = 'finalizado'), 0),
+      'recusado',        coalesce((select n from por_coluna where coluna = 'recusado'), 0),
+      'tempo_medio_dias', (
+        select round(extract(epoch from avg(resolved_at - created_at)) / 86400, 1)
+          from base where coluna = 'finalizado' and resolved_at is not null
+      ),
+      'por_mes',  coalesce((select jsonb_agg(jsonb_build_object('mes', mes, 'n', n)) from por_mes), '[]'::jsonb),
+      'ranking',  coalesce((select jsonb_agg(jsonb_build_object('nome', nome, 'n', n)) from ranking), '[]'::jsonb)
+    )
+  );
+end;
+$$;
+revoke all on function inovacao.dashboard(date, date) from public, anon;
+grant execute on function inovacao.dashboard(date, date) to authenticated;
 
 -- ============================================================
 -- RLS  (defesa em profundidade — as RPCs security definer já validam
@@ -394,3 +449,4 @@ on conflict (user_id) do nothing;
 --   select inovacao.quadro();                     -- só gestor
 --   select inovacao.mover_solicitacao('<id>', 'analise');
 --   select inovacao.badge();
+--   select inovacao.dashboard();                  -- só gestor

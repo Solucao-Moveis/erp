@@ -10,15 +10,15 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
-    versao: '6.38',
+    versao: '6.39',
     data: '15/07/2026',
     titulo: 'Novo setor Inovação → Desenvolvimento: peça uma melhoria pro dev',
     resumo: 'Todo mundo agora pode abrir um pedido de desenvolvimento direto pelo ERP, com print de tela, e acompanhar o andamento até ser entregue.',
     mudancas: [
       {
         app: 'Inovação → Desenvolvimento (novo)',
-        o_que: 'Kanban de solicitações de desenvolvimento: Solicitação → Em Análise/Priorizado → Em Desenvolvimento → Finalizado (ou Recusado).',
-        como: 'Clique em "Desenvolvimento" na barra lateral (ou no card do setor "Inovação"). Preencha título, o que você quer, como gostaria que funcionasse e a finalidade do pedido — os quatro são obrigatórios. Se quiser, cole um print da tela com Ctrl+V ou arraste a imagem pro quadro de anexo (opcional). Depois de enviar, acompanhe o status em "Minhas solicitações" — você recebe um aviso a cada mudança (entrou em análise, começou o desenvolvimento — com a previsão de entrega — foi finalizado ou recusado, com o motivo).',
+        o_que: 'Kanban de solicitações de desenvolvimento (Solicitação → Em Análise/Priorizado → Em Desenvolvimento → Finalizado ou Recusado) + Dashboard de solicitações resolvidas, numa tela própria.',
+        como: 'Clique no card do setor "Inovação → Desenvolvimento" no ERP. Preencha título, o que você quer, como gostaria que funcionasse e a finalidade do pedido — os quatro são obrigatórios. Se quiser, cole um print da tela com Ctrl+V ou arraste a imagem pro quadro de anexo (opcional). Depois de enviar, acompanhe o status em "Minhas solicitações": entrou em análise, começou o desenvolvimento (com a previsão de entrega), foi finalizado ou recusado (com o motivo).',
       },
     ],
   },
