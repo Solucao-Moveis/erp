@@ -212,7 +212,8 @@
     truck: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
     book:  '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
     shield: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
-    users: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
+    users: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    bulb:  '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M15.09 14c.937-.834 1.91-2.084 1.91-4a5 5 0 1 0-10 0c0 1.916.973 3.166 1.91 4 .53.47.99 1.077.99 1.766V17h4.2v-1.234c0-.69.46-1.297.99-1.766z"/></svg>'
   };
   var SETOR_CHEVRON = '<svg class="setor__chev" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
   var ARROW = '<svg class="sys__go" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
@@ -443,6 +444,9 @@
     if (solUI) { solUI.gate(); solUI.refreshBadge(); solUI.startWatch(); }
     // Engenharia: mostra a aba só p/ quem tem acesso ao módulo
     if (engUI) engUI.gate();
+    // Inovação/Desenvolvimento: badge/aviso + libera a aba "Quadro" só p/ gestor
+    // (invUI.gate() descobre o papel e avisa o módulo via setIsGestor)
+    if (invUI) { invUI.gate(); invUI.refreshBadge(); invUI.startWatch(); }
     // Avisos no Windows: mostra o botão "Ativar avisos" se ainda não decidiram;
     // se já está permitido, garante a inscrição do Web Push (app fechado).
     if (window.SMERPNotify) {
@@ -459,9 +463,10 @@
 
   // Abre o app na MESMA aba, levando a sessão atual no hash (SSO).
   async function openApp(system, path) {
-    // Engenharia é um MÓDULO INTERNO do Hub (overlay), não um app externo:
-    // abre a tela aqui mesmo em vez de redirecionar.
+    // Engenharia e Inovação são MÓDULOS INTERNOS do Hub (overlay), não apps
+    // externos: abrem a tela aqui mesmo em vez de redirecionar.
     if (system === 'engenharia') { if (engUI && engUI.open) engUI.open(); return; }
+    if (system === 'inovacao') { if (window.SMERPInovacao && window.SMERPInovacao.open) window.SMERPInovacao.open(); return; }
     var url = CFG.APPS && CFG.APPS[system];
     if (!url) return;
     // 'path' opcional: abre uma sub-rota do app (ex.: bip em modo celular -> /apontar).
@@ -610,6 +615,8 @@
       if (usersUI) usersUI.hide();
       if (solUI) solUI.hide();
       if (engUI) engUI.hide();
+      if (invUI) invUI.hide();
+      if (window.SMERPInovacao && window.SMERPInovacao.hide) window.SMERPInovacao.hide();
       if (loginPassword) loginPassword.value = '';
       showLoginState();
     });
@@ -1172,9 +1179,77 @@
 
   solUI = initSolicitacoes(sb);
 
+  // ============================================================
+  //  INOVAÇÃO · DESENVOLVIMENTO — badge/aviso no Windows (o quadro em
+  //  si mora em inovacao.js). Segue o mesmo molde de initSolicitacoes:
+  //  botão fixo na sidebar, poll periódico, SMERPNotify quando sobe.
+  // ============================================================
+  function initInovacao(client) {
+    var navBtn = $('btnInov'), elBadge = $('invBadge');
+    if (!navBtn) return null;
+
+    var db = function () { return client.schema('inovacao'); };
+    var isGestor = false, lastBadge = null, watchTimer = null;
+
+    function updateBadge(n) {
+      n = n || 0;
+      if (!elBadge) return;
+      if (n > 0) { elBadge.textContent = n > 99 ? '99+' : String(n); elBadge.hidden = false; navBtn.classList.add('has-badge'); }
+      else { elBadge.hidden = true; navBtn.classList.remove('has-badge'); }
+    }
+
+    async function gate() {
+      try { var r = await db().rpc('is_gestor'); isGestor = !r.error && r.data === true; }
+      catch (e) { isGestor = false; }
+      if (window.SMERPInovacao && window.SMERPInovacao.setIsGestor) window.SMERPInovacao.setIsGestor(isGestor);
+    }
+
+    async function refreshBadge() {
+      var n = 0;
+      try { var res = await db().rpc('badge'); n = !res.error ? (res.data || 0) : 0; }
+      catch (e) { n = 0; }
+      updateBadge(n);
+      if (lastBadge !== null && n > lastBadge && window.SMERPNotify) {
+        window.SMERPNotify.notify(
+          isGestor ? '💡 Nova solicitação de desenvolvimento' : '💡 Sua solicitação foi atualizada',
+          isGestor ? 'Abra o SMERP e veja a aba Desenvolvimento.' : 'Veja a mudança na aba Desenvolvimento do SMERP.',
+          { tag: 'inov', url: (CFG.HUB_URL || '/') }
+        );
+      }
+      lastBadge = n;
+      return n;
+    }
+
+    function startWatch() {
+      stopWatch();
+      var ms = (CFG.NOTIFY_POLL_MS && CFG.NOTIFY_POLL_MS > 5000) ? CFG.NOTIFY_POLL_MS : 45000;
+      watchTimer = setInterval(function () { refreshBadge(); }, ms);
+    }
+    function stopWatch() { if (watchTimer) { clearInterval(watchTimer); watchTimer = null; } }
+
+    navBtn.addEventListener('click', function () {
+      if (window.SMERPInovacao && window.SMERPInovacao.open) window.SMERPInovacao.open();
+    });
+
+    return {
+      gate: gate,
+      refreshBadge: refreshBadge,
+      startWatch: startWatch,
+      stopWatch: stopWatch,
+      hide: function () { stopWatch(); lastBadge = null; updateBadge(0); }
+    };
+  }
+
+  var invUI = initInovacao(sb);
+
   // Engenharia · Assistências (aba interna; lógica em engenharia.js)
   var engUI = (window.SMERPEngenharia && window.SMERPEngenharia.init)
     ? window.SMERPEngenharia.init(sb) : null;
+
+  // Inovação · Desenvolvimento (aba interna; lógica em inovacao.js).
+  // Diferente do engenharia.js, expõe os métodos direto em window.SMERPInovacao
+  // (singleton) — não precisa guardar o retorno do init().
+  if (window.SMERPInovacao && window.SMERPInovacao.init) window.SMERPInovacao.init(sb);
 
   // --- Avisos no Windows: botão "Ativar avisos" + inscrição de Web Push ---
   // Mostra o botão só quando dá pra decidir (permissão 'default'); some quando

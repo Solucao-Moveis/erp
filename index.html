@@ -289,6 +289,38 @@
     <div id="engPdfStage" aria-hidden="true" style="position:fixed;left:-99999px;top:0;width:210mm;"></div>
   </div>
 
+  <!-- ===================== INOVAÇÃO · DESENVOLVIMENTO (Kanban — aba interna) ===================== -->
+  <div class="smerp-overlay smerp-inov" id="invOverlay" hidden>
+    <div class="smerp-modal__backdrop" data-close></div>
+    <div class="usr inov" role="dialog" aria-modal="true" aria-labelledby="invTitle">
+      <header class="upd__top">
+        <div class="upd__brand">
+          <img class="upd__logo" src="assets/logo-solucao-moveis.png" alt="Solução Móveis" />
+          <div>
+            <h2 class="upd__title" id="invTitle">Inovação · Desenvolvimento</h2>
+            <p class="upd__sub">Peça uma melhoria no ERP e acompanhe o andamento do seu pedido</p>
+          </div>
+        </div>
+        <button class="eng__back" id="invClose" type="button" data-close aria-label="Voltar ao ERP">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Voltar ao ERP
+        </button>
+      </header>
+
+      <div class="eng__tabs" role="tablist">
+        <button class="eng__tab is-active" data-tab="novo" type="button">＋ Nova solicitação</button>
+        <button class="eng__tab" data-tab="minhas" type="button">Minhas solicitações</button>
+        <button class="eng__tab" data-tab="quadro" type="button" id="invTabQuadro" hidden>Quadro</button>
+      </div>
+
+      <div class="eng__body">
+        <div class="eng__panel" id="invPanelNovo"></div>
+        <div class="eng__panel" id="invPanelMinhas" hidden></div>
+        <div class="eng__panel" id="invPanelQuadro" hidden></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================== APP SHELL (sidebar por sistema + principal por setor) ===================== -->
   <div class="app">
     <!-- TOPO MOBILE: hambúrguer + marca (só aparece no celular) -->
@@ -330,6 +362,11 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         Solicitações
         <span class="nav__badge" id="solBadge" hidden></span>
+      </button>
+      <button class="nav nav--home" id="btnInov" type="button" title="Inovação · Desenvolvimento">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M15.09 14c.937-.834 1.91-2.084 1.91-4a5 5 0 1 0-10 0c0 1.916.973 3.166 1.91 4 .53.47.99 1.077.99 1.766V17h4.2v-1.234c0-.69.46-1.297.99-1.766z"/></svg>
+        Desenvolvimento
+        <span class="nav__badge" id="invBadge" hidden></span>
       </button>
       <!-- Avisos do Windows (notificações). Aparece só quando dá pra ativar. -->
       <button class="nav nav--home" id="btnNotif" type="button" title="Receber avisos no computador" hidden>
@@ -409,7 +446,8 @@
   </script>
   <script src="notify.js?v=1"></script>
   <script src="engenharia.js?v=3"></script>
-  <script src="script.js?v=18"></script>
+  <script src="inovacao.js?v=1"></script>
+  <script src="script.js?v=19"></script>
   <script src="mobilenav.js?v=2"></script>
   <script src="pwa.js?v=3"></script>
   <script src="assistant.js?v=8"></script>

@@ -83,6 +83,14 @@ as $$
             then '["usuario"]'::jsonb
           end
         ),
+        -- Inovacao -> Desenvolvimento: modulo interno do Hub. TODO usuario
+        -- autenticado tem acesso (abre solicitacao); o papel de fato
+        -- (solicitante/gestor) e' resolvido no front via inovacao.is_gestor().
+        'inovacao', (
+          select case when auth.uid() is not null
+            then '["usuario"]'::jsonb
+          end
+        ),
         'engenharia', (
           -- Modulo interno do Hub (aba "Engenharia" -> Assistencia / RNC).
           select case when exists (select 1 from engenharia.profiles where id = auth.uid())

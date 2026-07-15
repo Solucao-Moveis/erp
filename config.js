@@ -99,6 +99,9 @@ window.SMERP_CONFIG = {
       ] },
     { id: 'utilitarios',    nome: 'Utilitários',           icon: 'book',  cor: '#0891B2', modulos: [
         { system: 'utilitarios', nome: 'Caderno', desc: 'Wiki/anotações: documentação pessoal e bases compartilhadas por equipe' }
+      ] },
+    { id: 'inovacao',       nome: 'Inovação',              icon: 'bulb',  cor: '#F59E0B', modulos: [
+        { system: 'inovacao', nome: 'Desenvolvimento', desc: 'Peça uma melhoria/desenvolvimento no ERP e acompanhe o andamento' }
       ] }
   ],
 
@@ -222,5 +225,17 @@ window.SMERP_CONFIG = {
       concluida:    { label: 'Feito',        cor: '#1F9D55' },
       recusada:     { label: 'Não feito',    cor: '#DC2626' }
     }
+  },
+
+  // Setor "Inovação" → aba "Desenvolvimento" (Kanban de solicitações pro dev).
+  // 'value' precisa casar EXATO com o enum inovacao.status_coluna do banco.
+  INOVACAO: {
+    COLUNAS: [
+      { value: 'solicitacao',     label: 'Solicitação',            cor: '#6B7280' },
+      { value: 'analise',         label: 'Em Análise/Priorizado',  cor: '#2E78D2' },
+      { value: 'desenvolvimento', label: 'Em Desenvolvimento',     cor: '#F59E0B' },
+      { value: 'finalizado',      label: 'Finalizado',             cor: '#1F9D55' },
+      { value: 'recusado',        label: 'Recusado',               cor: '#DC2626' }
+    ]
   }
 };
