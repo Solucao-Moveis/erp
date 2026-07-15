@@ -437,7 +437,8 @@ create policy inov_anexos_write on storage.objects
 -- BOOTSTRAP — promova você mesmo a gestor (troque o e-mail se precisar)
 -- ============================================================
 insert into inovacao.gestores (user_id)
-select id from auth.users where lower(email) = 'fszcdi@gmail.com'
+select id from auth.users
+ where lower(email) in ('fszcdi@gmail.com', 'master@solucaomoveis.ind.br')
 on conflict (user_id) do nothing;
 
 -- ============================================================
