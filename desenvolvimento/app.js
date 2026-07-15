@@ -1,9 +1,9 @@
 /* ============================================================
    Desenvolvimento (Inovação) — página própria, separada do Hub.
-   Reaproveita o design system do ERP (../styles.css: mesma cor,
-   fonte e componentes do resto do SMERP — classes eng-, usr, upd__
-   já usadas pelo módulo Engenharia) + um complemento local só pro
-   quadro/kanban e dropzone de anexo (styles.css desta pasta).
+   Usa a MESMA casca do Hub (classes app/side/main de ../styles.css,
+   a mesma barra lateral recolhível que todo o ERP usa) — só que a
+   barra aqui lista PÁGINAS (Nova solicitação, Minhas solicitações,
+   Quadro, Dashboard) em vez de setores.
    ------------------------------------------------------------
    - Nova solicitação / Minhas solicitações: qualquer usuário do ERP.
    - Quadro / Dashboard: só quem está em inovacao.gestores.
@@ -24,6 +24,25 @@
     { value: 'recusado',        label: 'Recusado',               cor: '#DC2626' }
   ];
 
+  var ICONS = {
+    novo:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>',
+    lista: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>',
+    quadro: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="6" height="16" rx="1"/><rect x="10" y="4" width="6" height="10" rx="1"/><rect x="17" y="4" width="4" height="7" rx="1"/></svg>',
+    dash:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg>',
+    back:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>',
+    total: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M15.09 14c.937-.834 1.91-2.084 1.91-4a5 5 0 1 0-10 0c0 1.916.973 3.166 1.91 4 .53.47.99 1.077.99 1.766V17h4.2v-1.234c0-.69.46-1.297.99-1.766z"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>',
+    timer: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4M12 14l3-3M12 22a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/></svg>'
+  };
+
+  var PAGINAS = [
+    { id: 'novo',      titulo: 'Nova solicitação',     sub: 'Descreva o pedido com o máximo de detalhe', icon: 'novo',   todos: true },
+    { id: 'minhas',    titulo: 'Minhas solicitações',  sub: 'Acompanhe o status dos seus pedidos',        icon: 'lista',  todos: true },
+    { id: 'quadro',    titulo: 'Quadro',               sub: 'Solicitação → Análise → Desenvolvimento → Finalizado', icon: 'quadro', todos: false },
+    { id: 'dashboard', titulo: 'Dashboard',            sub: 'Visão geral das solicitações de desenvolvimento',       icon: 'dash',   todos: false }
+  ];
+
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -39,11 +58,18 @@
     for (var i = 0; i < COLUNAS.length; i++) if (COLUNAS[i].value === value) return COLUNAS[i];
     return { value: value, label: value, cor: '#6B7280' };
   }
+  function iniciais(nome, email) {
+    var base = (nome || email || '?').trim();
+    var partes = base.split(/\s+/);
+    if (partes.length >= 2) return (partes[0][0] + partes[1][0]).toUpperCase();
+    return base.slice(0, 2).toUpperCase();
+  }
 
   var sb = null;
   var isGestor = false;
   var pendentes = [];
   var cacheQuadro = [];
+  var paginaAtual = 'novo';
 
   function db() { return sb.schema('inovacao'); }
 
@@ -60,70 +86,70 @@
     window.history.replaceState(null, '', window.location.pathname + window.location.search);
   }
 
-  var BACK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>';
+  // ============================================================
+  //  Casca (mesma barra lateral .app/.side/.main do Hub)
+  // ============================================================
+  function paginasVisiveis() { return PAGINAS.filter(function (p) { return p.todos || isGestor; }); }
 
-  // ============================================================
-  //  Casca da página (mesma "roupa" do overlay de Engenharia)
-  // ============================================================
   function renderShell(user) {
+    var itens = paginasVisiveis();
     document.getElementById('app').innerHTML =
-      '<div class="usr dev">' +
-        '<header class="upd__top">' +
-          '<div class="upd__brand">' +
-            '<img class="upd__logo" src="../assets/logo-solucao-moveis.png" alt="Solução Móveis" />' +
-            '<div><h2 class="upd__title">Desenvolvimento</h2><p class="upd__sub">Peça uma melhoria e acompanhe o andamento do seu pedido</p></div>' +
-          '</div>' +
-          '<div style="display:flex;align-items:center;gap:14px">' +
-            '<span style="font-size:12.5px;color:var(--ink-soft)">' + esc(user.email || '') + '</span>' +
-            '<a class="eng__back" href="' + esc(HUB_URL) + '">' + BACK_ICON + ' Voltar ao ERP</a>' +
-          '</div>' +
-        '</header>' +
-        '<div class="eng__tabs" role="tablist" id="dvTabs">' +
-          '<button class="eng__tab is-active" data-tab="novo" type="button">＋ Nova solicitação</button>' +
-          '<button class="eng__tab" data-tab="minhas" type="button">Minhas solicitações</button>' +
-          '<button class="eng__tab" data-tab="quadro" type="button" id="dvTabQuadro" hidden>Quadro</button>' +
-          '<button class="eng__tab" data-tab="dashboard" type="button" id="dvTabDash" hidden>Dashboard</button>' +
+      '<aside class="side">' +
+        '<a class="side__brand" href="' + esc(HUB_URL) + '">' +
+          '<img src="../assets/logo-solucao-moveis.png" alt="Solução Móveis" />' +
+          '<span class="side__brand-txt"><b>SMERP</b><span>Desenvolvimento</span></span>' +
+        '</a>' +
+        '<div class="side__lbl">Páginas</div>' +
+        '<nav id="devNav">' + itens.map(function (p) {
+          return '<button class="nav nav--home" type="button" data-page="' + p.id + '">' +
+            ICONS[p.icon] + p.titulo + '</button>';
+        }).join('') + '</nav>' +
+        '<div style="flex:1"></div>' +
+        '<a class="side__back" href="' + esc(HUB_URL) + '">' + ICONS.back + ' Voltar ao ERP</a>' +
+        '<div class="side__user">' +
+          '<div class="side__av">' + esc(iniciais(null, user.email)) + '</div>' +
+          '<div class="side__userinfo"><span class="user-email">' + esc(user.email || '') + '</span></div>' +
         '</div>' +
-        '<div class="eng__body">' +
-          '<div class="eng__panel" id="dvPanelNovo"></div>' +
-          '<div class="eng__panel" id="dvPanelMinhas" hidden></div>' +
-          '<div class="eng__panel" id="dvPanelQuadro" hidden></div>' +
-          '<div class="eng__panel" id="dvPanelDash" hidden></div>' +
-        '</div>' +
-      '</div>';
+      '</aside>' +
+      '<main class="main" id="devMain"></main>';
 
-    $('dvTabs').querySelectorAll('.eng__tab').forEach(function (b) {
-      b.addEventListener('click', function () { setTab(b.getAttribute('data-tab')); });
+    $('devNav').querySelectorAll('.nav').forEach(function (b) {
+      b.addEventListener('click', function () { setPagina(b.getAttribute('data-page')); });
     });
   }
 
   function renderGate(msg) {
     document.getElementById('app').innerHTML =
-      '<div class="dev-gate">' +
+      '<div class="dev-gate" style="grid-column:1/-1">' +
         '<h1>Desenvolvimento</h1>' +
         '<p>' + esc(msg) + '</p>' +
         '<a class="smerp-login__btn" style="display:inline-block;text-decoration:none" href="' + esc(HUB_URL) + '">Ir para o SMERP</a>' +
       '</div>';
   }
 
-  function setTab(tab) {
-    document.querySelectorAll('.eng__tab').forEach(function (b) { b.classList.toggle('is-active', b.getAttribute('data-tab') === tab); });
-    $('dvPanelNovo').hidden = tab !== 'novo';
-    $('dvPanelMinhas').hidden = tab !== 'minhas';
-    $('dvPanelQuadro').hidden = tab !== 'quadro';
-    $('dvPanelDash').hidden = tab !== 'dashboard';
-    if (tab === 'novo' && !$('dvPanelNovo').innerHTML) renderNovo();
-    if (tab === 'minhas') renderMinhas();
-    if (tab === 'quadro' && isGestor) renderQuadro();
-    if (tab === 'dashboard' && isGestor) renderDashboard();
+  function setPagina(id) {
+    paginaAtual = id;
+    document.querySelectorAll('#devNav .nav').forEach(function (b) {
+      b.classList.toggle('is-active', b.getAttribute('data-page') === id);
+    });
+    var info = PAGINAS.filter(function (p) { return p.id === id; })[0] || PAGINAS[0];
+    var main = $('devMain');
+    main.innerHTML =
+      '<div class="main__top"><div><p class="hello">Desenvolvimento</p><h1 class="h1">' + esc(info.titulo) + '</h1><p class="sub">' + esc(info.sub) + '</p></div></div>' +
+      '<div id="devBody"></div>';
+
+    if (id === 'novo') renderNovo();
+    if (id === 'minhas') renderMinhas();
+    if (id === 'quadro' && isGestor) renderQuadro();
+    if (id === 'dashboard' && isGestor) renderDashboard();
   }
 
   // ============================================================
-  //  ABA 1 — NOVA SOLICITAÇÃO
+  //  PÁGINA — NOVA SOLICITAÇÃO
   // ============================================================
   function renderNovo() {
-    $('dvPanelNovo').innerHTML =
-      '<form id="dvForm" autocomplete="off" class="eng-form">' +
+    $('devBody').innerHTML =
+      '<form id="dvForm" autocomplete="off" class="eng-form" style="margin-top:24px">' +
         '<p class="eng-form__hd">Capriche no detalhe: quanto mais completo, mais rápido dá pra entender e resolver.</p>' +
 
         '<label class="smerp-field"><span>Título</span><input id="dv_titulo" type="text" maxlength="160" placeholder="Resumo curto do pedido" /></label>' +
@@ -217,21 +243,21 @@
   }
 
   // ============================================================
-  //  ABA 2 — MINHAS SOLICITAÇÕES
+  //  PÁGINA — MINHAS SOLICITAÇÕES
   // ============================================================
   async function renderMinhas() {
-    var box = $('dvPanelMinhas');
-    box.innerHTML = '<p class="usr__empty">Carregando…</p>';
+    var box = $('devBody');
+    box.innerHTML = '<p class="usr__empty" style="margin-top:24px">Carregando…</p>';
     try {
       var res = await db().rpc('minhas_solicitacoes');
       if (res.error) throw res.error;
       var rows = res.data || [];
       box.innerHTML = rows.length
         ? '<div class="kb-mine">' + rows.map(minhaItemHtml).join('') + '</div>'
-        : '<p class="usr__empty">Você ainda não abriu nenhuma solicitação.</p>';
+        : '<p class="usr__empty" style="margin-top:24px">Você ainda não abriu nenhuma solicitação.</p>';
       try { await db().rpc('marcar_notificacoes_vistas'); } catch (e) {}
     } catch (e) {
-      box.innerHTML = '<p class="usr__empty">Não foi possível carregar.</p>';
+      box.innerHTML = '<p class="usr__empty" style="margin-top:24px">Não foi possível carregar.</p>';
       console.error('[DEV] minhas_solicitacoes', e);
     }
   }
@@ -253,18 +279,18 @@
   }
 
   // ============================================================
-  //  ABA 3 — QUADRO (só gestor)
+  //  PÁGINA — QUADRO (só gestor)
   // ============================================================
   async function renderQuadro() {
-    var box = $('dvPanelQuadro');
-    box.innerHTML = '<p class="usr__empty">Carregando…</p>';
+    var box = $('devBody');
+    box.innerHTML = '<p class="usr__empty" style="margin-top:24px">Carregando…</p>';
     try {
       var res = await db().rpc('quadro');
       if (res.error) throw res.error;
       cacheQuadro = res.data || [];
       drawQuadro();
     } catch (e) {
-      box.innerHTML = '<p class="usr__empty">Não foi possível carregar.</p>';
+      box.innerHTML = '<p class="usr__empty" style="margin-top:24px">Não foi possível carregar.</p>';
       console.error('[DEV] quadro', e);
     }
   }
@@ -282,7 +308,7 @@
   }
 
   function drawQuadro() {
-    var box = $('dvPanelQuadro');
+    var box = $('devBody');
     box.innerHTML = '<div class="kb-board">' + COLUNAS.map(function (c) {
       var itens = cacheQuadro.filter(function (s) { return s.coluna === c.value; });
       return '<div class="kb-col" data-coluna="' + esc(c.value) + '">' +
@@ -397,12 +423,12 @@
   }
 
   // ============================================================
-  //  ABA 4 — DASHBOARD (só gestor)
+  //  PÁGINA — DASHBOARD (só gestor)
   // ============================================================
   async function renderDashboard() {
-    var box = $('dvPanelDash');
+    var box = $('devBody');
     box.innerHTML =
-      '<div class="eng-dash__bar">' +
+      '<div class="eng-dash__bar" style="margin-top:20px">' +
         '<label class="eng-f"><span>De</span><input type="date" id="dd_de" /></label>' +
         '<label class="eng-f"><span>Até</span><input type="date" id="dd_ate" /></label>' +
         '<button class="eng-btn-ghost" id="dd_go" type="button">Atualizar</button>' +
@@ -426,13 +452,20 @@
     }
   }
 
+  function statCard(label, n, icone, cor, corSoft, desc) {
+    return '<div class="stat" style="--c:' + cor + ';--c-soft:' + corSoft + '">' +
+      '<div class="stat__top"><span class="stat__lbl">' + esc(label) + '</span><span class="stat__ic">' + ICONS[icone] + '</span></div>' +
+      '<span class="stat__n">' + n + '</span><span class="stat__d">' + esc(desc) + '</span>' +
+    '</div>';
+  }
+
   function dashHtml(d) {
-    var kpis = [
-      ['Total de solicitações', d.total || 0, '#E8722A'],
-      ['Em desenvolvimento', d.desenvolvimento || 0, '#2E78D2'],
-      ['Finalizadas', d.finalizado || 0, '#1F9D55'],
-      ['Tempo médio de resolução', (d.tempo_medio_dias != null ? d.tempo_medio_dias + ' dia(s)' : '—'), '#8B5CF6']
-    ];
+    var stats =
+      statCard('Total de solicitações', d.total || 0, 'total', '#E8722A', 'rgba(232,114,42,.12)', 'Desde sempre') +
+      statCard('Em desenvolvimento', d.desenvolvimento || 0, 'clock', '#2E78D2', 'rgba(46,120,210,.12)', 'Sendo feitas agora') +
+      statCard('Finalizadas', d.finalizado || 0, 'check', '#1F9D55', 'rgba(31,157,85,.12)', 'Entregues no período') +
+      statCard('Tempo médio de resolução', (d.tempo_medio_dias != null ? d.tempo_medio_dias + ' dia(s)' : '—'), 'timer', '#8B5CF6', 'rgba(139,92,246,.12)', 'Do pedido até finalizar');
+
     var funil = [
       { label: 'Solicitação', n: d.solicitacao || 0 },
       { label: 'Em Análise/Priorizado', n: d.analise || 0 },
@@ -446,12 +479,9 @@
     var meses = d.por_mes || [];
     var maxMes = meses.reduce(function (m, x) { return Math.max(m, x.n); }, 1);
 
-    return '' +
-      '<div class="eng-kpis">' + kpis.map(function (k) {
-        return '<div class="eng-kpi" style="--c:' + k[2] + '"><span class="eng-kpi__n">' + k[1] + '</span><span class="eng-kpi__l">' + esc(k[0]) + '</span></div>';
-      }).join('') + '</div>' +
+    return '<div class="stats">' + stats + '</div>' +
 
-      '<section class="eng-card"><h4>Funil (todas as colunas no período)</h4><div class="eng-bars">' +
+      '<section class="eng-card dev-section"><h4>Funil (todas as colunas no período)</h4><div class="eng-bars">' +
         funil.map(function (f) {
           var pct = Math.max(4, Math.round((f.n / maxFunil) * 100));
           return '<div class="eng-bar"><span class="eng-bar__lbl">' + esc(f.label) + '</span>' +
@@ -460,14 +490,14 @@
         }).join('') +
       '</div></section>' +
 
-      '<section class="eng-card"><h4>Solicitações finalizadas por mês</h4>' +
+      '<section class="eng-card dev-section"><h4>Solicitações finalizadas por mês</h4>' +
         (meses.length ? '<div class="eng-months">' + meses.map(function (m) {
           var h = Math.max(8, Math.round((m.n / maxMes) * 100));
           return '<div class="eng-month"><span class="eng-month__bar" style="height:' + h + '%"></span><span class="eng-month__n">' + m.n + '</span><span class="eng-month__l">' + esc(m.mes) + '</span></div>';
         }).join('') + '</div>' : '<p class="eng-empty">Sem dados no período.</p>') +
       '</section>' +
 
-      '<section class="eng-card"><h4>Quem mais pediu</h4>' +
+      '<section class="eng-card dev-section"><h4>Quem mais pediu</h4>' +
         (ranking.length ? '<div class="eng-bars">' + ranking.map(function (r) {
           var pct = Math.max(4, Math.round((r.n / maxRank) * 100));
           return '<div class="eng-bar"><span class="eng-bar__lbl">' + esc(r.nome) + '</span>' +
@@ -498,16 +528,11 @@
     } catch (e) { isGestor = false; }
 
     renderShell(sess.user);
-    if (isGestor) {
-      $('dvTabQuadro').hidden = false;
-      $('dvTabDash').hidden = false;
-    }
-    setTab(isGestor ? 'quadro' : 'novo');
+    setPagina(isGestor ? 'quadro' : 'novo');
 
-    // Cola (Ctrl+V) só é capturada com a aba "Nova solicitação" visível.
+    // Cola (Ctrl+V) só é capturada com a página "Nova solicitação" visível.
     document.addEventListener('paste', function (e) {
-      var painel = $('dvPanelNovo');
-      if (!painel || painel.hidden) return;
+      if (paginaAtual !== 'novo') return;
       var items = (e.clipboardData || {}).items || [];
       for (var i = 0; i < items.length; i++) {
         if (items[i].type && items[i].type.indexOf('image') === 0) {
