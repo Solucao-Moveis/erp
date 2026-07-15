@@ -69,8 +69,8 @@
 .kb-mine__extra--neg { color: #DC2626; }
 
 /* ---- Quadro — 5 colunas com drag-and-drop nativo ---- */
-.kb-board { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(240px, 1fr); gap: 16px; overflow-x: auto; padding-bottom: 10px; margin-top: 24px; }
-.kb-col { display: flex; flex-direction: column; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; min-height: 320px; transition: background .12s, border-color .12s; }
+.kb-board { display: flex; align-items: flex-start; gap: 16px; overflow-x: auto; padding-bottom: 10px; margin-top: 24px; }
+.kb-col { flex: 1 1 0; min-width: 220px; display: flex; flex-direction: column; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; min-height: 140px; transition: background .12s, border-color .12s; }
 .kb-col.is-over { background: var(--orange-soft); border-color: var(--orange); }
 .kb-col__hd { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; font-weight: 800; color: var(--c, var(--ink)); padding: 4px 6px; }
 .kb-col__count { font-size: 11px; font-weight: 700; color: var(--ink-soft); background: var(--panel); border-radius: 999px; padding: 1px 8px; }
