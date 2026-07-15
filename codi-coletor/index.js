@@ -486,6 +486,20 @@ async function pollDetalhe() {
   console.log(`[detalhe] ${MAQUINAS_IDS.length} máquinas atualizadas`);
 }
 
+// ─── Helpers de data ─────────────────────────────────────────
+
+function dataHA(dias) {
+  const d = new Date();
+  d.setDate(d.getDate() - dias);
+  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+}
+
+function parseBRDate(str) {
+  if (!str) return null;
+  const [d, m, y] = str.split('/');
+  return (d && m && y) ? `${y}-${m}-${d}` : null;
+}
+
 // ─── API Industrial (Forwood via CODI) ────────────────────────
 // Usa POST (GET com body é rejeitado por Node 18+); autenticação via ApiToken no body.
 
@@ -605,6 +619,76 @@ async function syncBomProdutos() {
   console.log(`[industrial] syncBomProdutos: ${ok} ok, ${falha} falha (de ${pais.length})`);
 }
 
+// ─── Lotes de producao (API Industrial) ───────────────────────
+
+function industrialPostLongo(endpoint, body) {
+  return new Promise((resolve, reject) => {
+    if (!INDUSTRIAL_BASE || !INDUSTRIAL_TOKEN) { resolve(null); return; }
+    const payload = JSON.stringify({ ApiToken: INDUSTRIAL_TOKEN, ...body });
+    const url = new URL(`${INDUSTRIAL_BASE}/Core/${endpoint}`);
+    const req = http.request({
+      hostname: url.hostname,
+      port:     parseInt(url.port || '80', 10),
+      method:   'POST',
+      path:     url.pathname,
+      headers:  { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) },
+    }, res => {
+      let data = '';
+      res.on('data', c => data += c);
+      res.on('end', () => {
+        try { resolve(JSON.parse(data)); } catch { resolve(null); }
+      });
+    });
+    req.on('error', reject);
+    req.setTimeout(5 * 60_000, () => { req.destroy(); reject(new Error('lotes timeout 5min')); });
+    req.write(payload);
+    req.end();
+  });
+}
+
+async function syncLotes() {
+  if (!INDUSTRIAL_BASE || !INDUSTRIAL_TOKEN) return;
+  const data = await industrialPostLongo('API_OrdemFabricacao/ListarOrdemFabricacao', {
+    DataAlteracao: dataHA(30), Ordem: 0, Produto: '', Tipo: 'OF',
+    Deposito: 0, Lote: '', OrdemEncerrada: 'S', IndustrializacaoTerceiros: '', EstruturaProduto: 'N',
+  });
+  const ofs = Array.isArray(data) ? data : [];
+  const comLote = ofs.filter(o => o.Lote?.trim());
+
+  const lotesMap = new Map();
+  for (const o of comLote) {
+    const n = o.Lote.trim();
+    if (!lotesMap.has(n)) lotesMap.set(n, { numero: n, data_previsao: null, total_ofs: 0 });
+    const l = lotesMap.get(n);
+    l.total_ofs++;
+    const dp = parseBRDate(o.DataPrevisao);
+    if (dp && (!l.data_previsao || dp > l.data_previsao)) l.data_previsao = dp;
+  }
+  const lotes = [...lotesMap.values()];
+  const BATCH = 100;
+  for (let i = 0; i < lotes.length; i += BATCH) {
+    const { error } = await sb.from('lotes').upsert(lotes.slice(i, i + BATCH), { onConflict: 'numero' });
+    if (error) throw error;
+  }
+  const ofRows = comLote.map(o => ({
+    ordem:                parseInt(o.Ordem),
+    lote:                 o.Lote.trim(),
+    produto:              o.Produto         || null,
+    nome_produto:         o.NomeProduto     || null,
+    quantidade:           parseFloat(o.Quantidade)         || 0,
+    quantidade_produzida: parseFloat(o.QuantidadeProduzida) || 0,
+    status:               o.Status          || null,
+    data_previsao:        parseBRDate(o.DataPrevisao),
+    data_alteracao:       parseBRDate(o.DataAlteracao),
+    deposito:             parseInt(o.Deposito) || 1,
+  }));
+  for (let i = 0; i < ofRows.length; i += BATCH) {
+    const { error } = await sb.from('of_por_lote').upsert(ofRows.slice(i, i + BATCH), { onConflict: 'ordem' });
+    if (error) throw error;
+  }
+  console.log(`[lotes] ${lotes.length} lotes, ${ofRows.length} OFs`);
+}
+
 async function cicloIndustrial() {
   if (!INDUSTRIAL_BASE || !INDUSTRIAL_TOKEN) return;
   try {
@@ -680,6 +764,13 @@ async function cicloREST() {
 
   try { await pollDetalhe(); }
   catch (e) { console.error('[detalhe]', e.message); await setSyncState('detalhe', false, e.message); }
+
+  // Lotes: a cada hora (12 ciclos de 5 min)
+  if (cicloNum === 1 || cicloNum % 12 === 0) {
+    syncLotes()
+      .then(() => setSyncState('lotes', true))
+      .catch(e => { console.error('[lotes]', e.message); setSyncState('lotes', false, e.message); });
+  }
 
   if (cicloNum === 1 || cicloNum % 288 === 0) {
     try { await syncMaquinas(); await setSyncState('maquinas', true); }
