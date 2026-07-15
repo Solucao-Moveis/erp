@@ -9,6 +9,7 @@ apis codi/
 # Env do coletor: CODI_TOKEN + SUPABASE_SERVICE_ROLE_KEY — NUNCA commitar
 codi-coletor/.env
 codi-coletor/.token
+codi-coletor/.access_token
 
 # ===== Migração (migracao/) — NÃO versionar segredos nem dumps =====
 # service_role key hardcoded (acesso total ao banco, ignora RLS)

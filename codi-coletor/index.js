@@ -135,65 +135,100 @@ function extrairJsessionid(headers) {
 }
 
 async function loginAction() {
-  // 1. GET /home → Spring Security redireciona para a tela de login e dá o cookie inicial
-  const r0 = await fetch(`${CODI_ACTION_URL}/home`, {
+  const BASE_HTTP = CODI_ACTION_URL.replace(/\/action$/, '');
+  const COMPANY   = process.env.CODI_COMPANY    || 'somvsomvpo';
+  const CO_ID     = process.env.CODI_COMPANY_ID || '1';
+
+  // 1. Inicia fluxo OAuth implicit — o mesmo que o coletor-web faz no browser
+  //    Isso faz o CODI criar um estado OAuth e redirecionar para o login com o redirect correto
+  const redirectUri = encodeURIComponent(`${BASE_HTTP}/coletor-web/pt/`);
+  const authUrl = `${BASE_HTTP}/auth/authorize?response_type=token&client_id=${CODI_CLIENT_ID}&client_secret=${CODI_SECRET}&redirect_uri=${redirectUri}&state=`;
+  const r0 = await fetch(authUrl, {
     redirect: 'manual',
     headers: { 'User-Agent': 'Mozilla/5.0 codi-coletor/2.0' },
   });
-  const initialSession = extrairJsessionid(r0.headers);
-  const loginLocation  = r0.headers.get('location') ?? '';
-  // Resolve a URL do formulário (Spring usa /j_spring_security_check ou /login)
-  const loginCheckUrl  = loginLocation.includes('login')
-    ? `${CODI_ACTION_URL}/j_spring_security_check`
-    : `${CODI_ACTION_URL}/j_spring_security_check`;
+  const loc0 = r0.headers.get('location') ?? '';
+  const initSession = extrairJsessionid(r0.headers);
 
-  // 2. GET da tela de login para obter possível CSRF token
-  let csrfToken = null;
-  if (initialSession) {
-    const rLogin = await fetch(`${CODI_ACTION_URL}/login`, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 codi-coletor/2.0',
-        'Cookie':     `JSESSIONID=${initialSession}`,
-      },
-    });
-    const html = await rLogin.text().catch(() => '');
-    const csrfMatch = html.match(/name="_csrf"[^>]+value="([^"]+)"/i)
-                   ?? html.match(/name="CSRFToken"[^>]+value="([^"]+)"/i);
-    if (csrfMatch) csrfToken = csrfMatch[1];
-  }
+  // 2. Abre a página de login (pode vir direto ou via redirect)
+  const loginUrl = loc0.startsWith('http') ? loc0
+    : loc0.startsWith('/') ? `${BASE_HTTP}${loc0}`
+    : `${CODI_ACTION_URL}/login/login`;
 
-  // 3. POST das credenciais com o cookie inicial + CSRF se existir
-  const body = new URLSearchParams({ j_username: CODI_WS_USER, j_password: CODI_WS_PASS });
-  if (csrfToken) body.set('_csrf', csrfToken);
+  const r1 = await fetch(loginUrl, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 codi-coletor/2.0',
+      ...(initSession ? { 'Cookie': `JSESSIONID=${initSession}` } : {}),
+    },
+  });
+  const html = await r1.text().catch(() => '');
+  const session1 = extrairJsessionid(r1.headers) ?? initSession;
 
-  const cookieEnvio = initialSession
-    ? `org.springframework.web.servlet.i18n.CookieLocaleResolver.LOCALE=pt-BR; JSESSIONID=${initialSession}`
+  // Extrai form action e todos os hidden inputs (incluem state OAuth, company, etc.)
+  const formMatch = html.match(/<form[^>]+action="([^"]+)"/i);
+  const hiddens   = [...html.matchAll(/<input[^>]+type="hidden"[^>]*>/gi)]
+    .reduce((acc, m) => {
+      const name  = m[0].match(/name="([^"]+)"/i)?.[1];
+      const value = m[0].match(/value="([^"]*)"/i)?.[1] ?? '';
+      if (name) acc[name] = value;
+      return acc;
+    }, {});
+
+  // Resolve URL absoluta do form action
+  const formAction = formMatch?.[1] ?? null;
+  const baseDir    = loginUrl.substring(0, loginUrl.lastIndexOf('/') + 1);
+  const postUrl    = !formAction ? null
+    : formAction.startsWith('http') ? formAction
+    : formAction.startsWith('/') ? `${BASE_HTTP}${formAction}`
+    : `${baseDir}${formAction}`;
+
+  if (!postUrl) throw new Error('[ws-auth] Não foi possível determinar URL do formulário de login');
+
+  // 3. POST com company + credenciais + todos os hidden fields (OAuth state incluso)
+  const userField = html.includes('j_username') ? 'j_username' : 'username';
+  const passField = html.includes('j_password') ? 'j_password' : 'password';
+  const postBody  = new URLSearchParams({
+    ...hiddens,
+    company:    hiddens.company    ?? COMPANY,
+    companyId:  hiddens.companyId  ?? CO_ID,
+    [userField]: CODI_WS_USER,
+    [passField]: CODI_WS_PASS,
+  });
+
+  const cookieLogin = session1
+    ? `org.springframework.web.servlet.i18n.CookieLocaleResolver.LOCALE=pt-BR; JSESSIONID=${session1}`
     : 'org.springframework.web.servlet.i18n.CookieLocaleResolver.LOCALE=pt-BR';
 
-  const r1 = await fetch(loginCheckUrl, {
-    method:   'POST',
-    redirect: 'manual',
+  const r2 = await fetch(postUrl, {
+    method: 'POST', redirect: 'manual',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       'User-Agent':   'Mozilla/5.0 codi-coletor/2.0',
-      'Cookie':       cookieEnvio,
-      'Origin':       CODI_ACTION_URL,
-      'Referer':      `${CODI_ACTION_URL}/login`,
+      'Cookie':       cookieLogin,
+      'Origin':       BASE_HTTP,
+      'Referer':      loginUrl,
     },
-    body,
+    body: postBody,
   });
 
-  // Spring manda 302 para /home em sucesso; 302 para /login?error em falha
-  const location = r1.headers.get('location') ?? '';
-  if (location.includes('error') || location.includes('login?error')) {
-    throw new Error(`Credenciais recusadas pelo CODI. Status: ${r1.status}, Location: ${location}`);
+  const loc2     = r2.headers.get('location') ?? '';
+  const session2 = extrairJsessionid(r2.headers) ?? session1;
+
+  if (r2.status >= 400) {
+    throw new Error(`[ws-auth] Login HTTP ${r2.status} em ${postUrl}`);
+  }
+  if (loc2.includes('error') || loc2.includes('login?error')) {
+    throw new Error(`[ws-auth] Credenciais recusadas. Location: ${loc2}`);
   }
 
-  // JSESSIONID novo vem no Set-Cookie do POST, senão reusa o inicial
-  const novoSession = extrairJsessionid(r1.headers) ?? initialSession;
-  if (!novoSession) throw new Error(`Login falhou — sem JSESSIONID. Status: ${r1.status}`);
+  // Se o redirect contém access_token (implicit flow completou), também salva o token
+  const tokenMatch = loc2.match(/[#&]access_token=([^&]+)/);
+  if (tokenMatch) {
+    const rtMatch = loc2.match(/[#&?]refresh_token=([^&]+)/);
+    if (rtMatch) { writeFileSync(TOKEN_FILE, decodeURIComponent(rtMatch[1]), 'utf8'); }
+  }
 
-  jsessionid = novoSession;
+  jsessionid = session2;
   console.log(`[ws-auth] Login ok. JSESSIONID=${jsessionid.substring(0, 8)}…`);
 }
 
