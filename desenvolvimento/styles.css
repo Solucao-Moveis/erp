@@ -7,6 +7,10 @@
    ERP", cartões de estatística, quadro (kanban) e dropzone de anexo.
    ============================================================ */
 
+/* Quadro/Dashboard precisam de mais espaço que o .main padrão (1120px)
+   permite — senão as 5 colunas do kanban ficam cortadas. */
+.main--wide { max-width: none; }
+
 /* ---- Rodapé da barra lateral: "Voltar ao ERP" (sem botão Sair aqui) ---- */
 .side__back {
   display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 8px;

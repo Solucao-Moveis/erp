@@ -134,6 +134,7 @@
     });
     var info = PAGINAS.filter(function (p) { return p.id === id; })[0] || PAGINAS[0];
     var main = $('devMain');
+    main.classList.toggle('main--wide', id === 'quadro' || id === 'dashboard');
     main.innerHTML =
       '<div class="main__top"><div><p class="hello">Desenvolvimento</p><h1 class="h1">' + esc(info.titulo) + '</h1><p class="sub">' + esc(info.sub) + '</p></div></div>' +
       '<div id="devBody"></div>';
