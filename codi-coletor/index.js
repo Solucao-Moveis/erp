@@ -35,6 +35,8 @@ const CODI_ACTION_URL     = (process.env.CODI_ACTION_URL         || '').replace(
 const CODI_WS_USER        = process.env.CODI_WS_USER             || '';
 const CODI_WS_PASS        = process.env.CODI_WS_PASS             || '';
 const CODI_WS_LABEL       = process.env.CODI_WS_LABEL            || '000';
+const CODI_COMPANY        = process.env.CODI_COMPANY             || 'somvsomvpo';
+const CODI_COMPANY_ID     = process.env.CODI_COMPANY_ID          || '1';
 const CODI_JSESSIONID     = process.env.CODI_JSESSIONID          || ''; // fallback manual
 const INDUSTRIAL_BASE     = (process.env.CODI_INDUSTRIAL_URL     || '').replace(/\/$/, '');
 const INDUSTRIAL_TOKEN    = process.env.CODI_INDUSTRIAL_TOKEN    || '';
@@ -74,22 +76,51 @@ function lerRefreshToken() {
 function salvarRefreshToken(t) { writeFileSync(TOKEN_FILE, t, 'utf8'); }
 
 async function renovarToken() {
-  const res = await fetch(CODI_AUTH_URL, {
+  // 1ª tentativa: refresh_token grant (rotativo, sem credenciais)
+  try {
+    const res = await fetch(CODI_AUTH_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type:    'refresh_token',
+        refresh_token: lerRefreshToken(),
+        client_id:     CODI_CLIENT_ID,
+        client_secret: CODI_SECRET,
+      }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      accessToken = data.access_token;
+      tokenExpiry = Date.now() + (data.expires_in - 300) * 1000;
+      salvarRefreshToken(data.refresh_token);
+      console.log('[auth] token renovado via refresh_token');
+      return;
+    }
+    console.warn(`[auth] refresh_token falhou (${res.status}) — tentando password grant...`);
+  } catch (e) {
+    console.warn('[auth] refresh_token erro:', e.message, '— tentando password grant...');
+  }
+
+  // 2ª tentativa: password grant (auto-recuperação quando refresh expira)
+  const res2 = await fetch(CODI_AUTH_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
-      grant_type:    'refresh_token',
-      refresh_token: lerRefreshToken(),
+      grant_type:    'password',
       client_id:     CODI_CLIENT_ID,
       client_secret: CODI_SECRET,
+      username:      CODI_WS_USER,
+      password:      CODI_WS_PASS,
+      company:       CODI_COMPANY,
+      companyId:     CODI_COMPANY_ID,
     }),
   });
-  if (!res.ok) throw new Error(`Auth ${res.status}: ${await res.text().catch(() => '')}`);
-  const data = await res.json();
-  accessToken = data.access_token;
-  tokenExpiry = Date.now() + (data.expires_in - 300) * 1000;
-  salvarRefreshToken(data.refresh_token);
-  console.log('[auth] token renovado');
+  if (!res2.ok) throw new Error(`Auth password grant ${res2.status}: ${await res2.text().catch(() => '')}`);
+  const data2 = await res2.json();
+  accessToken = data2.access_token;
+  tokenExpiry = Date.now() + (data2.expires_in - 300) * 1000;
+  salvarRefreshToken(data2.refresh_token);
+  console.log('[auth] token renovado via password grant (refresh rotacionado)');
 }
 
 async function garantirToken() {
