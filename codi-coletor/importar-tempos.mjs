@@ -1,6 +1,16 @@
 /**
  * Importa cronometragens da planilha PCP para codi.produto_tempos_maquina.
  *
+ * Usa só as abas CORTE, DOBRA, SOLDA, MARCENARIA, INSPEÇÃO A EXPEDIÇÃO — as demais
+ * (INSPEÇÃO antiga, TRATAMENTO, PINTURA, EMBALAGEM, MOVIMENTAÇÕES MONTAGEM, MONTAGEM 2)
+ * estão obsoletas/paradas no tempo.
+ *
+ * A média é por código+operação, ignorando qual máquina física fez cada medição — a
+ * mesma operação costuma ser cronometrada em várias máquinas equivalentes (ex: 10 robôs
+ * de solda diferentes para o mesmo código), e manter isso separado por máquina fazia a
+ * view somar tempo duplicado. `maquina_nome` guarda a lista das máquinas observadas,
+ * só para exibição.
+ *
  * Uso:
  *   npm install xlsx          (só na primeira vez)
  *   node importar-tempos.mjs  (roda na máquina local, não na fábrica)
@@ -12,7 +22,8 @@
  */
 
 import 'dotenv/config';
-import { readFile, utils } from 'xlsx';
+import pkg from 'xlsx';
+const { readFile, utils } = pkg;
 import { createClient } from '@supabase/supabase-js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -28,28 +39,7 @@ const sb = createClient(
   { db: { schema: 'codi' } }
 );
 
-// ─── Configuração das abas ────────────────────────────────────
-
-// Abas com coluna "forwood" (decimal de hora por peça)
-// codigoCol, maquinaCol, forWoodCol: índices 0-based no array de células da linha
-// operacaoCol: índice da coluna operação (null = usar operacaoDefault)
-const ABAS_FORWOOD = [
-  { nome: 'CORTE',    codigoCol: 1, maquinaCol: 4, forWoodCol: 10, operacaoCol: 3, operacaoDefault: null },
-  { nome: 'DOBRA',    codigoCol: 1, maquinaCol: 4, forWoodCol:  8, operacaoCol: 3, operacaoDefault: null },
-  { nome: 'SOLDA',    codigoCol: 1, maquinaCol: 4, forWoodCol: 10, operacaoCol: 3, operacaoDefault: null },
-  { nome: 'MARCENARIA', codigoCol: 1, maquinaCol: 4, forWoodCol: 10, operacaoCol: 3, operacaoDefault: null },
-  // Montagem: código do COMPONENTE está em col D (3), não B (1)
-  { nome: 'MOVIMENTAÇÕES MONTAGEM', codigoCol: 3, maquinaCol: null, maquinaFixed: 'MONTAGEM', forWoodCol: 11, operacaoCol: null, operacaoDefault: 'MONTAGEM' },
-  { nome: 'MONTAGEM 2',             codigoCol: 3, maquinaCol: null, maquinaFixed: 'MONTAGEM', forWoodCol: 11, operacaoCol: null, operacaoDefault: 'MONTAGEM' },
-];
-
-// Abas com coluna "peças por hora" (taxa → tempo = 60 / taxa)
-const ABAS_TAXA = [
-  { nome: 'INSPEÇÃO',   codigoCol: 0, taxaCol: 3, maquinaFixed: 'INSPEÇÃO',   operacao: 'INSPEÇÃO' },
-  { nome: 'TRATAMENTO', codigoCol: 1, taxaCol: 6, maquinaFixed: 'TRATAMENTO', operacao: 'TRATAMENTO' },
-  { nome: 'PINTURA',    codigoCol: 1, taxaCol: 6, maquinaFixed: 'PINTURA',    operacao: 'PINTURA' },
-  { nome: 'EMBALAGEM',  codigoCol: 1, taxaCol: 4, maquinaFixed: 'EMBALADEIRA',operacao: 'EMBALAGEM' },
-];
+const ABAS = ['CORTE', 'DOBRA', 'SOLDA', 'MARCENARIA', 'INSPEÇÃO A EXPEDIÇÃO'];
 
 // ─── Leitura da planilha ──────────────────────────────────────
 
@@ -58,7 +48,7 @@ function lerAba(wb, nomeAba) {
   if (!ws) { console.warn(`  ⚠ Aba "${nomeAba}" não encontrada — pulando`); return []; }
   // header: 1 = array de valores brutos por linha (sem converter para objeto)
   const rows = utils.sheet_to_json(ws, { header: 1, defval: null });
-  return rows.slice(1); // pula linha 1 (cabeçalho está na linha 2 da planilha)
+  return rows.slice(1); // pula linha 1 (título mesclado; o cabeçalho real é a linha 2)
 }
 
 function strCodigo(v) {
@@ -67,65 +57,102 @@ function strCodigo(v) {
   return s || null;
 }
 
-function parseForwood(v) {
-  if (v == null) return null;
-  const n = typeof v === 'number' ? v : parseFloat(String(v).replace(',', '.'));
-  if (!isFinite(n) || n <= 0) return null;
-  return n * 60; // horas → minutos
+function normalizaHeader(v) {
+  return String(v ?? '').trim().toLowerCase();
 }
 
-function parseTaxa(v) {
-  if (v == null) return null;
+// Acha as colunas pelo texto do cabeçalho em vez de posição fixa — o "Tempo" não fica
+// na mesma coluna em todas as abas (J em CORTE/SOLDA/MARCENARIA, H em DOBRA/INSPEÇÃO A
+// EXPEDIÇÃO, que têm duas colunas a menos).
+function localizarColunas(headerRow) {
+  const cols = { codigo: null, descricao: null, operacao: null, maquina: null, tempo: null, data: null };
+  headerRow.forEach((v, i) => {
+    const h = normalizaHeader(v);
+    if (h === 'código' || h === 'codigo') cols.codigo = i;
+    else if (h === 'descrição' || h === 'descricao') cols.descricao = i;
+    else if (h === 'operação' || h === 'operacao') cols.operacao = i;
+    else if (h === 'equipamento') cols.maquina = i;
+    else if (h === 'tempo') cols.tempo = i; // exato — não pode casar com "forwood"
+    else if (h === 'data') cols.data = i;
+  });
+  return cols;
+}
+
+// A coluna DATA vem como número serial do Excel (dias desde 1899-12-30) quando
+// preenchida — em boa parte das linhas vem vazia.
+function parseDataExcel(v) {
+  if (v == null || v === '') return null;
   const n = typeof v === 'number' ? v : parseFloat(String(v).replace(',', '.'));
   if (!isFinite(n) || n <= 0) return null;
-  return 60 / n; // peças/hora → minutos por peça
+  const ms = Math.round((n - 25569) * 86400 * 1000);
+  const d = new Date(ms);
+  if (isNaN(d.getTime())) return null;
+  return d.toISOString().slice(0, 10);
+}
+
+// "Tempo" vem como texto de relógio (ex: "0:00:51" = 51s). Fallback numérico pro caso
+// raro da célula vir como fração de dia do Excel em vez de string.
+function parseTempoRelogio(v) {
+  if (v == null) return null;
+  const s = String(v).trim();
+  if (!s) return null;
+
+  const partes = s.split(':').map(p => parseFloat(String(p).replace(',', '.')));
+  if (partes.length >= 2 && partes.every(p => isFinite(p))) {
+    const min = partes.length === 3
+      ? partes[0] * 60 + partes[1] + partes[2] / 60
+      : partes[0] + partes[1] / 60;
+    return min > 0 ? min : null;
+  }
+
+  const n = parseFloat(s.replace(',', '.'));
+  if (isFinite(n) && n > 0) return n * 24 * 60; // fração de dia → minutos
+  return null;
 }
 
 // ─── Coleta de medições ───────────────────────────────────────
 
-function coletarForwood(wb, cfg) {
-  const rows = lerAba(wb, cfg.nome);
-  const medições = {}; // key: "codigo|maquina|operacao" → [tempo_min, ...]
+function coletarAba(wb, nomeAba, todas, brutas) {
+  const rows = lerAba(wb, nomeAba);
+  if (rows.length === 0) return;
 
-  for (const row of rows) {
-    const codigo = strCodigo(row[cfg.codigoCol]);
+  const cols = localizarColunas(rows[0]);
+  if (cols.codigo == null || cols.operacao == null || cols.maquina == null || cols.tempo == null) {
+    console.warn(`  ⚠ Aba "${nomeAba}": não achei todas as colunas (código/operação/equipamento/tempo) no cabeçalho — pulando`);
+    return;
+  }
+
+  let lidas = 0;
+  for (const row of rows.slice(1)) {
+    const codigo = strCodigo(row[cols.codigo]);
     if (!codigo) continue;
 
-    const maquina = cfg.maquinaFixed
-      || (cfg.maquinaCol != null ? String(row[cfg.maquinaCol] ?? '').trim() : null);
+    const operacao = String(row[cols.operacao] ?? '').trim();
+    if (!operacao) continue;
+
+    const maquina = String(row[cols.maquina] ?? '').trim();
     if (!maquina) continue;
 
-    const operacao = cfg.operacaoDefault
-      || (cfg.operacaoCol != null ? String(row[cfg.operacaoCol] ?? '').trim() : '');
-
-    const tempo = parseForwood(row[cfg.forWoodCol]);
+    const tempo = parseTempoRelogio(row[cols.tempo]);
     if (tempo == null) continue;
 
-    const key = `${codigo}|${maquina}|${operacao}`;
-    if (!medições[key]) medições[key] = { codigo, maquina, operacao, tempos: [] };
-    medições[key].tempos.push(tempo);
+    const key = `${codigo}|${operacao}`;
+    if (!todas[key]) todas[key] = { codigo, operacao, tempos: [], maquinas: new Set() };
+    todas[key].tempos.push(tempo);
+    todas[key].maquinas.add(maquina);
+    lidas++;
+
+    brutas.push({
+      codigo_item: codigo,
+      descricao_planilha: cols.descricao != null ? String(row[cols.descricao] ?? '').trim() || null : null,
+      aba_origem: nomeAba,
+      operacao,
+      maquina_nome: maquina,
+      tempo_min: parseFloat(tempo.toFixed(4)),
+      data_medicao: cols.data != null ? parseDataExcel(row[cols.data]) : null,
+    });
   }
-
-  return medições;
-}
-
-function coletarTaxa(wb, cfg) {
-  const rows = lerAba(wb, cfg.nome);
-  const medições = {};
-
-  for (const row of rows) {
-    const codigo = strCodigo(row[cfg.codigoCol]);
-    if (!codigo) continue;
-
-    const tempo = parseTaxa(row[cfg.taxaCol]);
-    if (tempo == null) continue;
-
-    const key = `${codigo}|${cfg.maquinaFixed}|${cfg.operacao}`;
-    if (!medições[key]) medições[key] = { codigo, maquina: cfg.maquinaFixed, operacao: cfg.operacao, tempos: [] };
-    medições[key].tempos.push(tempo);
-  }
-
-  return medições;
+  console.log(`    ${lidas} medições válidas`);
 }
 
 function media(arr) {
@@ -156,34 +183,43 @@ async function upsertBatch(rows) {
   return { ok, err };
 }
 
+// ─── Medições brutas (cronoanalise_medicoes) ───────────────────
+
+async function recriarBrutas(brutas, codigosValidos) {
+  const validas = brutas.filter(r => codigosValidos.has(r.codigo_item));
+  console.log(`  Medições brutas válidas (com FK): ${validas.length} de ${brutas.length}`);
+
+  console.log('  Apagando cronoanalise_medicoes…');
+  const { error: delErr } = await sb.from('cronoanalise_medicoes').delete().neq('codigo_item', '');
+  if (delErr) throw delErr;
+
+  const BATCH = 500;
+  let ok = 0, err = 0;
+  for (let i = 0; i < validas.length; i += BATCH) {
+    const slice = validas.slice(i, i + BATCH);
+    const { error } = await sb.from('cronoanalise_medicoes').insert(slice);
+    if (error) { console.error('  ✗ batch erro:', error.message); err += slice.length; }
+    else ok += slice.length;
+  }
+  return { ok, err };
+}
+
 // ─── Main ─────────────────────────────────────────────────────
 
 async function main() {
   console.log('Lendo planilha:', PLANILHA);
   const wb = readFile(PLANILHA, { cellDates: false, raw: false });
 
-  // Coleta todas as medições
+  // Coleta todas as medições (chave = código+operação, junta todas as máquinas) e,
+  // em paralelo, a lista bruta (uma entrada por linha válida, com data)
   const todas = {};
-
-  for (const cfg of ABAS_FORWOOD) {
-    console.log(`  → ${cfg.nome} (forwood)`);
-    const m = coletarForwood(wb, cfg);
-    for (const [k, v] of Object.entries(m)) {
-      if (!todas[k]) todas[k] = v;
-      else todas[k].tempos.push(...v.tempos);
-    }
+  const brutas = [];
+  for (const nome of ABAS) {
+    console.log(`  → ${nome}`);
+    coletarAba(wb, nome, todas, brutas);
   }
 
-  for (const cfg of ABAS_TAXA) {
-    console.log(`  → ${cfg.nome} (taxa)`);
-    const m = coletarTaxa(wb, cfg);
-    for (const [k, v] of Object.entries(m)) {
-      if (!todas[k]) todas[k] = v;
-      else todas[k].tempos.push(...v.tempos);
-    }
-  }
-
-  console.log(`\nMedições únicas (código+máquina+operação): ${Object.keys(todas).length}`);
+  console.log(`\nMedições únicas (código+operação): ${Object.keys(todas).length}`);
 
   // Verifica quais códigos existem no banco
   console.log('Verificando FK em codi.produtos…');
@@ -192,12 +228,12 @@ async function main() {
 
   const rows = [];
   let ignorados = 0;
-  for (const { codigo, maquina, operacao, tempos } of Object.values(todas)) {
+  for (const { codigo, operacao, tempos, maquinas } of Object.values(todas)) {
     if (!validos.has(codigo)) { ignorados++; continue; }
     rows.push({
       codigo_item:  codigo,
-      maquina_nome: maquina,
-      operacao:     operacao || '',
+      maquina_nome: [...maquinas].join(' + '),
+      operacao:     operacao,
       tempo_min:    parseFloat(media(tempos).toFixed(4)),
       fonte:        'planilha_pcp',
     });
@@ -210,7 +246,11 @@ async function main() {
 
   console.log('Fazendo upsert…');
   const { ok, err } = await upsertBatch(rows);
-  console.log(`\n✓ Concluído: ${ok} inseridos/atualizados, ${err} erros`);
+  console.log(`\n✓ Agregado (produto_tempos_maquina): ${ok} inseridos/atualizados, ${err} erros`);
+
+  console.log('\nGravando medições brutas (cronoanalise_medicoes)…');
+  const { ok: okBrutas, err: errBrutas } = await recriarBrutas(brutas, validos);
+  console.log(`✓ Bruto (cronoanalise_medicoes): ${okBrutas} inseridos, ${errBrutas} erros`);
 }
 
 main().catch(e => { console.error(e); process.exit(1); });
