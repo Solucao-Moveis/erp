@@ -276,6 +276,23 @@ $$;
 revoke all on function inovacao.mover_solicitacao(uuid, inovacao.status_coluna, date, text) from public, anon;
 grant execute on function inovacao.mover_solicitacao(uuid, inovacao.status_coluna, date, text) to authenticated;
 
+-- Excluir chamado (só gestor). Apaga junto as notificações (FK on delete cascade).
+create or replace function inovacao.deletar_solicitacao(p_id uuid)
+returns void
+language plpgsql security definer set search_path = inovacao, public
+as $$
+begin
+  if not inovacao.is_gestor() then
+    raise exception 'Sem permissão para excluir solicitações.' using errcode = '42501';
+  end if;
+
+  delete from inovacao.solicitacoes where id = p_id;
+  if not found then raise exception 'Solicitação não encontrada.'; end if;
+end;
+$$;
+revoke all on function inovacao.deletar_solicitacao(uuid) from public, anon;
+grant execute on function inovacao.deletar_solicitacao(uuid) to authenticated;
+
 -- Definir/editar início e previsão de entrega (só gestor), a qualquer momento,
 -- independente da coluna atual do card (não precisa arrastar pra 'desenvolvimento').
 create or replace function inovacao.definir_datas(
@@ -422,12 +439,17 @@ create policy inov_sol_update on inovacao.solicitacoes
   for update to authenticated
   using (inovacao.is_gestor()) with check (inovacao.is_gestor());
 
+drop policy if exists inov_sol_delete on inovacao.solicitacoes;
+create policy inov_sol_delete on inovacao.solicitacoes
+  for delete to authenticated
+  using (inovacao.is_gestor());
+
 drop policy if exists inov_notif_select on inovacao.notificacoes;
 create policy inov_notif_select on inovacao.notificacoes
   for select to authenticated using (user_id = auth.uid());
 
 grant select on inovacao.gestores to authenticated;
-grant select, insert, update on inovacao.solicitacoes to authenticated;
+grant select, insert, update, delete on inovacao.solicitacoes to authenticated;
 grant select on inovacao.notificacoes to authenticated;
 
 -- ============================================================

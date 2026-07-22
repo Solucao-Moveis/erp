@@ -428,13 +428,32 @@
                (s.data_prevista ? '<div><b>Previsão de entrega:</b> ' + esc(fmtData(s.data_prevista)) + '</div>' : ''))) +
           (s.motivo_recusa ? '<div><b>Motivo da recusa:</b> ' + esc(s.motivo_recusa) + '</div>' : '') +
           '<div id="dvd_anexos">' + (s.anexos && s.anexos.length ? 'Carregando anexos…' : 'Sem anexos.') + '</div>' +
+          (isGestor ? '<div style="padding-top:6px"><button type="button" class="eng-btn-ghost eng-btn-del" id="dvd_del">Excluir chamado</button></div>' : '') +
         '</div>' +
       '</div>';
     m.hidden = false;
     $('dvd_close').onclick = function () { m.hidden = true; };
     m.addEventListener('click', function (e) { if (e.target === m) m.hidden = true; });
     if (isGestor) $('dvd_datas_save').onclick = function () { salvarDatas(s.id); };
+    if (isGestor) $('dvd_del').onclick = function () { excluirSolicitacao(s.id, s.titulo); };
     if (s.anexos && s.anexos.length) loadAnexos(s.anexos);
+  }
+
+  async function excluirSolicitacao(id, titulo) {
+    if (!confirm('Excluir o chamado "' + titulo + '"? Essa ação não pode ser desfeita.')) return;
+    var btn = $('dvd_del');
+    btn.disabled = true; btn.textContent = 'Excluindo…';
+    try {
+      var res = await db().rpc('deletar_solicitacao', { p_id: id });
+      if (res.error) throw res.error;
+      $('dvDetalhe').hidden = true;
+      cacheQuadro = cacheQuadro.filter(function (s) { return s.id !== id; });
+      drawQuadro();
+    } catch (e) {
+      alert((e && e.message) || 'Não foi possível excluir o chamado.');
+      console.error('[DEV] deletar_solicitacao', e);
+      btn.disabled = false; btn.textContent = 'Excluir chamado';
+    }
   }
 
   async function salvarDatas(id) {

@@ -30,6 +30,11 @@ window.SMERP_NOTAS = [
         o_que: 'Correção: o texto do card (O que quer / Como quer / Finalidade) ficava cortado quando era mais longo que a altura do modal, sem barra de rolagem.',
         como: 'O corpo do card de detalhe agora rola internamente quando o conteúdo é grande — nenhuma ação necessária, é só abrir o card normalmente.',
       },
+      {
+        app: 'Inovação → Desenvolvimento → detalhe do card',
+        o_que: 'Gestor agora pode excluir um chamado direto do card.',
+        como: 'Abra o card no Quadro e clique em "Excluir chamado" no fim do detalhe (só aparece pra gestor). Pede confirmação antes de apagar — a ação não pode ser desfeita.',
+      },
     ],
   },
   {
