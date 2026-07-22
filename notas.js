@@ -10,6 +10,29 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.40',
+    data: '22/07/2026',
+    titulo: 'Desenvolvimento: Quadro aberto pra todos + datas de início/previsão editáveis',
+    resumo: 'Agora todo mundo pode ver o Quadro completo se movendo (só o gestor arrasta os cards), e o gestor pode marcar início e previsão de entrega a qualquer momento, não só ao mover o card.',
+    mudancas: [
+      {
+        app: 'Inovação → Desenvolvimento → Quadro',
+        o_que: 'Quadro completo (todas as colunas e cards) agora é visível pra qualquer usuário — antes só o gestor via.',
+        como: 'Abra "Desenvolvimento" → "Quadro". Se você não for gestor, vê os cards se movendo entre as colunas mas não consegue arrastar nem abrir o formulário de mover — é só acompanhamento. O gestor continua sendo o único que arrasta os cards de coluna.',
+      },
+      {
+        app: 'Inovação → Desenvolvimento → detalhe do card',
+        o_que: 'Data de início e previsão de entrega agora podem ser definidas/editadas pelo gestor a qualquer momento, direto no card — não precisam mais ser setadas só no momento de arrastar o card pra "Em Desenvolvimento".',
+        como: 'Clique em qualquer card do Quadro. Se você é gestor, aparecem os campos "Data de início" e "Previsão de entrega" com um botão "Salvar datas" — edite quando quiser, mesmo com o card já em outra coluna. Quem não é gestor (inclusive quem abriu o pedido) vê essas datas no card e em "Minhas solicitações", mas não edita.',
+      },
+      {
+        app: 'Inovação → Desenvolvimento → detalhe do card',
+        o_que: 'Correção: o texto do card (O que quer / Como quer / Finalidade) ficava cortado quando era mais longo que a altura do modal, sem barra de rolagem.',
+        como: 'O corpo do card de detalhe agora rola internamente quando o conteúdo é grande — nenhuma ação necessária, é só abrir o card normalmente.',
+      },
+    ],
+  },
+  {
     versao: '6.39',
     data: '15/07/2026',
     titulo: 'Novo setor Inovação → Desenvolvimento: peça uma melhoria pro dev',

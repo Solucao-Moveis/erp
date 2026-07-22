@@ -5,7 +5,8 @@
 --   QUALQUER usuário autenticado pode abrir um pedido (não precisa
 --   ter perfil neste schema — ver bloco 'inovacao' em my_systems.sql,
 --   que libera o acesso pra todo mundo, igual ao 'utilitarios').
---   Só quem está em inovacao.gestores move os cards e resolve.
+--   Todo autenticado vê o quadro completo (todos os cards), mas só quem
+--   está em inovacao.gestores arrasta/move os cards, edita datas e resolve.
 --
 -- Colunas do quadro são um ENUM fixo (não texto livre) porque é UM
 -- board só, não multi-projeto: evita a fragilidade de nome de coluna
@@ -64,7 +65,8 @@ create table if not exists inovacao.solicitacoes (
   anexos           jsonb not null default '[]', -- [{path,name}] — opcional (print/tela)
 
   coluna           inovacao.status_coluna not null default 'solicitacao',
-  data_prevista    date,      -- previsão de entrega, setada ao mover p/ 'desenvolvimento'
+  data_inicio      date,      -- data de início do desenvolvimento, setada livremente pelo gestor
+  data_prevista    date,      -- previsão de entrega, setada livremente pelo gestor
   motivo_recusa    text,      -- obrigatório ao mover p/ 'recusado'
   check (coluna <> 'recusado' or coalesce(btrim(motivo_recusa), '') <> ''),
 
@@ -77,8 +79,9 @@ create table if not exists inovacao.solicitacoes (
   updated_at  timestamptz not null default now(),
   resolved_at timestamptz -- setado quando entra em 'finalizado'/'recusado' (pro Dashboard)
 );
--- (schema já existia em produção sem esta coluna — garante que ela apareça)
+-- (schema já existia em produção sem estas colunas — garante que apareçam)
 alter table inovacao.solicitacoes add column if not exists resolved_at timestamptz;
+alter table inovacao.solicitacoes add column if not exists data_inicio date;
 
 create index if not exists idx_inov_sol_coluna     on inovacao.solicitacoes (coluna, created_at);
 create index if not exists idx_inov_sol_created_by on inovacao.solicitacoes (created_by, created_at desc);
@@ -229,17 +232,12 @@ $$;
 revoke all on function inovacao.minhas_solicitacoes() from public, anon;
 grant execute on function inovacao.minhas_solicitacoes() to authenticated;
 
--- Quadro completo (só gestor).
+-- Quadro completo (todo autenticado vê todos os cards — só gestor arrasta/move/edita).
 create or replace function inovacao.quadro()
 returns setof inovacao.solicitacoes
-language plpgsql stable security definer set search_path = inovacao, public
+language sql stable security definer set search_path = inovacao, public
 as $$
-begin
-  if not inovacao.is_gestor() then
-    raise exception 'Sem permissão para ver o quadro.' using errcode = '42501';
-  end if;
-  return query select * from inovacao.solicitacoes order by coluna, created_at;
-end;
+  select * from inovacao.solicitacoes order by coluna, created_at;
 $$;
 revoke all on function inovacao.quadro() from public, anon;
 grant execute on function inovacao.quadro() to authenticated;
@@ -277,6 +275,33 @@ end;
 $$;
 revoke all on function inovacao.mover_solicitacao(uuid, inovacao.status_coluna, date, text) from public, anon;
 grant execute on function inovacao.mover_solicitacao(uuid, inovacao.status_coluna, date, text) to authenticated;
+
+-- Definir/editar início e previsão de entrega (só gestor), a qualquer momento,
+-- independente da coluna atual do card (não precisa arrastar pra 'desenvolvimento').
+create or replace function inovacao.definir_datas(
+  p_id uuid,
+  p_data_inicio date default null,
+  p_data_prevista date default null
+)
+returns jsonb
+language plpgsql security definer set search_path = inovacao, public
+as $$
+begin
+  if not inovacao.is_gestor() then
+    raise exception 'Sem permissão para definir datas.' using errcode = '42501';
+  end if;
+
+  update inovacao.solicitacoes
+     set data_inicio   = p_data_inicio,
+         data_prevista = p_data_prevista
+   where id = p_id;
+  if not found then raise exception 'Solicitação não encontrada.'; end if;
+
+  return jsonb_build_object('id', p_id, 'data_inicio', p_data_inicio, 'data_prevista', p_data_prevista);
+end;
+$$;
+revoke all on function inovacao.definir_datas(uuid, date, date) from public, anon;
+grant execute on function inovacao.definir_datas(uuid, date, date) to authenticated;
 
 -- Badge da sidebar: gestor -> pendentes em "Solicitação"; comum -> notificações não lidas.
 create or replace function inovacao.badge()
@@ -447,7 +472,8 @@ on conflict (user_id) do nothing;
 --   select inovacao.is_gestor();
 --   select inovacao.criar_solicitacao('Título', 'O que eu quero', 'Como eu quero', 'Finalidade');
 --   select inovacao.minhas_solicitacoes();
---   select inovacao.quadro();                     -- só gestor
+--   select inovacao.quadro();                     -- todo autenticado
+--   select inovacao.definir_datas('<id>', '2026-08-01', '2026-08-15'); -- só gestor
 --   select inovacao.mover_solicitacao('<id>', 'analise');
 --   select inovacao.badge();
 --   select inovacao.dashboard();                  -- só gestor

@@ -5,8 +5,9 @@
    barra aqui lista PÁGINAS (Nova solicitação, Minhas solicitações,
    Quadro, Dashboard) em vez de setores.
    ------------------------------------------------------------
-   - Nova solicitação / Minhas solicitações: qualquer usuário do ERP.
-   - Quadro / Dashboard: só quem está em inovacao.gestores.
+   - Nova solicitação / Minhas solicitações / Quadro: qualquer usuário do ERP
+     (no Quadro, quem não é gestor só visualiza — não arrasta os cards).
+   - Dashboard e mover/editar datas dos cards: só quem está em inovacao.gestores.
    ============================================================ */
 (function () {
   'use strict';
@@ -39,7 +40,7 @@
   var PAGINAS = [
     { id: 'novo',      titulo: 'Nova solicitação',     sub: 'Descreva o pedido com o máximo de detalhe', icon: 'novo',   todos: true },
     { id: 'minhas',    titulo: 'Minhas solicitações',  sub: 'Acompanhe o status dos seus pedidos',        icon: 'lista',  todos: true },
-    { id: 'quadro',    titulo: 'Quadro',               sub: 'Solicitação → Análise → Desenvolvimento → Finalizado', icon: 'quadro', todos: false },
+    { id: 'quadro',    titulo: 'Quadro',               sub: 'Solicitação → Análise → Desenvolvimento → Finalizado', icon: 'quadro', todos: true },
     { id: 'dashboard', titulo: 'Dashboard',            sub: 'Visão geral das solicitações de desenvolvimento',       icon: 'dash',   todos: false }
   ];
 
@@ -141,7 +142,7 @@
 
     if (id === 'novo') renderNovo();
     if (id === 'minhas') renderMinhas();
-    if (id === 'quadro' && isGestor) renderQuadro();
+    if (id === 'quadro') renderQuadro();
     if (id === 'dashboard' && isGestor) renderDashboard();
   }
 
@@ -266,10 +267,15 @@
   function minhaItemHtml(s) {
     var col = colInfo(s.coluna);
     var extra = '';
-    if (s.coluna === 'desenvolvimento' && s.data_prevista) {
-      extra = '<div class="kb-mine__extra">Previsão de entrega: ' + esc(fmtData(s.data_prevista)) + '</div>';
-    } else if (s.coluna === 'recusado' && s.motivo_recusa) {
-      extra = '<div class="kb-mine__extra kb-mine__extra--neg">Motivo: ' + esc(s.motivo_recusa) + '</div>';
+    if (s.data_inicio || s.data_prevista) {
+      extra += '<div class="kb-mine__extra">' +
+        (s.data_inicio ? 'Início: ' + esc(fmtData(s.data_inicio)) : '') +
+        (s.data_inicio && s.data_prevista ? ' · ' : '') +
+        (s.data_prevista ? 'Previsão de entrega: ' + esc(fmtData(s.data_prevista)) : '') +
+      '</div>';
+    }
+    if (s.coluna === 'recusado' && s.motivo_recusa) {
+      extra += '<div class="kb-mine__extra kb-mine__extra--neg">Motivo: ' + esc(s.motivo_recusa) + '</div>';
     }
     return '<div class="kb-mine__item">' +
       '<div class="kb-mine__top"><b>' + esc(s.titulo) + '</b><span class="eng-status" style="--c:' + esc(col.cor) + '">' + esc(col.label) + '</span></div>' +
@@ -300,10 +306,19 @@
 
   function cardHtml(s) {
     var quem = esc(s.created_by_nome || s.created_by_email || 'Alguém');
-    return '<div class="kb-card" draggable="true" data-id="' + esc(s.id) + '">' +
+    var datas = '';
+    if (s.data_inicio || s.data_prevista) {
+      datas = '<div class="kb-card__datas">' +
+        (s.data_inicio ? 'Início ' + esc(fmtData(s.data_inicio)) : '') +
+        (s.data_inicio && s.data_prevista ? ' · ' : '') +
+        (s.data_prevista ? 'Previsão ' + esc(fmtData(s.data_prevista)) : '') +
+      '</div>';
+    }
+    return '<div class="kb-card"' + (isGestor ? ' draggable="true"' : '') + ' data-id="' + esc(s.id) + '">' +
       '<div class="kb-card__top"><b>' + esc(s.titulo) + '</b></div>' +
       '<div class="kb-card__who">' + quem + '</div>' +
       '<div class="kb-card__sub">' + esc((s.o_que_quer || '').slice(0, 90)) + '</div>' +
+      datas +
       (s.anexos && s.anexos.length ? '<div class="kb-card__anexos">📎 ' + s.anexos.length + '</div>' : '') +
     '</div>';
   }
@@ -319,10 +334,13 @@
     }).join('') + '</div>';
 
     box.querySelectorAll('.kb-card').forEach(function (el) {
-      el.addEventListener('dragstart', function (e) { e.dataTransfer.setData('text/plain', el.getAttribute('data-id')); el.classList.add('is-dragging'); });
-      el.addEventListener('dragend', function () { el.classList.remove('is-dragging'); });
+      if (isGestor) {
+        el.addEventListener('dragstart', function (e) { e.dataTransfer.setData('text/plain', el.getAttribute('data-id')); el.classList.add('is-dragging'); });
+        el.addEventListener('dragend', function () { el.classList.remove('is-dragging'); });
+      }
       el.addEventListener('click', function () { abrirDetalhe(el.getAttribute('data-id')); });
     });
+    if (!isGestor) return;
     box.querySelectorAll('.kb-col').forEach(function (col) {
       col.addEventListener('dragover', function (e) { e.preventDefault(); col.classList.add('is-over'); });
       col.addEventListener('dragleave', function () { col.classList.remove('is-over'); });
@@ -394,13 +412,20 @@
     m.innerHTML =
       '<div class="eng-picker__card" style="max-width:640px">' +
         '<div class="eng-picker__hd"><b>' + esc(s.titulo) + '</b><button type="button" class="smerp-modal__close" id="dvd_close" aria-label="Fechar">&times;</button></div>' +
-        '<div class="eng-picker__filters" style="flex-direction:column;align-items:stretch;gap:10px">' +
+        '<div class="eng-picker__filters dvd-body" style="flex-direction:column;align-items:stretch;gap:10px">' +
           '<span class="eng-status" style="--c:' + esc(col.cor) + '">' + esc(col.label) + '</span>' +
           '<div><b>Solicitante:</b> ' + esc(s.created_by_nome || '') + (s.created_by_email ? ' — ' + esc(s.created_by_email) : '') + '</div>' +
           '<div><b>O que quer:</b><br/>' + esc(s.o_que_quer) + '</div>' +
           '<div><b>Como quer:</b><br/>' + esc(s.como_quer) + '</div>' +
           '<div><b>Finalidade:</b><br/>' + esc(s.finalidade) + '</div>' +
-          (s.data_prevista ? '<div><b>Previsão de entrega:</b> ' + esc(fmtData(s.data_prevista)) + '</div>' : '') +
+          (isGestor
+            ? '<div class="eng-picker__filters" style="padding:10px 0 0;border:none;gap:10px">' +
+                '<label class="smerp-field"><span>Data de início</span><input type="date" id="dvd_inicio" class="eng-in" value="' + esc((s.data_inicio || '').slice(0, 10)) + '" /></label>' +
+                '<label class="smerp-field"><span>Previsão de entrega</span><input type="date" id="dvd_prevista" class="eng-in" value="' + esc((s.data_prevista || '').slice(0, 10)) + '" /></label>' +
+                '<button type="button" class="eng-btn-ghost" id="dvd_datas_save">Salvar datas</button>' +
+              '</div>'
+            : ((s.data_inicio ? '<div><b>Data de início:</b> ' + esc(fmtData(s.data_inicio)) + '</div>' : '') +
+               (s.data_prevista ? '<div><b>Previsão de entrega:</b> ' + esc(fmtData(s.data_prevista)) + '</div>' : ''))) +
           (s.motivo_recusa ? '<div><b>Motivo da recusa:</b> ' + esc(s.motivo_recusa) + '</div>' : '') +
           '<div id="dvd_anexos">' + (s.anexos && s.anexos.length ? 'Carregando anexos…' : 'Sem anexos.') + '</div>' +
         '</div>' +
@@ -408,7 +433,30 @@
     m.hidden = false;
     $('dvd_close').onclick = function () { m.hidden = true; };
     m.addEventListener('click', function (e) { if (e.target === m) m.hidden = true; });
+    if (isGestor) $('dvd_datas_save').onclick = function () { salvarDatas(s.id); };
     if (s.anexos && s.anexos.length) loadAnexos(s.anexos);
+  }
+
+  async function salvarDatas(id) {
+    var btn = $('dvd_datas_save');
+    var prev = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Salvando…';
+    try {
+      var res = await db().rpc('definir_datas', {
+        p_id: id,
+        p_data_inicio: fval('dvd_inicio') || null,
+        p_data_prevista: fval('dvd_prevista') || null
+      });
+      if (res.error) throw res.error;
+      var s = cardById(id);
+      if (s) { s.data_inicio = fval('dvd_inicio') || null; s.data_prevista = fval('dvd_prevista') || null; }
+      btn.textContent = 'Salvo!';
+      setTimeout(function () { drawQuadro(); }, 400);
+    } catch (e) {
+      alert((e && e.message) || 'Não foi possível salvar as datas.');
+      console.error('[DEV] definir_datas', e);
+      btn.disabled = false; btn.textContent = prev;
+    }
   }
 
   async function loadAnexos(anexos) {
