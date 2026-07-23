@@ -107,19 +107,31 @@ async function main() {
   }
   console.log(`  Lotes upsertados: ${lotesOk}`);
 
+  // OFs travadas por lançamento manual (ver lotes.$numero.tsx) não podem ser
+  // sobrescritas por este sync — senão a correção manual some na próxima rodada.
+  const { data: travadas, error: travadasErr } = await sb
+    .from('of_por_lote')
+    .select('ordem')
+    .eq('travado_sync', true);
+  if (travadasErr) console.error('  Erro ao buscar OFs travadas:', travadasErr.message);
+  const ordensTravadas = new Set((travadas ?? []).map(r => r.ordem));
+  if (ordensTravadas.size > 0) console.log(`  ${ordensTravadas.size} OF(s) travada(s) por lançamento manual — ignoradas neste sync`);
+
   // Monta linhas de of_por_lote
-  const ofRows = comLote.map(o => ({
-    ordem:                parseInt(o.Ordem),
-    lote:                 o.Lote.trim(),
-    produto:              o.Produto || null,
-    nome_produto:         o.NomeProduto || null,
-    quantidade:           parseFloat(o.Quantidade) || 0,
-    quantidade_produzida: parseFloat(o.QuantidadeProduzida) || 0,
-    status:               o.Status || null,
-    data_previsao:        parseBRDate(o.DataPrevisao),
-    data_alteracao:       parseBRDate(o.DataAlteracao),
-    deposito:             parseInt(o.Deposito) || 1,
-  }));
+  const ofRows = comLote
+    .filter(o => !ordensTravadas.has(parseInt(o.Ordem)))
+    .map(o => ({
+      ordem:                parseInt(o.Ordem),
+      lote:                 o.Lote.trim(),
+      produto:              o.Produto || null,
+      nome_produto:         o.NomeProduto || null,
+      quantidade:           parseFloat(o.Quantidade) || 0,
+      quantidade_produzida: parseFloat(o.QuantidadeProduzida) || 0,
+      status:               o.Status || null,
+      data_previsao:        parseBRDate(o.DataPrevisao),
+      data_alteracao:       parseBRDate(o.DataAlteracao),
+      deposito:             parseInt(o.Deposito) || 1,
+    }));
 
   let ofOk = 0, ofErr = 0;
   for (let i = 0; i < ofRows.length; i += BATCH) {
