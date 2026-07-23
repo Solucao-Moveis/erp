@@ -706,7 +706,7 @@ function industrialPostLongo(endpoint, body) {
       });
     });
     req.on('error', reject);
-    req.setTimeout(5 * 60_000, () => { req.destroy(); reject(new Error('lotes timeout 5min')); });
+    req.setTimeout(10 * 60_000, () => { req.destroy(); reject(new Error('lotes timeout 10min')); });
     req.write(payload);
     req.end();
   });
