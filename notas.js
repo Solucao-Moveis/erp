@@ -10,6 +10,29 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.43',
+    data: '23/07/2026',
+    titulo: 'Compras: percentuais no Dashboard e novo indicador de prazo de compra (36h)',
+    resumo: 'Os cards de prazo do Dashboard de Compras agora mostram o percentual ao lado do número, o card "Atrasadas" separa o que ainda nem foi comprado do que já foi comprado mas a entrega está atrasada, e entrou um novo indicador que cobra um prazo máximo de 36 horas entre a aprovação da solicitação e o registro da compra.',
+    mudancas: [
+      {
+        app: 'Compras — Dashboard',
+        o_que: 'Os 4 cards da linha de prazo (Atrasadas, Compradas em trânsito, Não compradas no prazo, Compradas e entregues no prazo) agora mostram o percentual ao lado do número.',
+        como: 'O percentual é sobre o total de solicitações em aberto, exceto no card "Compradas e entregues no prazo", que mostra a taxa de pontualidade das entregas (percentual sobre o total já entregue, no prazo ou atrasado).',
+      },
+      {
+        app: 'Compras — Dashboard',
+        o_que: 'O card Atrasadas agora separa quantas ainda nem foram compradas de quantas já foram compradas mas a entrega está atrasada.',
+        como: 'Dentro do card Atrasadas aparecem duas linhas: "Ainda não comprada" e "Comprada — entrega atrasada", cada uma com sua contagem e percentual — assim dá pra saber se o atraso é porque falta comprar ou porque o fornecedor está atrasando a entrega.',
+      },
+      {
+        app: 'Compras — Dashboard',
+        o_que: 'Novo indicador de prazo para a etapa de compra: máximo de 36 horas entre a aprovação da solicitação e o registro da compra.',
+        como: 'Uma nova linha de cards mostra "Compradas dentro do prazo (36h da aprovação)" e "Não compradas no prazo (36h da aprovação)". Esse prazo não é a data de necessidade do item — é contado a partir do momento em que a solicitação foi aprovada. Clique no card pra ver a lista das solicitações.',
+      },
+    ],
+  },
+  {
     versao: '6.42',
     data: '23/07/2026',
     titulo: 'Manutenção: excluir e cancelar Ordem de Serviço, restrito a admin',
