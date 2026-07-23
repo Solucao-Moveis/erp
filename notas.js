@@ -10,6 +10,24 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.42',
+    data: '23/07/2026',
+    titulo: 'Manutenção: excluir e cancelar Ordem de Serviço, restrito a admin',
+    resumo: 'Quem tem papel de admin no sistema de Manutenção agora pode excluir uma OS de vez ou cancelar uma OS aberta por engano — a cancelada some da lista de abertas, fica guardada numa aba própria pra histórico, e não conta em nenhum indicador (MTTR, MTBF, disponibilidade).',
+    mudancas: [
+      {
+        app: 'Pro-Care — Manutenção → Ordens de Serviço',
+        o_que: 'Botão de excluir OS definitivamente, visível só para quem é admin.',
+        como: 'Na lista de OS (abertas, fechadas ou canceladas), o admin clica no ícone de lixeira na linha da OS e confirma. Apaga o registro do banco, não tem como desfazer.',
+      },
+      {
+        app: 'Pro-Care — Manutenção → Ordens de Serviço',
+        o_que: 'Botão de cancelar OS (ícone de proibido), visível só para quem é admin — pra chamados abertos por engano.',
+        como: 'Na lista de OS em aberto, o admin clica no ícone de cancelar, escreve o motivo e confirma. A OS sai da lista de abertas e passa para uma nova aba "OS canceladas", mantida pra consulta/histórico — mas o tempo que ela ficou aberta não entra em nenhuma conta de indicador (Dashboard e Indicadores) nem no contador de chamados pendentes do sino.',
+      },
+    ],
+  },
+  {
     versao: '6.41',
     data: '23/07/2026',
     titulo: 'Compras: vários pedidos de compra por solicitação, vínculo com itens, nota fiscal anexada e recebimento por item',
