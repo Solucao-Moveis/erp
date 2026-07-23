@@ -52,6 +52,28 @@ function industrialPost(endpoint, body) {
   });
 }
 
+async function industrialPostRaw(endpoint, body) {
+  const url     = new URL(`${INDUSTRIAL_BASE}/${endpoint}`);
+  const payload = JSON.stringify({ ...body, ApiToken: INDUSTRIAL_TOKEN });
+  return new Promise((resolve, reject) => {
+    const req = http.request({
+      hostname: url.hostname,
+      port:     url.port || 80,
+      path:     url.pathname,
+      method:   'POST',
+      headers:  { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) },
+    }, res => {
+      let data = '';
+      res.on('data', c => data += c);
+      res.on('end', () => resolve({ status: res.statusCode, body: data }));
+    });
+    req.on('error', reject);
+    req.setTimeout(15 * 60_000, () => { req.destroy(); reject(new Error('timeout 15min')); });
+    req.write(payload);
+    req.end();
+  });
+}
+
 async function setSyncState(ok, mensagem = null) {
   await sb.from('sync_state').upsert(
     { recurso: 'lotes', ultimo_sync: new Date().toISOString(), ok, mensagem },
@@ -61,14 +83,15 @@ async function setSyncState(ok, mensagem = null) {
 
 async function main() {
   console.log(`[lotes] Buscando OFs no Industrial (DataAlteracao >= ${dataHA(30)})...`);
-  const data = await industrialPost('API_OrdemFabricacao/ListarOrdemFabricacao', {
+
+  // Debug: ver resposta bruta da API
+  const raw = await industrialPostRaw('API_OrdemFabricacao/ListarOrdemFabricacao', {
     DataAlteracao: dataHA(30), Ordem: 0, Produto: '', Tipo: 'OF',
     Deposito: 0, Lote: '', OrdemEncerrada: 'S', IndustrializacaoTerceiros: '', EstruturaProduto: 'N',
   });
-
-  console.log('[lotes] API raw:', typeof data, Array.isArray(data)
-    ? `array[${data.length}]`
-    : JSON.stringify(data)?.substring(0, 300));
+  console.log(`[lotes] HTTP ${raw.status} — primeiros 500 chars:`);
+  console.log(raw.body.substring(0, 500));
+  process.exit(0);
 
   const ofs    = Array.isArray(data) ? data : [];
   const comLote = ofs.filter(o => o.Lote?.trim());
