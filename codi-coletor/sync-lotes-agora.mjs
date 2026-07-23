@@ -66,6 +66,10 @@ async function main() {
     Deposito: 0, Lote: '', OrdemEncerrada: 'S', IndustrializacaoTerceiros: '', EstruturaProduto: 'N',
   });
 
+  console.log('[lotes] API raw:', typeof data, Array.isArray(data)
+    ? `array[${data.length}]`
+    : JSON.stringify(data)?.substring(0, 300));
+
   const ofs    = Array.isArray(data) ? data : [];
   const comLote = ofs.filter(o => o.Lote?.trim());
   console.log(`[lotes] ${ofs.length} OFs recebidas, ${comLote.length} com lote`);
