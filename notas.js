@@ -12,18 +12,18 @@ window.SMERP_NOTAS = [
   {
     versao: '6.41',
     data: '23/07/2026',
-    titulo: 'Compras: vários pedidos de compra por solicitação, nota fiscal anexada e recebimento por item',
-    resumo: 'Uma solicitação agora pode ter vários pedidos de compra (cada um com sua nota fiscal), o recebimento do material passa a ser lançado item por item — inclusive parcial — e o comprador pode registrar a previsão de entrega do fornecedor.',
+    titulo: 'Compras: vários pedidos de compra por solicitação, vínculo com itens, nota fiscal anexada e recebimento por item',
+    resumo: 'Uma solicitação agora pode ter vários pedidos de compra (cada um com sua nota fiscal), cada pedido pode ser vinculado aos itens que ele cobre pra dar baixa automática na chegada, o recebimento do material passa a ser lançado item por item — inclusive parcial — e o comprador pode registrar a previsão de entrega do fornecedor.',
     mudancas: [
       {
         app: 'Compras → Solicitações → detalhe',
-        o_que: 'Pedidos de compra agora são uma lista (pode ter mais de um por solicitação), cada um com a opção de anexar a nota fiscal.',
-        como: 'Abra uma solicitação aprovada. Em "Pedidos de compra", o comprador/admin digita o número e clica em "Adicionar" — pode repetir para mais de um pedido. Depois que o pedido é criado, aparece o botão "Anexar NF" para subir o arquivo da nota; uma vez anexada, qualquer um pode clicar em "Ver NF" para baixar.',
+        o_que: 'Pedidos de compra agora são uma lista (pode ter mais de um por solicitação), cada um com a opção de vincular os itens que cobre e de anexar a nota fiscal.',
+        como: 'Abra uma solicitação aprovada. Em "Pedidos de compra", o comprador/admin clica em "Adicionar pedido de compra": informa o número e, se quiser, marca quais itens (e quanto de cada) esse pedido cobre — um mesmo item pode ser dividido entre pedidos diferentes. Pedidos já cadastrados antes também podem ser abertos pra vincular os itens depois, clicando em "Vincular itens" (ou no contador de itens, pra editar). Depois de criado, aparece o botão "Anexar NF" para subir o arquivo da nota; uma vez anexada, qualquer um pode clicar em "Ver NF" para baixar.',
       },
       {
         app: 'Compras → Solicitações → detalhe',
-        o_que: 'Recebimento do material passa a ser lançado por item, podendo ser parcial (uma parte agora, o resto depois).',
-        como: 'Na tabela de itens já comprados, a coluna "Chegada" mostra quanto já chegou de cada um. Informe a quantidade recebida de cada item e clique em "Registrar chegada" (ou "Registrar chegada parcial" se ainda faltar algo) — a solicitação só passa para "Finalizado" quando todos os itens chegarem 100%.',
+        o_que: 'Recebimento do material passa a ser lançado por item, podendo ser parcial (uma parte agora, o resto depois) — ou de uma vez só por pedido de compra, se ele tiver itens vinculados.',
+        como: 'Na tabela de itens já comprados, a coluna "Chegada" mostra quanto já chegou de cada um. Informe a quantidade recebida de cada item e clique em "Registrar chegada" (ou "Registrar chegada parcial" se ainda faltar algo) — a solicitação só passa para "Finalizado" quando todos os itens chegarem 100%. Se um pedido de compra tem itens vinculados, aparece também a opção "Registrar chegada" dele na seção de Ações: um clique só dá baixa em todos os itens daquele pedido, na quantidade exata vinculada, sem precisar digitar de novo.',
       },
       {
         app: 'Compras → Solicitações → detalhe',
