@@ -10,6 +10,34 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.44',
+    data: '24/07/2026',
+    titulo: 'Compras: tipo de compra, urgência com justificativa e rejeição de item na aprovação',
+    resumo: 'Toda solicitação de compra agora exige classificar o tipo (matéria-prima ou insumos/outros), dá pra marcar como urgente com justificativa obrigatória, o aprovador pode rejeitar itens específicos de uma solicitação com vários itens (aprovando o resto) e reverter uma aprovação já feita se precisar.',
+    mudancas: [
+      {
+        app: 'Compras — Nova solicitação / Editar',
+        o_que: 'Campo obrigatório "Tipo de compra" (Matéria-prima ou Insumos / Outros).',
+        como: 'Ao abrir ou editar uma solicitação, escolha o tipo no formulário. Se a data de necessidade escolhida for menor que o prazo padrão de entrega desse tipo, aparece um aviso — mas não impede o envio.',
+      },
+      {
+        app: 'Compras — Nova solicitação / Editar',
+        o_que: 'Marcação de "Urgente" com justificativa obrigatória.',
+        como: 'Ative o botão "Urgente" e escreva o motivo — o campo de justificativa só aparece quando ligado e é obrigatório pra salvar. Solicitações urgentes ganham uma tag vermelha "Urgente" no detalhe e na fila de aprovação.',
+      },
+      {
+        app: 'Compras — Detalhe da solicitação',
+        o_que: 'O aprovador pode rejeitar itens específicos de uma solicitação com vários itens, aprovando o restante.',
+        como: 'Na tela de aprovação, marque a caixinha de "rejeitar" do item e escreva o motivo antes de clicar em Aprovar. O item rejeitado fica marcado na lista e não entra mais nas etapas de compra e chegada — a solicitação segue seu fluxo normal com os itens restantes.',
+      },
+      {
+        app: 'Compras — Detalhe da solicitação',
+        o_que: 'Botão para reverter uma aprovação já feita.',
+        como: 'Enquanto nada foi comprado ainda, aparece o botão "Reverter aprovação" — pede um motivo, volta a solicitação para "pendente" e limpa as rejeições de item, pra o aprovador decidir tudo de novo (ex.: descobriu depois que a urgência não se justificava).',
+      },
+    ],
+  },
+  {
     versao: '6.43',
     data: '23/07/2026',
     titulo: 'Compras: percentuais no Dashboard e novo indicador de prazo de compra (36h)',
