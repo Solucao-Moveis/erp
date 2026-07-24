@@ -10,6 +10,24 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.45',
+    data: '24/07/2026',
+    titulo: 'Compras: SLA automático de entrega e alerta de "fora do prazo acordado"',
+    resumo: 'Assim que a solicitação é aprovada, o sistema já calcula o prazo máximo de entrega (15 dias pra matéria-prima, 5 pra insumos, 1 dia se for urgente). Quando o comprador registra a previsão do fornecedor além desse prazo, precisa justificar — e a solicitação fica marcada com um alerta "Fora do prazo acordado".',
+    mudancas: [
+      {
+        app: 'Compras — Detalhe da solicitação',
+        o_que: 'Prazo limite (SLA) calculado automaticamente e mostrado ao comprador ao lado do campo de previsão de entrega.',
+        como: 'Ao abrir uma SC aprovada, o comprador vê "Prazo limite (SLA): dd/mm/aaaa" — a data da aprovação mais o prazo padrão do tipo de compra (ou 1 dia se for urgente).',
+      },
+      {
+        app: 'Compras — Detalhe da solicitação',
+        o_que: 'Justificativa obrigatória quando a previsão do fornecedor passa do prazo-limite.',
+        como: 'Se o comprador escolher uma data de entrega além do prazo, aparece um campo de justificativa obrigatório antes de salvar. Depois de salvar, a SC ganha uma tag âmbar "Fora do prazo acordado" com o motivo visível pra quem acompanhar.',
+      },
+    ],
+  },
+  {
     versao: '6.44',
     data: '24/07/2026',
     titulo: 'Compras: tipo de compra, urgência com justificativa e rejeição de item na aprovação',
