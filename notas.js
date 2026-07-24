@@ -10,6 +10,29 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.46',
+    data: '24/07/2026',
+    titulo: 'Compras: nova tela "Indicadores" com tendência mensal de prazo e SLA',
+    resumo: 'Nova tela dedicada a acompanhar prazo e SLA de compras ao longo do tempo, separada do Dashboard de custo. Mostra a evolução mês a mês de quatro indicadores de saúde de prazo, os tempos médios do processo, e uma tabela com o detalhe de cada solicitação.',
+    mudancas: [
+      {
+        app: 'Compras — Indicadores (novo)',
+        o_que: 'Gráfico de tendência mensal com 4 indicadores: SC aberta tardia, Fora do prazo acordado, Entregue no prazo da necessidade, e Fornecedor cumpriu o prometido.',
+        como: 'Acesse pelo menu lateral "Indicadores". Cada linha do gráfico mostra o percentual mês a mês — inclusive para as solicitações antigas, já que o histórico foi classificado. "Fornecedor cumpriu o prometido" é novo: mede se a entrega chegou na data que o próprio fornecedor prometeu, separado de saber se essa promessa estava dentro do prazo aceito pela empresa.',
+      },
+      {
+        app: 'Compras — Indicadores (novo)',
+        o_que: 'Gráfico de tempos médios (Abertura→Aprovação, Aprovação→Compra, Compra→Chegada) em tendência mensal.',
+        como: 'Mesmos tempos que já apareciam no Dashboard, agora mostrados mês a mês pra dar pra ver se o processo está melhorando ou piorando ao longo do tempo.',
+      },
+      {
+        app: 'Compras — Indicadores (novo)',
+        o_que: 'Tabela paginada com todas as solicitações, uma linha por SC, mostrando as 4 datas (necessidade, abertura, aprovação, compra, prevista, real) e os 4 indicadores.',
+        como: 'Role até o final da página de Indicadores; use os botões de página pra navegar. Clique no número da SC pra abrir o detalhe dela.',
+      },
+    ],
+  },
+  {
     versao: '6.45',
     data: '24/07/2026',
     titulo: 'Compras: SLA automático de entrega e alerta de "fora do prazo acordado"',
