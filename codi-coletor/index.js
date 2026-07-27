@@ -541,6 +541,22 @@ async function pollDetalheMaquina(maqId) {
 
   const { error } = await sb.from('maquinas_detalhe').upsert(detalhe, { onConflict: 'maquina_id' });
   if (error) console.error(`[detalhe] upsert ${maqId}:`, error.message);
+
+  // maquinas_disponibilidade_dia: mesmo dado do ciclo, upsert por (maquina_id, dia).
+  // Quando o dia vira, a linha do dia anterior para de ser tocada e fica com o
+  // último valor do turno — vira o histórico daquele dia. Sem chamada nova à API.
+  const { error: errDia } = await sb.from('maquinas_disponibilidade_dia').upsert({
+    maquina_id:          parseInt(maqId),
+    dia:                 hoje,
+    tempo_producao_min:  oee?.prodTime != null ? safeNum(oee.prodTime * 60) : null,
+    tempo_parada_min:    oee?.downTime != null ? safeNum(oee.downTime * 60) : null,
+    disponibilidade_pct: safeNum(oee?.disp),
+    oee_pct:             safeNum(oee?.oee),
+    performance_pct:     safeNum(oee?.perf),
+    qualidade_pct:       safeNum(oee?.qual),
+    atualizado_em:       new Date().toISOString(),
+  }, { onConflict: 'maquina_id,dia' });
+  if (errDia) console.error(`[disp-dia] upsert ${maqId}:`, errDia.message);
 }
 
 async function pollDetalhe() {
