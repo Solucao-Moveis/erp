@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.48',
+    data: '27/07/2026',
+    titulo: 'Compras: aba "Dashboard" removida, Indicadores agora é a tela inicial',
+    resumo: 'A aba Dashboard foi removida do menu de Compras — todos os gráficos e alertas que estavam lá já tinham sido migrados pra Indicadores, que agora é a tela que abre ao entrar no sistema.',
+    mudancas: [
+      {
+        app: 'Compras',
+        o_que: 'Aba "Dashboard" removida do menu lateral; a página foi apagada.',
+        como: 'Ao entrar no sistema (ou fazer login), você cai direto em "Indicadores", que já reúne tudo que estava no Dashboard antigo. Links salvos ou favoritados pro Dashboard antigo deixam de funcionar.',
+      },
+    ],
+  },
+  {
     versao: '6.47',
     data: '27/07/2026',
     titulo: 'Compras: gráficos de setor/status/centro de custo agora ficam em Indicadores',
