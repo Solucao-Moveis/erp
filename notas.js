@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.52',
+    data: '27/07/2026',
+    titulo: 'Compras: rótulos dos gráficos de Indicadores corrigidos',
+    resumo: 'O rótulo do ponto mais alto do gráfico "Saúde de prazo (%)" estava sendo cortado no topo, e o gráfico "Tempos médios (dias)" tinha ficado sem os rótulos de valor. Os dois foram corrigidos.',
+    mudancas: [
+      {
+        app: 'Compras — Indicadores',
+        o_que: 'Rótulo de valor adicionado também no gráfico "Tempos médios (dias)"; corte no topo do gráfico "Saúde de prazo (%)" resolvido.',
+        como: 'Os dois gráficos agora mostram o valor de cada ponto de forma legível, sem cortar, inclusive quando o filtro cai num único mês.',
+      },
+    ],
+  },
+  {
     versao: '6.51',
     data: '27/07/2026',
     titulo: 'Compras: percentual visível nos pontos do gráfico Saúde de prazo',
