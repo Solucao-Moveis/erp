@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.47',
+    data: '27/07/2026',
+    titulo: 'Compras: gráficos de setor/status/centro de custo agora ficam em Indicadores',
+    resumo: 'Os gráficos "Solicitações por setor", "Distribuição por status" e "Valor de compras por centro de custo" saíram do Dashboard e passaram a viver na tela de Indicadores, logo abaixo dos Tempos médios — o Dashboard fica focado só nos alertas de prazo/SLA.',
+    mudancas: [
+      {
+        app: 'Compras — Indicadores',
+        o_que: 'Os 3 gráficos de setor, status e centro de custo (com filtro de mês e detalhe por clique) foram movidos do Dashboard para cá.',
+        como: 'Acesse "Indicadores" no menu lateral e role até abaixo do gráfico de Tempos médios — os gráficos de setor e status aparecem lado a lado, e o de centro de custo logo abaixo (clique numa barra pra ver as compras daquele centro de custo). Eles não aparecem mais no Dashboard.',
+      },
+    ],
+  },
+  {
     versao: '6.46',
     data: '24/07/2026',
     titulo: 'Compras: nova tela "Indicadores" com tendência mensal de prazo e SLA',
