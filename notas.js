@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.50',
+    data: '27/07/2026',
+    titulo: 'Compras: descrição liberada para o item "Despesa Geral"',
+    resumo: 'Ao escolher um item do catálogo, a descrição normalmente só pode ser editada pelo comprador. Agora, especificamente para o item "0000000 — Despesa Geral", qualquer solicitante pode escrever a descrição, já que esse código é genérico e o texto muda a cada solicitação.',
+    mudancas: [
+      {
+        app: 'Compras — Nova solicitação / Editar solicitação',
+        o_que: 'Campo Descrição liberado para edição por qualquer usuário quando o item escolhido é "0000000 — Despesa Geral".',
+        como: 'Ao selecionar esse código no Item, o campo Descrição fica digitável normalmente (antes só o comprador conseguia editar). Para os demais itens do catálogo, continua bloqueado como antes.',
+      },
+    ],
+  },
+  {
     versao: '6.49',
     data: '27/07/2026',
     titulo: 'Compras: gráficos de setor/status/centro de custo agora seguem o filtro De/Até',
