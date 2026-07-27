@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.49',
+    data: '27/07/2026',
+    titulo: 'Compras: gráficos de setor/status/centro de custo agora seguem o filtro De/Até',
+    resumo: 'Os gráficos "Solicitações por setor", "Distribuição por status" e "Valor de compras por centro de custo" da tela de Indicadores não respeitavam o período selecionado no topo da página — agora acompanham o mesmo filtro De/Até dos outros gráficos.',
+    mudancas: [
+      {
+        app: 'Compras — Indicadores',
+        o_que: 'Os 3 gráficos passaram a considerar apenas o período (De/Até) selecionado no topo da tela.',
+        como: 'Escolha o mês (ou intervalo) desejado nos campos "De" e "até" no topo de Indicadores — os gráficos de setor, status e centro de custo atualizam junto com os demais, inclusive pra ver só o mês atual.',
+      },
+    ],
+  },
+  {
     versao: '6.48',
     data: '27/07/2026',
     titulo: 'Compras: aba "Dashboard" removida, Indicadores agora é a tela inicial',
