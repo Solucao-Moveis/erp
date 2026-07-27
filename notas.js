@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.51',
+    data: '27/07/2026',
+    titulo: 'Compras: percentual visível nos pontos do gráfico Saúde de prazo',
+    resumo: 'Ao filtrar Indicadores pra um único mês, o gráfico "Saúde de prazo (%)" virava só 4 pontos soltos, sem dar pra ler o valor. Agora cada ponto mostra o percentual ao lado, tanto filtrando 1 mês quanto vários.',
+    mudancas: [
+      {
+        app: 'Compras — Indicadores',
+        o_que: 'Rótulo com o percentual adicionado em cada ponto do gráfico "Saúde de prazo (%)".',
+        como: 'Não precisa fazer nada diferente — ao passar o mouse ou já olhando o gráfico, o valor de cada indicador aparece escrito ao lado do ponto correspondente.',
+      },
+    ],
+  },
+  {
     versao: '6.50',
     data: '27/07/2026',
     titulo: 'Compras: descrição liberada para o item "Despesa Geral"',
