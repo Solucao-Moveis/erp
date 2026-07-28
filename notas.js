@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.54',
+    data: '27/07/2026',
+    titulo: 'Compras: cards de tempo médio do topo de Indicadores agora seguem o filtro',
+    resumo: 'Os 3 cards no topo de Indicadores (Abertura→Aprovação, Aprovação→Compra, Compra→Chegada) sempre mostravam o mês atual de verdade, mesmo quando você mudava o período no filtro De/Até — agora eles acompanham o período selecionado, igual ao resto da tela.',
+    mudancas: [
+      {
+        app: 'Compras — Indicadores',
+        o_que: 'Os 3 cards do topo passaram a considerar o período (De/Até) selecionado, em vez de sempre o mês corrente.',
+        como: 'Sem filtro, os cards mostram a média de todo o histórico; ao escolher um período no calendário De/Até, eles atualizam pra mostrar só a média daquele intervalo — igual aos gráficos e às outras tabelas da tela.',
+      },
+    ],
+  },
+  {
     versao: '6.53',
     data: '27/07/2026',
     titulo: 'Compras: filtro De/Até de Indicadores agora usa calendário',
