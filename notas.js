@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.57',
+    data: '27/07/2026',
+    titulo: 'Compras: card SAVE não conta mais o item Despesa Geral',
+    resumo: 'O item genérico "0000000 — Despesa Geral" estava entrando no cálculo de economia do card SAVE, mas como a descrição dele varia a cada solicitação, comparar preço unitário nesse item não faz sentido — foi excluído do cálculo.',
+    mudancas: [
+      {
+        app: 'Compras — Indicadores',
+        o_que: 'Item "Despesa Geral" (código 0000000) não entra mais na conta de economia do card SAVE nem na tabela de detalhe.',
+        como: 'O card e a tabela por produto agora só mostram economia de itens reais do catálogo.',
+      },
+    ],
+  },
+  {
     versao: '6.56',
     data: '27/07/2026',
     titulo: 'Compras: card SAVE — economia média por produto em Indicadores',
