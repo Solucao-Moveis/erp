@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.58',
+    data: '27/07/2026',
+    titulo: 'Compras: card SAVE agora destaca o total economizado',
+    resumo: 'O número grande do card SAVE, em Indicadores, era a média por produto — agora é o total economizado no período, com a média aparecendo como informação secundária.',
+    mudancas: [
+      {
+        app: 'Compras — Indicadores',
+        o_que: 'Card SAVE passou a mostrar o total economizado em destaque, com a média por produto e a quantidade de produtos como legenda.',
+        como: 'Nenhuma ação necessária — o card já aparece com o total em destaque na tela de Indicadores.',
+      },
+    ],
+  },
+  {
     versao: '6.57',
     data: '27/07/2026',
     titulo: 'Compras: card SAVE não conta mais o item Despesa Geral',
