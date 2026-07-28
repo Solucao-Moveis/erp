@@ -90,8 +90,8 @@ function parseDataExcel(v) {
   return d.toISOString().slice(0, 10);
 }
 
-// "Tempo" vem como texto de relógio (ex: "0:00:51" = 51s). Fallback numérico pro caso
-// raro da célula vir como fração de dia do Excel em vez de string.
+// "Tempo" vem como texto de relógio (ex: "0:00:51" = 51s). Retorna SEGUNDOS.
+// Fallback numérico pro caso raro da célula vir como fração de dia do Excel.
 function parseTempoRelogio(v) {
   if (v == null) return null;
   const s = String(v).trim();
@@ -99,14 +99,15 @@ function parseTempoRelogio(v) {
 
   const partes = s.split(':').map(p => parseFloat(String(p).replace(',', '.')));
   if (partes.length >= 2 && partes.every(p => isFinite(p))) {
+    // converte para minutos, depois × 60 para segundos
     const min = partes.length === 3
       ? partes[0] * 60 + partes[1] + partes[2] / 60
       : partes[0] + partes[1] / 60;
-    return min > 0 ? min : null;
+    return min > 0 ? min * 60 : null;
   }
 
   const n = parseFloat(s.replace(',', '.'));
-  if (isFinite(n) && n > 0) return n * 24 * 60; // fração de dia → minutos
+  if (isFinite(n) && n > 0) return n * 24 * 60 * 60; // fração de dia → segundos
   return null;
 }
 
@@ -148,7 +149,7 @@ function coletarAba(wb, nomeAba, todas, brutas) {
       aba_origem: nomeAba,
       operacao,
       maquina_nome: maquina,
-      tempo_min: parseFloat(tempo.toFixed(4)),
+      tempo_seg: parseFloat(tempo.toFixed(4)),
       data_medicao: cols.data != null ? parseDataExcel(row[cols.data]) : null,
     });
   }
@@ -234,7 +235,7 @@ async function main() {
       codigo_item:  codigo,
       maquina_nome: [...maquinas].join(' + '),
       operacao:     operacao,
-      tempo_min:    parseFloat(media(tempos).toFixed(4)),
+      tempo_seg:    parseFloat(media(tempos).toFixed(4)),
       fonte:        'planilha_pcp',
     });
   }
