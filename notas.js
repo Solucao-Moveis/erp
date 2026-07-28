@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.53',
+    data: '27/07/2026',
+    titulo: 'Compras: filtro De/Até de Indicadores agora usa calendário',
+    resumo: 'O filtro de período da tela de Indicadores, que antes era escolher o mês numa lista, agora abre um calendário pra escolher a data direto — mais rápido e visual.',
+    mudancas: [
+      {
+        app: 'Compras — Indicadores',
+        o_que: 'Os campos "De" e "até" do filtro de período viraram um calendário de data.',
+        como: 'Clique no campo "De" ou "até" no topo de Indicadores — abre um calendário pra escolher o dia; datas fora do período com dados registrados ficam desabilitadas. Os gráficos continuam mostrando por mês, só a forma de escolher o período mudou.',
+      },
+    ],
+  },
+  {
     versao: '6.52',
     data: '27/07/2026',
     titulo: 'Compras: rótulos dos gráficos de Indicadores corrigidos',
