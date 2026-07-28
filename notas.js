@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.55',
+    data: '27/07/2026',
+    titulo: 'Compras: título e filtro de Indicadores sobem pro topo; padrão vira mês atual',
+    resumo: 'O título "Indicadores" e o filtro De/Até agora aparecem acima dos cards de tempo médio (antes ficavam embaixo). Além disso, a tela já abre filtrada no mês atual, em vez de mostrar todo o histórico por padrão.',
+    mudancas: [
+      {
+        app: 'Compras — Indicadores',
+        o_que: 'Título e filtro De/Até reposicionados para o topo da página; filtro passa a abrir já com o mês atual selecionado.',
+        como: 'Ao entrar em Indicadores, os dados já vêm filtrados pro mês corrente. Clique em "Limpar" no filtro pra ver todo o histórico, ou escolha outro período no calendário.',
+      },
+    ],
+  },
+  {
     versao: '6.54',
     data: '27/07/2026',
     titulo: 'Compras: cards de tempo médio do topo de Indicadores agora seguem o filtro',
