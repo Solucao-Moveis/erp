@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.56',
+    data: '27/07/2026',
+    titulo: 'Compras: card SAVE — economia média por produto em Indicadores',
+    resumo: 'Novo card "SAVE" na tela de Indicadores, logo abaixo dos 3 cards de tempo médio, mostrando quanto em média cada produto rendeu de economia quando o comprador conseguiu um preço menor do que na compra anterior do mesmo item.',
+    mudancas: [
+      {
+        app: 'Compras — Indicadores',
+        o_que: 'Card "SAVE — economia média por produto" com o valor médio e o total geral do período filtrado; clique abre o detalhe produto a produto (total economizado, nº de vezes que o preço caiu, média por queda).',
+        como: 'Aparece automaticamente na tela de Indicadores, abaixo dos cards de tempo médio. Segue o mesmo filtro De/Até do topo da página — mude o período pra ver a economia de outro mês ou de todo o histórico.',
+      },
+    ],
+  },
+  {
     versao: '6.55',
     data: '27/07/2026',
     titulo: 'Compras: título e filtro de Indicadores sobem pro topo; padrão vira mês atual',
