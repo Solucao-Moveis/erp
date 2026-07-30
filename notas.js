@@ -10,6 +10,24 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.59',
+    data: '30/07/2026',
+    titulo: 'Compras: nova aba "Fornecedores" com consulta automática de CNPJ',
+    resumo: 'Nova aba no Compras pra cadastrar fornecedores de verdade: você digita o CNPJ, o sistema busca os dados oficiais na Receita Federal (razão social, endereço, situação cadastral, sócios, se é Simples Nacional etc.) e salva tudo automaticamente — sem digitar nada manualmente.',
+    mudancas: [
+      {
+        app: 'Compras — Fornecedores (novo)',
+        o_que: 'Cadastro de fornecedores com busca de CNPJ gratuita e automática.',
+        como: 'Acesse "Fornecedores" no menu lateral, clique em "Novo fornecedor", digite o CNPJ e clique em "Buscar" — os dados aparecem na tela pra conferência; clique em "Salvar fornecedor" pra cadastrar. Qualquer usuário logado pode cadastrar. Os dados vêm direto da Receita Federal e não podem ser editados manualmente (evita erro de digitação); se cadastrar um CNPJ errado, é só apagar e cadastrar de novo.',
+      },
+      {
+        app: 'Compras — Fornecedores (novo)',
+        o_que: 'Tela de detalhe do fornecedor com todos os dados oficiais: endereço, sócios, CNAE, regime tributário, se é optante pelo Simples Nacional, situação cadastral (ativa/baixada/etc.).',
+        como: 'Clique no nome do fornecedor na lista pra ver todos os detalhes.',
+      },
+    ],
+  },
+  {
     versao: '6.58',
     data: '27/07/2026',
     titulo: 'Compras: card SAVE agora destaca o total economizado',
