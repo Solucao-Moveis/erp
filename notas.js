@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.61',
+    data: '30/07/2026',
+    titulo: 'Compras: fornecedor agora mostra a classificação fiscal certa',
+    resumo: 'A etiqueta que antes só dizia "Simples Nacional: Não" agora mostra qual é de fato o regime tributário do fornecedor — Simples Nacional, MEI, Lucro Real, Lucro Presumido etc.',
+    mudancas: [
+      {
+        app: 'Compras — Fornecedores',
+        o_que: 'Etiqueta de classificação fiscal corrigida na lista, na tela de detalhe e na prévia do cadastro.',
+        como: 'Em vez de só responder "Simples Nacional: Sim/Não", a etiqueta agora mostra a classificação real do fornecedor (Simples Nacional, MEI, ou o regime tributário mais recente registrado na Receita Federal, como Lucro Real ou Lucro Presumido).',
+      },
+    ],
+  },
+  {
     versao: '6.60',
     data: '30/07/2026',
     titulo: 'Compras: botão "Importar" em Fornecedores (planilha em lote)',
