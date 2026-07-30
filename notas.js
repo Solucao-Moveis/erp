@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.60',
+    data: '30/07/2026',
+    titulo: 'Compras: botão "Importar" em Fornecedores (planilha em lote)',
+    resumo: 'Agora dá pra cadastrar vários fornecedores de uma vez só, subindo uma planilha com uma lista de CNPJs — o sistema busca cada um na Receita Federal e cadastra automaticamente, mostrando no final o que deu certo, o que já estava cadastrado e o que não foi encontrado.',
+    mudancas: [
+      {
+        app: 'Compras — Fornecedores',
+        o_que: 'Botão "Importar" na tela de Fornecedores, para cadastro em lote via planilha (.xlsx ou .csv).',
+        como: 'Clique em "Importar", escolha uma planilha com uma coluna de CNPJ (com ou sem outras colunas junto) — o sistema encontra os CNPJs automaticamente, mostra quantos achou e, ao confirmar, busca e cadastra um por um, com um resumo no final (importado / já cadastrado / não encontrado).',
+      },
+    ],
+  },
+  {
     versao: '6.59',
     data: '30/07/2026',
     titulo: 'Compras: nova aba "Fornecedores" com consulta automática de CNPJ',
