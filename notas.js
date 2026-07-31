@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.62',
+    data: '31/07/2026',
+    titulo: 'Compras: produtos comprados e histórico de preço na tela do fornecedor',
+    resumo: 'A tela de cada fornecedor ganhou uma seção "Produtos comprados", mostrando os itens vinculados a ele, com preço médio, última compra e se o preço está subindo ou caindo — clicando num produto, abre o gráfico de como o preço variou ao longo do tempo.',
+    mudancas: [
+      {
+        app: 'Compras — Fornecedores',
+        o_que: 'Nova seção "Produtos comprados" na tela de detalhe do fornecedor, com seta de tendência de preço e gráfico por produto ao clicar.',
+        como: 'Abra um fornecedor e role até "Produtos comprados". Por enquanto essa lista só aparece depois que o produto for vinculado ao fornecedor — o vínculo em massa (por planilha de CNPJ) ainda vai ser feito numa próxima etapa, então a seção começa vazia.',
+      },
+    ],
+  },
+  {
     versao: '6.61',
     data: '30/07/2026',
     titulo: 'Compras: fornecedor agora mostra a classificação fiscal certa',
