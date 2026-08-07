@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.63',
+    data: '07/08/2026',
+    titulo: 'RH: registro de advertências por colaborador',
+    resumo: 'A tela de Colaboradores ganhou uma coluna "Advertências" no Ranking, mostrando quantas cada pessoa recebeu no período — clicando dá pra ver a data e o motivo de cada uma, e registrar, editar ou excluir.',
+    mudancas: [
+      {
+        app: 'RH — Colaboradores',
+        o_que: 'Nova coluna "Advertências" na aba Ranking, com o histórico de cada registro (data + motivo).',
+        como: 'Na tela de Colaboradores, aba Ranking, clique no número da coluna "Advertências" de um colaborador — abre uma lista com data e motivo de cada advertência recebida no período selecionado. Clique em "+ Nova advertência" para registrar uma nova, ou use "Editar"/"Excluir" nas já lançadas.',
+      },
+    ],
+  },
+  {
     versao: '6.62',
     data: '31/07/2026',
     titulo: 'Compras: produtos comprados e histórico de preço na tela do fornecedor',
