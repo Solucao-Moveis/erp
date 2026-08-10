@@ -26,12 +26,22 @@
 create table if not exists manutencao.os_pausas (
   id uuid primary key default gen_random_uuid(),
   os_id uuid not null references manutencao.ordens_servico(id) on delete cascade,
-  compra_request_id uuid not null references compras.purchase_requests(id) on delete restrict,
+  compra_request_id uuid references compras.purchase_requests(id) on delete set null,
   pausado_em timestamptz not null default now(),
   retomado_em timestamptz,
   created_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now()
 );
+
+-- FIX (2026-08-10): admin apagando a SC no Compras batia em "on delete
+-- restrict" e travava a exclusão. Troca pra SET NULL — a pausa fecha
+-- sozinha (trigger BEFORE DELETE abaixo) e o histórico de tempo fica,
+-- só perde o vínculo com a SC que não existe mais. Idempotente: roda
+-- em instalação nova (não muda nada, já nasce assim) e na já existente.
+alter table manutencao.os_pausas alter column compra_request_id drop not null;
+alter table manutencao.os_pausas drop constraint if exists os_pausas_compra_request_id_fkey;
+alter table manutencao.os_pausas add constraint os_pausas_compra_request_id_fkey
+  foreign key (compra_request_id) references compras.purchase_requests(id) on delete set null;
 
 -- só pode haver 1 pausa aberta por vez por OS
 create unique index if not exists ux_os_pausas_aberta
@@ -149,8 +159,9 @@ grant execute on function manutencao.criar_pedido_compra_os(uuid,text,numeric,te
 
 -- ============================================================
 -- TRIGGER: retoma o MTTR sozinho quando a SC chega a um desfecho final
--- (comprado = peça garantida; negado/cancelado = não vai vir mesmo,
--- não faz sentido travar a OS esperando pra sempre)
+-- (finalizado = peça chegou de verdade na mão do técnico, "comprado"
+-- sozinho não conta — só atende quando chega; negado/cancelado = não
+-- vai vir mesmo, não faz sentido travar a OS esperando pra sempre)
 -- ============================================================
 create or replace function manutencao.retomar_mttr_compra()
 returns trigger
@@ -171,9 +182,35 @@ drop trigger if exists trg_compras_retomar_mttr on compras.purchase_requests;
 create trigger trg_compras_retomar_mttr
   after update on compras.purchase_requests
   for each row
-  when (new.status in ('comprado','negado','cancelado')
+  when (new.status in ('finalizado','negado','cancelado')
         and old.status is distinct from new.status)
   execute function manutencao.retomar_mttr_compra();
+
+-- ============================================================
+-- TRIGGER: se a SC for EXCLUÍDA (não só mudar de status) no Compras,
+-- fecha a pausa antes — senão o FK vira SET NULL e o retomado_em nunca
+-- seria setado, deixando a OS pausada pra sempre.
+-- ============================================================
+create or replace function manutencao.fechar_pausa_compra_excluida()
+returns trigger
+language plpgsql
+security definer
+set search_path = manutencao, public
+as $$
+begin
+  update manutencao.os_pausas
+     set retomado_em = now()
+   where compra_request_id = old.id
+     and retomado_em is null;
+  return old;
+end;
+$$;
+
+drop trigger if exists trg_compras_excluir_retomar_mttr on compras.purchase_requests;
+create trigger trg_compras_excluir_retomar_mttr
+  before delete on compras.purchase_requests
+  for each row
+  execute function manutencao.fechar_pausa_compra_excluida();
 
 -- ============================================================
 -- Recarrega o cache do PostgREST (a RPC precisa aparecer pro Pro-Care)
