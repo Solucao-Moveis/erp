@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.64',
+    data: '11/08/2026',
+    titulo: 'Segurança: setores Tratamento e Pintura unificados',
+    resumo: 'No painel de Segurança (SST), os setores "Tratamento" e "Pintura" viraram um único setor "Tratamento e Pintura" — as avaliações já lançadas foram unificadas, e o lançamento não mostra mais meses anteriores a julho/2026, quando o sistema começou a ser usado.',
+    mudancas: [
+      {
+        app: 'Segurança — SESMT',
+        o_que: '"Tratamento" e "Pintura" passam a ser um único setor "Tratamento e Pintura" em todo o painel (dashboard, ranking, lançamento e registros).',
+        como: 'No lançamento mensal, pódio e mural do dashboard, aparece só "Tratamento e Pintura" no lugar dos dois separados. No dropdown de mês do lançamento, meses antes de julho/2026 não aparecem mais.',
+      },
+    ],
+  },
+  {
     versao: '6.63',
     data: '07/08/2026',
     titulo: 'RH: registro de advertências por colaborador',
