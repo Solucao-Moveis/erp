@@ -394,20 +394,24 @@ async function conectarWS() {
 
 async function syncOfs() {
   const items = await codiGetAll('productionOrder', { status: 'STARTED' });
-  const rows = items.map(o => ({
-    id:                o.id,
-    code:              o.code              ?? null,
-    item_id:           o.item?.id          ?? null,
-    item_code:         o.item?.code        ?? null,
-    item_name:         o.item?.name        ?? null,
-    item_context:      o.item?.context     ?? null,
-    item_measure_unit: o.item?.measureUnit?.name ?? null,
-    status:            o.status            ?? 'STARTED',
-    quantity:          o.quantity          ?? null,
-    note:              o.note              ?? null,
-    codi_version:      o.version ? new Date(o.version).toISOString() : null,
-    atualizado_em:     new Date().toISOString(),
-  }));
+  const rowsMap = new Map();
+  for (const o of items) {
+    rowsMap.set(o.id, {
+      id:                o.id,
+      code:              o.code              ?? null,
+      item_id:           o.item?.id          ?? null,
+      item_code:         o.item?.code        ?? null,
+      item_name:         o.item?.name        ?? null,
+      item_context:      o.item?.context     ?? null,
+      item_measure_unit: o.item?.measureUnit?.name ?? null,
+      status:            o.status            ?? 'STARTED',
+      quantity:          o.quantity          ?? null,
+      note:              o.note              ?? null,
+      codi_version:      o.version ? new Date(o.version).toISOString() : null,
+      atualizado_em:     new Date().toISOString(),
+    });
+  }
+  const rows = [...rowsMap.values()];
   const { error } = await sb.from('ofs').upsert(rows, { onConflict: 'id' });
   if (error) throw error;
   console.log(`[ofs] ${rows.length} upserted`);
@@ -685,10 +689,19 @@ async function syncBomProdutos() {
         atualizado_em: new Date().toISOString(),
       })).filter(r => r.codigo_pai && r.codigo_filho);
 
+      // Deduplica por PK antes de inserir (API pode devolver duplicatas)
+      const seen = new Set();
+      const uniqueRows = rows.filter(r => {
+        const k = `${r.produto_raiz}|${r.codigo_pai}|${r.codigo_filho}|${r.contador}`;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+
       // Substitui a BOM do produto por completo
       await sb.from('bom_estrutura').delete().eq('produto_raiz', pai.codigo);
-      if (rows.length) {
-        const { error: ie } = await sb.from('bom_estrutura').insert(rows);
+      if (uniqueRows.length) {
+        const { error: ie } = await sb.from('bom_estrutura').insert(uniqueRows);
         if (ie) console.error(`[industrial] bom insert ${pai.codigo}:`, ie.message);
       }
       ok++;
