@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.65',
+    data: '12/08/2026',
+    titulo: 'RH: férias por período, com lançamento automático',
+    resumo: 'No Diário do painel de RH, agora dá pra registrar as férias de um colaborador informando a data de início e fim — o sistema já lança automaticamente em todos os dias do período, sem precisar repetir dia a dia.',
+    mudancas: [
+      {
+        app: 'RH — Diário',
+        o_que: 'O card "Colaboradores de Férias" ganhou período (De/Até) com lançamento automático, e o nome/setor agora vêm do cadastro de colaboradores.',
+        como: 'Clique em "+ Adicionar" no card de Férias, digite o nome (o setor preenche sozinho ao escolher da lista) e informe De/Até — a pessoa aparece automaticamente como de férias em todos os dias desse período. Pra cancelar, clique no "✕" ao lado do nome: ele confirma e remove de todos os dias restantes do período de uma vez.',
+      },
+    ],
+  },
+  {
     versao: '6.64',
     data: '11/08/2026',
     titulo: 'Segurança: setores Tratamento e Pintura unificados',
