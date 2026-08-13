@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.69',
+    data: '13/08/2026',
+    titulo: 'Manutenção: Disponibilidade e Backlog do Dashboard agora são tempo real',
+    resumo: 'O Dashboard perdeu o seletor de data e o botão "Incluir manuais" — Disponibilidade e Backlog de OS deixaram de ser cálculo por período e passaram a mostrar sempre o estado agora, atualizando sozinhos a cada minuto.',
+    mudancas: [
+      {
+        app: 'Manutenção — Dashboard',
+        o_que: 'Removidos o filtro de data e o botão "Incluir manuais" do topo. Disponibilidade virou "% de máquinas não paradas agora" (não mais a média de um período) e a tela atualiza sozinha a cada 60 segundos.',
+        como: 'A tela abre já mostrando o estado atual, sem precisar escolher período. Se quiser olhar um intervalo específico ou comparar com o mês anterior, use a aba Indicadores (Relatório de PCM), que continua com filtro de data.',
+      },
+    ],
+  },
+  {
     versao: '6.68',
     data: '13/08/2026',
     titulo: 'Manutenção: Dashboard mais enxuto — MTTR/MTBF e falhas foram pro Relatório de PCM',
