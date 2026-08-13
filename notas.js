@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.71',
+    data: '13/08/2026',
+    titulo: 'Manutenção: correção de lentidão (índices + fotos de máquina)',
+    resumo: 'O sistema de Manutenção estava lento pra tudo — abrir telas, carregar fotos das máquinas, até abrir/fechar OS. Duas causas encontradas e corrigidas: faltavam índices na tabela de Ordens de Serviço, e o Dashboard gerava um link temporário pra CADA foto de máquina toda vez que abria (e a cada minuto).',
+    mudancas: [
+      {
+        app: 'Manutenção',
+        o_que: 'Adicionados índices na tabela de Ordens de Serviço (e Preventivas/Máquinas) que faltavam desde o início — toda busca ou gravação de OS varria a tabela inteira. E as fotos de máquina do Dashboard passaram a carregar direto, sem gerar link temporário pra cada uma.',
+        como: 'Não muda nada na forma de usar — só deve sentir o sistema mais rápido pra navegar entre telas, abrir/atender/fechar OS e carregar as fotos das máquinas no Dashboard.',
+      },
+    ],
+  },
+  {
     versao: '6.70',
     data: '13/08/2026',
     titulo: 'Manutenção: Metas foram pro Relatório de PCM, com cor verde/vermelho',
