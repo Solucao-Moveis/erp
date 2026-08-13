@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.70',
+    data: '13/08/2026',
+    titulo: 'Manutenção: Metas foram pro Relatório de PCM, com cor verde/vermelho',
+    resumo: 'O botão "Metas" saiu do Dashboard e passou pro Relatório de PCM (aba Indicadores), que é onde os indicadores por período realmente vivem agora. E lá, em vez das cores fixas (azul, roxo, laranja) que cada card tinha, o número fica verde quando bate a meta e vermelho quando não bate.',
+    mudancas: [
+      {
+        app: 'Manutenção — Indicadores',
+        o_que: 'Botão "Metas" (editar metas dos indicadores) movido do Dashboard pra cá. Os cards de Disponibilidade, MTTR, MTTR (Total) e MTBF agora ficam verdes quando estão dentro da meta e vermelhos quando não estão, em vez da cor fixa por card.',
+        como: 'Na aba Indicadores, o botão "Metas" aparece acima dos cards (só pra admin/manutenção). MTTR Pausado e OS no Período não têm meta cadastrada, então ficam em cinza neutro. O Dashboard não tem mais botão de Metas.',
+      },
+    ],
+  },
+  {
     versao: '6.69',
     data: '13/08/2026',
     titulo: 'Manutenção: Disponibilidade e Backlog do Dashboard agora são tempo real',
