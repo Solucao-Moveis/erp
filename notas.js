@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.68',
+    data: '13/08/2026',
+    titulo: 'Manutenção: Dashboard mais enxuto — MTTR/MTBF e falhas foram pro Relatório de PCM',
+    resumo: 'O Dashboard da Manutenção ficou só com Disponibilidade e Backlog de OS. Os cards de MTTR/MTBF e os gráficos de Top 5 Falhas e Pareto de Falhas saíram de lá porque já estão no Relatório de PCM (aba Indicadores), que é o lugar certo pra olhar indicador por período.',
+    mudancas: [
+      {
+        app: 'Manutenção — Dashboard',
+        o_que: 'Removidos do Dashboard os cards MTTR (Técnico), MTTR Pausado (Média), MTTR (Total), MTBF e os gráficos Top 5 Equipamentos com mais falhas e Pareto de Falhas.',
+        como: 'O Dashboard agora mostra só Disponibilidade e Backlog de OS (que refletem o estado atual, não um período). Pra ver MTTR, MTBF, Top 5 e Pareto, use a aba Indicadores (Relatório de PCM), onde eles já estavam disponíveis com filtro de período e comparação.',
+      },
+    ],
+  },
+  {
     versao: '6.67',
     data: '13/08/2026',
     titulo: 'Manutenção: Top 5 Falhas e Pareto de Falhas no Relatório de PCM',
