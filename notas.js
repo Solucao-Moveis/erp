@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.66',
+    data: '13/08/2026',
+    titulo: 'Manutenção: MTTR Pausado e MTTR Total no Relatório de PCM',
+    resumo: 'O Relatório de PCM (aba Indicadores da Manutenção) ganhou dois indicadores que já existiam no Dashboard, ao lado do MTTR: o tempo médio parado esperando pedido de compra, e o tempo total de reparo sem descontar essa espera.',
+    mudancas: [
+      {
+        app: 'Manutenção — Indicadores',
+        o_que: 'Dois novos cards no topo do Relatório de PCM: "MTTR Pausado (Média)" e "MTTR (Total)".',
+        como: 'Na aba Indicadores, os cards aparecem logo depois do MTTR. "MTTR (Total)" conta o tempo de reparo inteiro (abertura até fechamento da OS); "MTTR Pausado (Média)" mostra, só entre as OS que tiveram pedido de compra vinculado, quanto tempo em média ficou pausado esperando a peça chegar. Os dois já funcionam com o botão "Comparar" (período atual x anterior), igual os outros indicadores.',
+      },
+    ],
+  },
+  {
     versao: '6.65',
     data: '12/08/2026',
     titulo: 'RH: férias por período, com lançamento automático',
