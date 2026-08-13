@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.67',
+    data: '13/08/2026',
+    titulo: 'Manutenção: Top 5 Falhas e Pareto de Falhas no Relatório de PCM',
+    resumo: 'O Relatório de PCM ganhou os dois gráficos que já existiam no Dashboard — quais equipamentos mais deram problema e quais tipos de falha são mais frequentes — agora também no relatório oficial, com PDF incluído.',
+    mudancas: [
+      {
+        app: 'Manutenção — Indicadores',
+        o_que: 'Dois novos gráficos no Relatório de PCM, logo acima da "Evolução de Disponibilidade": "Top 5 Equipamentos com mais falhas" e "Pareto de Falhas".',
+        como: 'Na aba Indicadores, os gráficos aparecem no topo do relatório, já respeitando o período selecionado. O Top 5 mostra as máquinas com mais chamados que pararam a produção; o Pareto agrupa por tipo de falha (desgaste, elétrica, ajuste, mecânica, programa) com a linha de % acumulado. Entram também no PDF exportado.',
+      },
+    ],
+  },
+  {
     versao: '6.66',
     data: '13/08/2026',
     titulo: 'Manutenção: MTTR Pausado e MTTR Total no Relatório de PCM',
