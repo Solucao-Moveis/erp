@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.72',
+    data: '13/08/2026',
+    titulo: 'Manutenção: Indicadores travava ao abrir',
+    resumo: 'A aba Indicadores (Relatório de PCM) demorava demais pra abrir. A causa: a busca de pausas por pedido de compra dependia de listar antes TODAS as Ordens de Serviço do período (por padrão, desde 1º de janeiro) pra montar uma consulta gigante com o número de cada uma — corrigido.',
+    mudancas: [
+      {
+        app: 'Manutenção — Indicadores',
+        o_que: 'Corrigida a consulta que buscava as pausas de pedido de compra, que dependia de uma lista enorme de IDs de OS e deixava a tela travada.',
+        como: 'Não muda nada visualmente — só deve abrir rápido agora.',
+      },
+    ],
+  },
+  {
     versao: '6.71',
     data: '13/08/2026',
     titulo: 'Manutenção: correção de lentidão (índices + fotos de máquina)',
