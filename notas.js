@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.74',
+    data: '14/08/2026',
+    titulo: 'Gerencial: indicadores manuais da Visão Geral agora somam por semana',
+    resumo: 'Os 5 indicadores manuais da Visão Geral (Faturamento, NC Injetado, Taxa de perda no corte, Assistência, Aderência ao PCP) são lançados semana a semana. Agora, ao olhar um período maior (mês, trimestre), o sistema soma ou tira a média das semanas lançadas em vez de mostrar "—".',
+    mudancas: [
+      {
+        app: 'Gerencial — Visão Geral',
+        o_que: 'Novo preset de período "Semana (seg-sex)", que virou o padrão da Visão Geral e da tela Preencher indicadores. Valores manuais agora combinam (soma ou média, conforme o indicador) todas as semanas lançadas dentro do período selecionado.',
+        como: 'Ao abrir a Visão Geral ou a tela de preenchimento, já vem selecionada a semana atual (segunda a sexta) — mesmo intervalo tanto pra quem lança o valor na sexta quanto pra quem olha depois. Se escolher um período maior (ex. "Mês atual"), o valor mostrado é a soma (Faturamento, Assistência) ou a média (indicadores em %) das semanas lançadas nesse mês. Editar um valor só fica disponível olhando exatamente 1 semana.',
+      },
+    ],
+  },
+  {
     versao: '6.73',
     data: '14/08/2026',
     titulo: 'Gerencial: nova aba "Visão Geral" com 12 indicadores executivos',
