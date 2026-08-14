@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.73',
+    data: '14/08/2026',
+    titulo: 'Gerencial: nova aba "Visão Geral" com 12 indicadores executivos',
+    resumo: 'O Painel Executivo (Gerencial) ganhou uma aba "Visão Geral" — um resumo de 12 indicadores cruzando Comercial, Expedição, PCP, Qualidade, Manutenção e Produção numa tela só, com meta e comparação com o período anterior.',
+    mudancas: [
+      {
+        app: 'Gerencial',
+        o_que: 'Nova aba "Visão Geral": Faturamento, OTIF, Caminhões, Leadtime do Pedido, Aderência ao PCP, NC Injetado, Disponibilidade de máquina, MTTR, MTBF, Máquina em operação, Assistência e Taxa de perda no corte de aço — cada um com valor, meta e variação vs período anterior, em verde quando bate a meta e vermelho quando não bate. Visível só pra diretoria.',
+        como: '7 indicadores atualizam sozinhos (OTIF, Caminhões, Leadtime, Disponibilidade/MTTR/MTBF, Máquina em operação); os outros 5 (Faturamento, NC Injetado, Taxa de perda no corte, Assistência, Aderência ao PCP) são preenchidos à mão, porque ainda não existe esse dado automatizado no sistema. Quem não é diretoria mas foi autorizado a preencher algum desses 5 usa a nova página "Preencher indicadores", que mostra só o(s) indicador(es) atribuídos a essa pessoa.',
+      },
+    ],
+  },
+  {
     versao: '6.72',
     data: '13/08/2026',
     titulo: 'Manutenção: Indicadores travava ao abrir',
