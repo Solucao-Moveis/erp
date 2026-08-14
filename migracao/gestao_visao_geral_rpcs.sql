@@ -184,6 +184,12 @@ begin
 end $$;
 
 -- ---------- Indicadores manuais: leitura em lote + escrita ----------
+-- Cada valor manual é lançado por semana (1 linha em kpi_manual_valores).
+-- kpi_manual_get soma (ou faz média, ver agregacao em kpiDefs.ts do front)
+-- todas as semanas CONTIDAS no período pedido — olhar exatamente 1 semana
+-- devolve amostra=1 (a própria linha); olhar o mês inteiro soma/tira média
+-- das semanas lançadas dentro dele. Ver gestao_visao_geral_semana.sql pro
+-- histórico dessa decisão.
 create or replace function gestao.kpi_manual_get(p_chaves text[], p_from date, p_to date)
 returns jsonb
 language plpgsql stable security definer set search_path = gestao, public
@@ -191,12 +197,18 @@ as $$
 begin
   return coalesce((
     select jsonb_object_agg(k, jsonb_build_object(
-      'valor',       v.valor,
+      'soma',        agg.soma,
+      'amostra',     agg.n,
       'pode_editar', gestao.pode_editar_kpi_manual(k)
     ))
     from unnest(p_chaves) as k
-    left join gestao.kpi_manual_valores v
-      on v.chave = k and v.periodo_inicio = p_from and v.periodo_fim = p_to
+    left join lateral (
+      select coalesce(sum(v.valor), 0) as soma, count(*) as n
+      from gestao.kpi_manual_valores v
+      where v.chave = k
+        and v.periodo_inicio >= p_from
+        and v.periodo_fim   <= p_to
+    ) agg on true
   ), '{}'::jsonb);
 end $$;
 
