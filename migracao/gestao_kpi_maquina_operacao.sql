@@ -26,7 +26,7 @@ begin
   from codi.maquinas_disponibilidade_dia d
   join codi.maquinas m on m.id = d.maquina_id
   where d.dia between p_from and p_to
-    and m.nome not ilike '%viterbo%';
+    and m.name not ilike '%viterbo%';
 
   return jsonb_build_object('valor', v_disponibilidade);
 end $$;
