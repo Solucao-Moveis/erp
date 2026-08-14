@@ -123,7 +123,11 @@ begin
     where o.status <> 'cancelada'
       and m.ativo = true and m.manual = false
       and o.aberto_em::date between p_from and p_to
-      and coalesce(o.categoria_falha, '') <> 'invalido'
+      -- categoria_falha é enum (manutencao.categoria_falha) — NÃO dá pra
+      -- coalesce(..., '') com ele, '' não é um valor válido do enum e
+      -- isso quebra a query na hora de montar o plano (erro de tipo,
+      -- sempre, pra qualquer período). Compara contra null direto.
+      and (o.categoria_falha is null or o.categoria_falha <> 'invalido')
   ),
   pausas as (
     select os_id, sum(greatest(0, extract(epoch from (retomado_em - pausado_em)))) as pausado_seg
