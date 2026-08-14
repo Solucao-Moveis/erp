@@ -18,11 +18,8 @@ begin
     raise exception 'forbidden' using errcode = '42501';
   end if;
 
-  select round(
-    100.0 * sum(d.tempo_producao_min)
-    / nullif(sum(d.tempo_producao_min + d.tempo_parada_min), 0),
-    1
-  ) into v_disponibilidade
+  select round(avg(d.disponibilidade_pct), 1)
+  into v_disponibilidade
   from codi.maquinas_disponibilidade_dia d
   join codi.maquinas m on m.id = d.maquina_id
   where d.dia between p_from and p_to
