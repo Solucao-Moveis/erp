@@ -210,8 +210,8 @@ begin
       select coalesce(sum(v.valor), 0) as soma, count(*) as n
       from gestao.kpi_manual_valores v
       where v.chave = k
-        and v.periodo_inicio >= p_from
-        and v.periodo_fim   <= p_to
+        and v.periodo_inicio <= p_to    -- sobreposto: o período salvo encosta no filtro
+        and v.periodo_fim   >= p_from
     ) agg on true
   ), '{}'::jsonb);
 end $$;
