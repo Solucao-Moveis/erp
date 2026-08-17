@@ -10,25 +10,37 @@ returns jsonb
 language plpgsql stable security definer set search_path = gestao, public
 as $$
 declare
-  v_meta      bigint;
-  v_realizado bigint;
+  v_valor numeric;
+  v_dias  integer;
 begin
   if not gestao.can_see('diretoria') then
     raise exception 'forbidden' using errcode = '42501';
   end if;
 
-  select coalesce(sum(goal), 0) into v_meta
-  from fabrill.production_goals
-  where goal_date between p_from and p_to;
-
-  select coalesce(sum(quantity), 0) into v_realizado
-  from fabrill.production_entries
-  where entry_date between p_from and p_to;
+  -- Fórmula: média das aderências diárias (não SUM/SUM).
+  -- Para cada dia: aderencia_dia = 100 * realizado / meta.
+  -- Resultado = AVG(aderencia_dia) sobre os dias com meta > 0 no período.
+  select
+    round(avg(100.0 * e.realizado / g.meta), 1),
+    count(*)
+  into v_valor, v_dias
+  from (
+    select goal_date  as dia, sum(goal)     as meta
+    from fabrill.production_goals
+    where goal_date between p_from and p_to
+    group by goal_date
+  ) g
+  join (
+    select entry_date as dia, sum(quantity) as realizado
+    from fabrill.production_entries
+    where entry_date between p_from and p_to
+    group by entry_date
+  ) e on e.dia = g.dia
+  where g.meta > 0;
 
   return jsonb_build_object(
-    'valor',      case when v_meta > 0 then round(100.0 * v_realizado / v_meta, 1) else null end,
-    'meta_total', v_meta,
-    'realizado',  v_realizado
+    'valor', v_valor,
+    'dias',  v_dias
   );
 end $$;
 
