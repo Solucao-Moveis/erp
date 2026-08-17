@@ -3,9 +3,15 @@
  * e salva em gestao.kpi_manual_valores para aparecer no Painel Gerencial.
  *
  * Uso:
- *   node buscar-disponibilidade-codi.mjs                       → semana atual (seg–dom)
- *   node buscar-disponibilidade-codi.mjs 2026-08-04 2026-08-10 → semana específica
- *   node buscar-disponibilidade-codi.mjs --dry-run             → mostra valor sem salvar
+ *   node buscar-disponibilidade-codi.mjs                              → semana anterior
+ *   node buscar-disponibilidade-codi.mjs 2026-08-04 2026-08-10        → semana específica
+ *   node buscar-disponibilidade-codi.mjs --dry-run                    → mostra sem salvar
+ *   node buscar-disponibilidade-codi.mjs --recursos=1,4,5,6,17        → máquinas customizadas
+ *
+ * Máquinas padrão: 1=LX-K6 151, 4=BLM, 5=Robótica, 6=EMT, 17=OMP
+ *   Excluídos por padrão: 3=Viterbo (vendido), 2=LX-K6 152 (em manutenção prolongada)
+ *   Para incluir K6-152: --recursos=1,2,4,5,6,17
+ *   Ou via env: CODI_RECURSOS_IDS=1,2,4,5,6,17
  *
  * Requer no .env: CODI_WS_USER, CODI_WS_PASS, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
  */
@@ -25,13 +31,26 @@ const CO_ID     = process.env.CODI_COMPANY_ID       || '1';
 const USER      = process.env.CODI_WS_USER          || '';
 const PASS      = process.env.CODI_WS_PASS          || '';
 
-// Máquinas de metalurgia — excluir Viterbo (id=3)
-// 1=LX-K6 151, 2=LX-K6 152, 4=BLM, 5=Robótica, 6=EMT, 17=OMP
-const RECURSOS = [1, 2, 4, 5, 6, 17];
-
 const DRY_RUN = process.argv.includes('--dry-run');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+// Lê lista de recursos: CLI (--recursos=1,4,5) > .env (CODI_RECURSOS_IDS) > padrão
+function resolverRecursos() {
+  const cliArg = process.argv.find(a => a.startsWith('--recursos='));
+  const raw = cliArg
+    ? cliArg.split('=')[1]
+    : (process.env.CODI_RECURSOS_IDS || '');
+  if (raw) {
+    const ids = raw.split(',').map(x => parseInt(x.trim(), 10)).filter(n => !isNaN(n));
+    if (ids.length) return ids;
+  }
+  // Padrão: metalurgia exceto Viterbo (3) e LX-K6 152 (2, em manutenção prolongada)
+  // 1=LX-K6 151, 4=BLM, 5=Robótica, 6=EMT, 17=OMP
+  return [1, 4, 5, 6, 17];
+}
+
+const RECURSOS = resolverRecursos();
 
 function validarEnv() {
   const faltando = [];
@@ -203,6 +222,7 @@ async function main() {
     : semanaAnterior();
 
   console.log(`Período: ${from} → ${to}`);
+  console.log(`Recursos: [${RECURSOS.join(', ')}]`);
 
   const token = await getToken();
   const disp  = await buscarDisponibilidade(token, from, to);
