@@ -37,6 +37,8 @@ async function safeUpdate(payload, contexto) {
   if (error) console.error(`[watcher] Erro ao ${contexto}:`, error.message);
 }
 
+const STALE_FETCHING_MS = 3 * 60_000; // ciclo normal leva ~15-20s
+
 async function check() {
   if (running) return;
 
@@ -44,7 +46,7 @@ async function check() {
   try {
     const { data, error } = await sb
       .from('codi_maquinas_config')
-      .select('recursos_ids, trigger_fetch, fetching')
+      .select('recursos_ids, trigger_fetch, fetching, updated_at')
       .eq('id', 1)
       .single();
     if (error) throw error;
@@ -52,6 +54,23 @@ async function check() {
   } catch (e) {
     console.error('[watcher] Erro ao ler config:', e.message);
     return;
+  }
+
+  // Auto-recuperação: se "fetching" ficou travado (ex.: o watcher foi
+  // reiniciado com uma busca em andamento, matando o processo filho no meio
+  // sem nunca marcar como concluído), destrava sozinho depois de um tempo —
+  // sem isso o front fica girando "Consultando..." pra sempre, sem ninguém
+  // pra processar de novo.
+  if (cfg.fetching && cfg.updated_at) {
+    const idadeMs = Date.now() - new Date(cfg.updated_at).getTime();
+    if (idadeMs > STALE_FETCHING_MS) {
+      console.warn(`[watcher] "fetching" travado há ${Math.round(idadeMs / 1000)}s — destravando.`);
+      await safeUpdate({
+        fetching: false,
+        last_error: 'Processo interrompido antes de concluir (watcher reiniciado?) — destravado automaticamente.',
+      }, 'destravar fetching travado');
+      cfg.fetching = false;
+    }
   }
 
   if (!cfg.trigger_fetch) return;
