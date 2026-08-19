@@ -29,6 +29,14 @@ const sb = createClient(SB_URL, SB_KEY, { db: { schema: 'gestao' } });
 
 let running = false; // evita execuções sobrepostas
 
+// O query builder do supabase-js é "thenable" (só implementa .then), não uma
+// Promise de verdade — encadear .catch() direto nele quebra com
+// "TypeError: .catch is not a function". Sempre await + checar {error}.
+async function safeUpdate(payload, contexto) {
+  const { error } = await sb.from('codi_maquinas_config').update(payload).eq('id', 1);
+  if (error) console.error(`[watcher] Erro ao ${contexto}:`, error.message);
+}
+
 async function check() {
   if (running) return;
 
@@ -53,10 +61,7 @@ async function check() {
   console.log(`[watcher] Disparando fetch CODI — recursos: [${recursos}]`);
 
   // Marca "em andamento"
-  await sb.from('codi_maquinas_config').update({
-    trigger_fetch: false,
-    fetching: true,
-  }).eq('id', 1).catch(e => console.error('[watcher] Erro ao marcar fetching:', e.message));
+  await safeUpdate({ trigger_fetch: false, fetching: true }, 'marcar fetching');
 
   const exitCode = await new Promise((resolve) => {
     const proc = spawn(process.execPath, [SCRIPT, `--recursos=${recursos.join(',')}`], {
@@ -72,17 +77,10 @@ async function check() {
   const agora = new Date().toISOString();
   if (exitCode === 0) {
     console.log('[watcher] Fetch concluído com sucesso.');
-    await sb.from('codi_maquinas_config').update({
-      fetching: false,
-      last_fetched_at: agora,
-      last_error: null,
-    }).eq('id', 1).catch(e => console.error('[watcher] Erro ao finalizar:', e.message));
+    await safeUpdate({ fetching: false, last_fetched_at: agora, last_error: null }, 'finalizar');
   } else {
     console.error(`[watcher] Fetch falhou (exit ${exitCode}).`);
-    await sb.from('codi_maquinas_config').update({
-      fetching: false,
-      last_error: `Script saiu com código ${exitCode}`,
-    }).eq('id', 1).catch(e => console.error('[watcher] Erro ao registrar falha:', e.message));
+    await safeUpdate({ fetching: false, last_error: `Script saiu com código ${exitCode}` }, 'registrar falha');
   }
 
   running = false;
