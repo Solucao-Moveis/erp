@@ -33,24 +33,36 @@ const PASS      = process.env.CODI_WS_PASS          || '';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 
+const sb = createClient(SB_URL, SB_KEY, { db: { schema: 'gestao' } });
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-// Lê lista de recursos: CLI (--recursos=1,4,5) > .env (CODI_RECURSOS_IDS) > padrão
-function resolverRecursos() {
+// Lê lista de recursos: CLI (--recursos=1,4,5) > .env (CODI_RECURSOS_IDS) >
+// configuração salva pelo diálogo "Máquinas — Disponibilidade CODI"
+// (gestao.codi_maquinas_config, mesma fonte que o "Buscar agora" usa) > padrão.
+// Precisa ser async pra cobrir o fallback do banco — é o que faz o cron
+// semanal (disp-codi-semanal, sem args) respeitar de fato a seleção feita
+// na tela, em vez de sempre cair no default fixo.
+async function resolverRecursos() {
   const cliArg = process.argv.find(a => a.startsWith('--recursos='));
-  const raw = cliArg
-    ? cliArg.split('=')[1]
-    : (process.env.CODI_RECURSOS_IDS || '');
-  if (raw) {
-    const ids = raw.split(',').map(x => parseInt(x.trim(), 10)).filter(n => !isNaN(n));
+  if (cliArg) {
+    const ids = cliArg.split('=')[1].split(',').map(x => parseInt(x.trim(), 10)).filter(n => !isNaN(n));
     if (ids.length) return ids;
+  }
+  if (process.env.CODI_RECURSOS_IDS) {
+    const ids = process.env.CODI_RECURSOS_IDS.split(',').map(x => parseInt(x.trim(), 10)).filter(n => !isNaN(n));
+    if (ids.length) return ids;
+  }
+  try {
+    const { data, error } = await sb.from('codi_maquinas_config').select('recursos_ids').eq('id', 1).single();
+    if (!error && data?.recursos_ids?.length) return data.recursos_ids;
+  } catch {
+    // silencioso — cai no padrão abaixo
   }
   // Padrão: metalurgia exceto Viterbo (3) e LX-K6 152 (2, em manutenção prolongada)
   // 1=LX-K6 151, 4=BLM, 5=Robótica, 6=EMT, 17=OMP
   return [1, 4, 5, 6, 17];
 }
-
-const RECURSOS = resolverRecursos();
 
 function validarEnv() {
   const faltando = [];
@@ -108,7 +120,7 @@ async function getToken() {
 
 // ─── Relatório CODI (formato CSV, header X-Requested-With) ───────────────────
 
-async function buscarDisponibilidade(token, from, to) {
+async function buscarDisponibilidade(token, from, to, recursos) {
   const inicio = fmtCodi(from);
   const fim    = fmtCodi(to);
 
@@ -118,21 +130,21 @@ async function buscarDisponibilidade(token, from, to) {
     tipoAnalise:      '2',   // Discriminado por recurso
     'tipoAgrupamentosRecurso_369777135': '',
     'agrupamentosRecurso_369777135':     '',
-    recursos:         RECURSOS.join(','),
+    recursos:         recursos.join(','),
     codigosTurno:     '1',
     quantidadeParadas:'5',
-    recursosPorPagina:String(Math.min(RECURSOS.length, 10)),
+    recursosPorPagina:String(Math.min(recursos.length, 10)),
     ordenacao:        'R',
     codigoAgrupamento:'',
     formato:          'CSV',  // CSV é parseable; PDF/HTML são binários/iframes
     codFavorito:      '',
   });
-  for (const id of RECURSOS) body.append('recursosSelecionados_369777135', String(id));
+  for (const id of recursos) body.append('recursosSelecionados_369777135', String(id));
   body.append('codigosTurno', '2');  // turnos 1 e 2
 
   const url = `${ACTION}/relatorio/disponibilidade/disponibilidadeGerencial/execute?access_token=${encodeURIComponent(token)}`;
   console.log(`Buscando relatório CODI: ${inicio} → ${fim}`);
-  console.log(`  Recursos: ${RECURSOS.join(', ')} | Turnos: 1, 2`);
+  console.log(`  Recursos: ${recursos.join(', ')} | Turnos: 1, 2`);
 
   const resp = await fetch(url, {
     method: 'POST',
@@ -196,7 +208,6 @@ async function salvar(from, to, valor) {
     console.log(`[dry-run] Não salvando. Valor: maquina_operacao = ${valor}% (${from} → ${to})`);
     return;
   }
-  const sb = createClient(SB_URL, SB_KEY, { db: { schema: 'gestao' } });
   const { error } = await sb.from('kpi_manual_valores').upsert(
     {
       chave:          'maquina_operacao',
@@ -221,11 +232,12 @@ async function main() {
     ? { from: args[0], to: args[1] }
     : semanaAnterior();
 
+  const recursos = await resolverRecursos();
   console.log(`Período: ${from} → ${to}`);
-  console.log(`Recursos: [${RECURSOS.join(', ')}]`);
+  console.log(`Recursos: [${recursos.join(', ')}]`);
 
   const token = await getToken();
-  const disp  = await buscarDisponibilidade(token, from, to);
+  const disp  = await buscarDisponibilidade(token, from, to, recursos);
   await salvar(from, to, disp);
 }
 
