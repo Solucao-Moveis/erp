@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.75',
+    data: '19/08/2026',
+    titulo: 'RH: colaborador some da lista de férias assim que o período termina',
+    resumo: 'Corrigido um problema em que, ao usar "Copiar dia anterior" no Diário, colaboradores que já tinham voltado das férias continuavam aparecendo no card "Colaboradores de Férias" mesmo depois do fim do período.',
+    mudancas: [
+      {
+        app: 'RH — Diário',
+        o_que: 'O botão "Copiar dia anterior" não traz mais colaboradores cujas férias já terminaram.',
+        como: 'Ao abrir um dia novo e clicar em "📋 Copiar dia anterior", só aparecem no card de Férias os colaboradores cujo período (De/Até) ainda cobre aquele dia — quem já voltou não é mais copiado para o dia seguinte.',
+      },
+    ],
+  },
+  {
     versao: '6.74',
     data: '14/08/2026',
     titulo: 'Gerencial: indicadores manuais da Visão Geral agora somam por semana',
