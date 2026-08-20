@@ -53,6 +53,8 @@ window.SMERP_CONFIG = {
     utilitarios: 'https://solucaomoveis-caderno.h5xdag.easypanel.host/',
     // Segurança do Trabalho — Programa de Gestão e Desempenho em SST
     seguranca: 'https://solucaomoveis-seguranca-solucao.h5xdag.easypanel.host/',
+    // TESTE — Acidentes e Afastamentos (módulo novo, nome provisório; acesso só master).
+    teste: 'https://solucaomoveis-testeseguranca.h5xdag.easypanel.host/',
     // RH — Indicadores de Absenteísmo & Turnover (acesso restrito a 3 pessoas)
     rh: 'https://solucaomoveis-rh-solucao.h5xdag.easypanel.host/',
     // Cronoanálise / PCP (repo timestamp, migrado do Lovable data-weave-vault)
@@ -95,7 +97,8 @@ window.SMERP_CONFIG = {
         { system: 'frota', nome: 'Gestor de Frota', desc: 'Veículos: abastecimento, manutenção, consumo e custos' }
       ] },
     { id: 'seguranca',      nome: 'Segurança do Trabalho', icon: 'shield', cor: '#DC2626', modulos: [
-        { system: 'seguranca', nome: 'SST — Gestão de Segurança', desc: 'Programa de Gestão e Desempenho em Segurança: placar mensal por setor, pódio, mural e evolução trimestral' }
+        { system: 'seguranca', nome: 'SST — Gestão de Segurança', desc: 'Programa de Gestão e Desempenho em Segurança: placar mensal por setor, pódio, mural e evolução trimestral' },
+        { system: 'teste', nome: 'TESTE — Acidentes e Afastamentos', desc: 'Módulo em teste (nome provisório, acesso só master): lançamento, dashboard e registros de acidentes/afastamentos' }
       ] },
     { id: 'rh',            nome: 'RH / Pessoas',           icon: 'users', cor: '#7C3AED', modulos: [
         { system: 'rh', nome: 'Indicadores de RH', desc: 'Absenteísmo & turnover: painel, diário de ausentes e lançamentos mensais' }

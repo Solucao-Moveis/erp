@@ -138,6 +138,15 @@ as $$
               (select jsonb_agg(role) from codi.user_roles where user_id = auth.uid()),
               '[]'::jsonb)
           end
+        ),
+        'teste', (
+          -- Módulo TESTE — Acidentes e Afastamentos (nome provisório).
+          -- Acesso só master por enquanto; sem profiles/user_roles no schema teste.
+          select case when exists (
+            select 1 from auth.users where id = auth.uid() and lower(email) = 'master@solucaomoveis.ind.br'
+          )
+            then '["master"]'::jsonb
+          end
         )
       )
     ),
