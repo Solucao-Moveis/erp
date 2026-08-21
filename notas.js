@@ -10,6 +10,37 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.81',
+    data: '21/08/2026',
+    titulo: 'PCP: kanban agora funciona no celular',
+    resumo: 'O quadro Kanban de Ordens de Produção só podia ser operado arrastando os cards — algo que não funciona em celular/tablet. Agora dá pra mover pelo toque também.',
+    mudancas: [
+      {
+        app: 'PCP — Kanban',
+        o_que: 'Cada card do Kanban ganhou um campo "mover para" além do arrastar.',
+        como: 'No celular, toque no campo de status dentro do card e escolha o setor de destino — a OP muda de coluna na hora, sem precisar arrastar.',
+      },
+    ],
+  },
+  {
+    versao: '6.80',
+    data: '21/08/2026',
+    titulo: 'Manutenção, Planejamento de Carga, Produção/CODI, Gerencial, Segurança e Gestor de Projeto ajustados para o celular',
+    resumo: 'Revisão completa de responsividade mobile nesses 6 módulos: barras de filtro que cortavam botões, formulários com colunas apertadas demais, mapa e gráficos grandes demais pra tela do celular, e nomes longos empurrando elementos pra fora da tela.',
+    mudancas: [
+      {
+        app: 'Manutenção, Planejamento de Carga, Produção/CODI, Gerencial, Segurança, Gestor de Projeto',
+        o_que: 'Diversos ajustes de layout pra celular em cada módulo: barras de filtro e cabeçalhos de tela agora quebram linha em vez de cortar botões; formulários com 2-3 campos lado a lado agora empilham; nomes longos (setor, cidade, produto) não empurram mais badges/valores pra fora da tela.',
+        como: 'Ao usar qualquer um desses módulos pelo celular, os filtros, formulários e cabeçalhos se ajustam automaticamente ao tamanho da tela — nada fica cortado ou escondido.',
+      },
+      {
+        app: 'Planejamento de Carga — Rota',
+        o_que: 'O mapa da rota agora ocupa menos altura da tela no celular.',
+        como: 'Ao abrir a tela de Rota pelo celular, o mapa fica mais baixo (280px em vez de 480px), sobrando mais espaço pra ver a lista de paradas e cubagem sem precisar rolar tanto.',
+      },
+    ],
+  },
+  {
     versao: '6.79',
     data: '21/08/2026',
     titulo: 'Todos os módulos: tabelas não quebram mais o texto no celular',
@@ -19,6 +50,11 @@ window.SMERP_NOTAS = [
         app: 'Todos os módulos com tabelas',
         o_que: 'Correção padronizada aplicada de uma vez em todos os módulos: tabelas largas agora rolam para os lados no celular em vez de espremer e quebrar o texto das células.',
         como: 'Ao abrir qualquer tela com tabela pelo celular, se ela não couber inteira na largura da tela, dá pra arrastar o dedo pra ver as colunas de fora — o texto de cada célula fica sempre em uma linha só.',
+      },
+      {
+        app: 'Todos os módulos com pop-ups (janelas de cadastro/edição)',
+        o_que: 'As janelas de cadastro/edição (pop-ups) não ficam mais coladas nas bordas da tela no celular.',
+        como: 'Ao abrir qualquer pop-up (novo item, editar, confirmar) pelo celular, agora sobra uma margem dos dois lados — antes a janela ia de ponta a ponta da tela.',
       },
     ],
   },
