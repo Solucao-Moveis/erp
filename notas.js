@@ -53,13 +53,23 @@ window.SMERP_NOTAS = [
   {
     versao: '6.76',
     data: '21/08/2026',
-    titulo: 'RH: Painel e cadastro de colaborador ajustados para o celular',
-    resumo: 'Os gráficos do Painel e os indicadores do cadastro de colaborador ficavam espremidos e difíceis de ler quando o RH era acessado pelo celular. Agora as telas se ajustam ao tamanho da tela.',
+    titulo: 'RH: telas ajustadas de verdade para o celular',
+    resumo: 'O RH tinha vários pontos que ficavam ruins de usar no celular: gráficos espremidos, o filtro de Ano/Mês/Período amassado no topo, e as tabelas quebrando o nome do colaborador em várias linhas em vez de deixar rolar. Todos corrigidos.',
     mudancas: [
       {
         app: 'RH — Painel e Colaboradores',
-        o_que: 'Gráficos do Painel e os 3 indicadores do cadastro de cada colaborador não ficam mais espremidos lado a lado no celular.',
-        como: 'Ao abrir o RH pelo celular, os gráficos do Painel aparecem um embaixo do outro (em vez de dois lado a lado) e os indicadores do cadastro do colaborador aparecem em 2 colunas — ficando legíveis. No computador continua igual a antes.',
+        o_que: 'Gráficos do Painel e os indicadores do cadastro de cada colaborador não ficam mais espremidos lado a lado no celular.',
+        como: 'No celular, os gráficos do Painel aparecem um embaixo do outro e os indicadores do cadastro do colaborador aparecem em 2 colunas — ficando legíveis. No computador continua igual a antes.',
+      },
+      {
+        app: 'RH — Filtro de Ano/Mês/Período',
+        o_que: 'O filtro de período não fica mais amassado dentro do topo da tela.',
+        como: 'No celular, o filtro agora aparece como uma barra normal logo abaixo do topo, com espaço pra cada campo — em vez de espremido ao lado do menu.',
+      },
+      {
+        app: 'RH — Tabelas (Colaboradores, Por Setor, Lançamentos Mensais, Painel)',
+        o_que: 'As tabelas não quebram mais o texto em várias linhas no celular.',
+        como: 'Quando a tabela é larga demais pra tela do celular, agora dá pra arrastar o dedo pros lados pra ver as colunas, em vez do nome do colaborador ficar cortado em 3-4 linhas.',
       },
     ],
   },
