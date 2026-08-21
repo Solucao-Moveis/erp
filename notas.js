@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.76',
+    data: '21/08/2026',
+    titulo: 'RH: Painel e cadastro de colaborador ajustados para o celular',
+    resumo: 'Os gráficos do Painel e os indicadores do cadastro de colaborador ficavam espremidos e difíceis de ler quando o RH era acessado pelo celular. Agora as telas se ajustam ao tamanho da tela.',
+    mudancas: [
+      {
+        app: 'RH — Painel e Colaboradores',
+        o_que: 'Gráficos do Painel e os 3 indicadores do cadastro de cada colaborador não ficam mais espremidos lado a lado no celular.',
+        como: 'Ao abrir o RH pelo celular, os gráficos do Painel aparecem um embaixo do outro (em vez de dois lado a lado) e os indicadores do cadastro do colaborador aparecem em 2 colunas — ficando legíveis. No computador continua igual a antes.',
+      },
+    ],
+  },
+  {
     versao: '6.75',
     data: '19/08/2026',
     titulo: 'RH: colaborador some da lista de férias assim que o período termina',
