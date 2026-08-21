@@ -10,6 +10,24 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.82',
+    data: '21/08/2026',
+    titulo: 'Caderno: barra de edição e tabelas de página ajustadas para o celular',
+    resumo: 'A barra de botões ao editar uma página e as tabelas criadas dentro do texto ficavam apertadas ou cortadas no celular.',
+    mudancas: [
+      {
+        app: 'Caderno — Editor de página',
+        o_que: 'A barra no topo do editor (Voltar, Definir resumo, Salvar, menu) não estoura mais a tela no celular.',
+        como: 'No celular, os botões da barra de edição mostram só o ícone (sem o texto), deixando tudo visível numa linha só.',
+      },
+      {
+        app: 'Caderno — Tabelas dentro da página',
+        o_que: 'Tabelas criadas dentro do texto de uma página não ficam mais cortadas no celular.',
+        como: 'Se a tabela tiver mais colunas do que cabe na tela, agora dá pra arrastar o dedo pro lado pra ver o resto.',
+      },
+    ],
+  },
+  {
     versao: '6.81',
     data: '21/08/2026',
     titulo: 'PCP: kanban agora funciona no celular',
