@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.79',
+    data: '21/08/2026',
+    titulo: 'Todos os módulos: tabelas não quebram mais o texto no celular',
+    resumo: 'Em quase todos os módulos do sistema (Compras, Hora a Hora, BIP, RH, Sobras, Manutenção, Gestor de Projeto, Frota, Segurança, Gerencial, Planejamento, Produção/CODI, PCP), quando uma tabela tinha mais colunas do que cabia na tela do celular, o texto (nomes, descrições) quebrava em várias linhas e ficava difícil de ler. Agora, nesse caso, a tabela deixa passar o dedo pro lado pra ver o resto — o texto não quebra mais.',
+    mudancas: [
+      {
+        app: 'Todos os módulos com tabelas',
+        o_que: 'Correção padronizada aplicada de uma vez em todos os módulos: tabelas largas agora rolam para os lados no celular em vez de espremer e quebrar o texto das células.',
+        como: 'Ao abrir qualquer tela com tabela pelo celular, se ela não couber inteira na largura da tela, dá pra arrastar o dedo pra ver as colunas de fora — o texto de cada célula fica sempre em uma linha só.',
+      },
+    ],
+  },
+  {
     versao: '6.78',
     data: '21/08/2026',
     titulo: 'Gestor de Expedição (BIP): relatório e cadastro de carga ajustados para o celular',
