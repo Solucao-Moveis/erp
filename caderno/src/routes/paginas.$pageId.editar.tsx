@@ -219,9 +219,12 @@ function EditarPagina() {
             </Button>
 
             {/* Centro: status */}
-            <div className="mx-auto flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="mx-auto hidden items-center gap-2 text-sm text-muted-foreground sm:flex">
               <Clock className="h-4 w-4" />
               <span className="font-medium text-foreground">Editando página</span>
+              <IndicadorAutosave estado={autosave} />
+            </div>
+            <div className="ml-auto sm:hidden">
               <IndicadorAutosave estado={autosave} />
             </div>
 
@@ -234,7 +237,7 @@ function EditarPagina() {
             </Button>
             <Button onClick={handleSalvar} disabled={ocupado} className="gap-2">
               {salvandoBtn ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              Salvar página
+              <span className="hidden sm:inline">Salvar página</span>
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

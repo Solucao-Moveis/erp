@@ -196,10 +196,11 @@
 
 /* --- Tabelas --- */
 .caderno-prose table {
-  width: 100%;
+  display: block;
+  max-width: 100%;
   border-collapse: collapse;
   margin: 1em 0;
-  overflow: hidden;
+  overflow-x: auto;
   font-size: 0.95em;
 }
 .caderno-prose th,
