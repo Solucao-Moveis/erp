@@ -10,6 +10,29 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.83',
+    data: '21/08/2026',
+    titulo: 'Compras: filtros, ações e anexos ajustados para o celular',
+    resumo: 'Alguns pontos do Compras (o app de referência do ERP) ainda ficavam apertados no celular: filtro de datas dos Indicadores, os botões de ação da Solicitação e a lista de anexos.',
+    mudancas: [
+      {
+        app: 'Compras — Indicadores',
+        o_que: 'O filtro de período "Desde o início / Mais recente" não fica mais cortado no celular.',
+        como: 'Os dois campos de data e o botão "Limpar" quebram para a linha de baixo quando não cabem lado a lado.',
+      },
+      {
+        app: 'Compras — Solicitação (detalhe)',
+        o_que: 'Os botões de ação (Editar, Cancelar, Excluir) não ficam mais espremidos no celular.',
+        como: 'Quando há vários botões disponíveis, eles quebram para uma segunda linha em vez de cortar.',
+      },
+      {
+        app: 'Compras — Anexos (Solicitação, novo pedido, edição)',
+        o_que: 'Nome de arquivo anexado longo não empurra mais o botão de baixar/remover pra fora da tela.',
+        como: 'O nome do anexo é cortado com "..." quando necessário, mantendo o botão sempre visível e clicável.',
+      },
+    ],
+  },
+  {
     versao: '6.82',
     data: '21/08/2026',
     titulo: 'Caderno: barra de edição e tabelas de página ajustadas para o celular',
