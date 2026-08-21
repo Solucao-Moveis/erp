@@ -10,6 +10,24 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.78',
+    data: '21/08/2026',
+    titulo: 'Gestor de Expedição (BIP): relatório e cadastro de carga ajustados para o celular',
+    resumo: 'O relatório de conferência de carregamento e a tela de colar itens de carga ficavam ilegíveis no celular; corrigido.',
+    mudancas: [
+      {
+        app: 'BIP — Relatório de carregamento',
+        o_que: 'As tabelas do relatório (Produtos do Carregamento e Móveis Bipados) não ficam mais cortadas na tela do celular.',
+        como: 'Ao abrir "Ver Relatório para Impressão" no celular, agora dá pra arrastar o dedo pros lados pra ver todas as colunas da tabela, sem que ela estoure a tela.',
+      },
+      {
+        app: 'BIP — Cadastro de carga (colar tabela)',
+        o_que: 'Os campos de cada item colado (Código, Descrição, Qtd, Pedido, NF) não ficam mais espremidos em uma única linha no celular.',
+        como: 'Ao usar "Colar tabela" pra montar uma carga pelo celular, os campos de cada item agora se organizam em 2 linhas em vez de 6 campos minúsculos lado a lado.',
+      },
+    ],
+  },
+  {
     versao: '6.77',
     data: '21/08/2026',
     titulo: 'Hora a Hora: telas ajustadas para o celular',
