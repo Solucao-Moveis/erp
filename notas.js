@@ -10,6 +10,29 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.77',
+    data: '21/08/2026',
+    titulo: 'Hora a Hora: telas ajustadas para o celular',
+    resumo: 'Alguns pontos do Hora a Hora ficavam apertados ou cortados quando acessados pelo celular: o filtro de datas dos Indicadores, o cabeçalho do link público de visualização e o gráfico de Meta vs Realizado.',
+    mudancas: [
+      {
+        app: 'Hora a Hora — Indicadores',
+        o_que: 'O filtro de datas "De/Até" não fica mais cortado no celular.',
+        como: 'Na tela de Indicadores, os campos de data quebram para a linha de baixo quando não cabem ao lado do título.',
+      },
+      {
+        app: 'Hora a Hora — Link público',
+        o_que: 'O cabeçalho do link "Somente leitura" (compartilhado com quem não tem login) não empurra mais o selo "Somente leitura" pra fora da tela quando o nome do visualizador é longo.',
+        como: 'O título e o nome do visualizador agora são cortados com "..." quando necessário, mantendo o selo sempre visível.',
+      },
+      {
+        app: 'Hora a Hora — Painel',
+        o_que: 'O gráfico "Meta vs Realizado por máquina" fica mais legível no celular.',
+        como: 'No celular, os nomes das máquinas ocupam menos espaço no gráfico, sobrando mais área pras barras de Meta e Realizado.',
+      },
+    ],
+  },
+  {
     versao: '6.76',
     data: '21/08/2026',
     titulo: 'RH: Painel e cadastro de colaborador ajustados para o celular',
