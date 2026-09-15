@@ -1,6 +1,9 @@
 // ============================================================
 // Anexos de página — estilo BookStack.
 //   <AnexosView>   = só leitura: lista para abrir/baixar (rail direita).
+//                    Word/Excel/PowerPoint abrem num visualizador embutido
+//                    (Office Online, somente leitura) em vez de baixar —
+//                    PDF e imagem o navegador já pré-visualiza sozinho.
 //   <AnexosEditor> = no editor: enviar arquivo, adicionar link, remover.
 // Arquivos vão para o bucket público caderno-midia; links ficam só na tabela.
 // ============================================================
@@ -20,6 +23,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   useAttachments,
   useUploadAttachment,
   useAddLinkAttachment,
@@ -36,49 +45,127 @@ function formatarTamanho(bytes: number | null): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+/** Extensões que o navegador não sabe abrir sozinho e o Office Online prevê. */
+const EXTENSOES_OFFICE = new Set(["doc", "docx", "xls", "xlsx", "ppt", "pptx"]);
+
+function extensaoDoAnexo(nome: string): string {
+  const ponto = nome.lastIndexOf(".");
+  return ponto > 0 ? nome.slice(ponto + 1).toLowerCase() : "";
+}
+
 /** Card de anexos só-leitura (rail direita). Some quando vazio. */
 export function AnexosView({ pageId }: { pageId: string }) {
   const { data: anexos } = useAttachments(pageId);
+  const [preview, setPreview] = useState<Attachment | null>(null);
   if (!anexos || anexos.length === 0) return null;
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-sm">
-          <Paperclip className="h-4 w-4 text-muted-foreground/70" />
-          Anexos
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-1">
-        {anexos.map((a) => {
-          const href = urlDoAnexo(a);
-          const tamanho = a.externo ? "" : formatarTamanho(a.tamanho);
-          return (
-            <a
-              key={a.id}
-              href={href ?? undefined}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted/60"
-            >
-              {a.externo ? (
-                <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground" />
-              ) : (
-                <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
-              )}
-              <span className="min-w-0 flex-1 truncate group-hover:text-primary">
-                {a.nome}
-              </span>
-              {tamanho && (
-                <span className="shrink-0 text-xs text-muted-foreground/70">
-                  {tamanho}
+    <>
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-sm">
+            <Paperclip className="h-4 w-4 text-muted-foreground/70" />
+            Anexos
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-1">
+          {anexos.map((a) => {
+            const href = urlDoAnexo(a);
+            const tamanho = a.externo ? "" : formatarTamanho(a.tamanho);
+            const ehOffice = !a.externo && EXTENSOES_OFFICE.has(extensaoDoAnexo(a.nome));
+
+            const conteudo = (
+              <>
+                {a.externo ? (
+                  <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground" />
+                ) : (
+                  <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+                )}
+                <span className="min-w-0 flex-1 truncate group-hover:text-primary">
+                  {a.nome}
                 </span>
-              )}
-            </a>
-          );
-        })}
-      </CardContent>
-    </Card>
+                {tamanho && (
+                  <span className="shrink-0 text-xs text-muted-foreground/70">
+                    {tamanho}
+                  </span>
+                )}
+              </>
+            );
+
+            if (ehOffice && href) {
+              return (
+                <button
+                  key={a.id}
+                  type="button"
+                  onClick={() => setPreview(a)}
+                  className="group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors hover:bg-muted/60"
+                >
+                  {conteudo}
+                </button>
+              );
+            }
+
+            return (
+              <a
+                key={a.id}
+                href={href ?? undefined}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted/60"
+              >
+                {conteudo}
+              </a>
+            );
+          })}
+        </CardContent>
+      </Card>
+
+      <PreviewOfficeDialog anexo={preview} onOpenChange={(o) => !o && setPreview(null)} />
+    </>
+  );
+}
+
+/** Visualizador embutido (somente leitura) pra Word/Excel/PowerPoint, via Office Online. */
+function PreviewOfficeDialog({
+  anexo,
+  onOpenChange,
+}: {
+  anexo: Attachment | null;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const href = anexo ? urlDoAnexo(anexo) : null;
+  const viewerSrc = href
+    ? `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(href)}`
+    : null;
+
+  return (
+    <Dialog open={!!anexo} onOpenChange={onOpenChange}>
+      <DialogContent className="flex h-[85vh] max-w-4xl flex-col p-0">
+        <DialogHeader className="border-b px-4 py-3">
+          <DialogTitle className="flex items-center justify-between gap-3 pr-6 text-sm font-medium">
+            <span className="min-w-0 truncate">{anexo?.nome}</span>
+            {href && (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 text-xs font-normal text-muted-foreground hover:text-primary hover:underline"
+              >
+                Baixar original
+              </a>
+            )}
+          </DialogTitle>
+        </DialogHeader>
+        {viewerSrc && (
+          <iframe
+            key={viewerSrc}
+            src={viewerSrc}
+            title={anexo?.nome ?? "Visualização do anexo"}
+            className="flex-1 border-0"
+          />
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
 

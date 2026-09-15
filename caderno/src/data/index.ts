@@ -22,6 +22,7 @@ export {
   useCreateBook,
   useUpdateBook,
   useDeleteBook,
+  useDuplicateBook,
   useAddBookToShelf,
   useRemoveBookFromShelf,
 } from "./books";
@@ -32,6 +33,7 @@ export {
   useCreateChapter,
   useUpdateChapter,
   useDeleteChapter,
+  useReorderChapters,
 } from "./chapters";
 
 export {
@@ -42,6 +44,7 @@ export {
   useCreatePage,
   useUpdatePage,
   useMovePage,
+  useReorderPages,
   useDeletePage,
 } from "./pages";
 

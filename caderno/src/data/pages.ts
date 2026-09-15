@@ -214,6 +214,25 @@ export function useRestaurarRevisao() {
   });
 }
 
+/** Reordena páginas (mesmo capítulo, ou soltas) — ordem = posição na lista informada. */
+export function useReorderPages() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { bookId: string; ids: string[] }): Promise<void> => {
+      const resultados = await Promise.all(
+        input.ids.map((id, ordem) =>
+          supabase.from("pages").update({ ordem }).eq("id", id),
+        ),
+      );
+      const erro = resultados.find((r) => r.error)?.error;
+      if (erro) throw erro;
+    },
+    onSuccess: (_data, variables) => {
+      qc.invalidateQueries({ queryKey: qk.bookConteudo(variables.bookId) });
+    },
+  });
+}
+
 /** Remove uma página. Informe book_id para invalidar o conteúdo do livro. */
 export function useDeletePage() {
   const qc = useQueryClient();

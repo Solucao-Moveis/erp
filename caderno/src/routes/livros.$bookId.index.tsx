@@ -3,7 +3,8 @@
 //   esquerda  = busca no livro + árvore (capítulos/páginas) + atividade
 //   centro    = breadcrumb + título + descrição + lista do conteúdo
 //   direita   = "Detalhes" + "Ações" (nova página/capítulo, editar,
-//               permissões, excluir; copiar/ordenar "em breve")
+//               permissões, copiar [duplica o livro], ordenar
+//               [arrastar-e-soltar de capítulos/páginas], excluir)
 // Registra a visualização do livro ao montar.
 // ============================================================
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
@@ -47,6 +48,7 @@ import { EntidadeDialog, type EntidadeFormValues } from "@/components/caderno/En
 import { EntityListItem } from "@/components/caderno/EntityListItem";
 import { Layout3Col } from "@/components/caderno/Layout3Col";
 import { LivroArvore } from "@/components/caderno/LivroArvore";
+import { OrdenarLivroDialog } from "@/components/caderno/OrdenarLivroDialog";
 import { RailAcoes } from "@/components/caderno/RailAcoes";
 import { RailDetalhes } from "@/components/caderno/RailDetalhes";
 import { VisibilidadeBadge } from "@/components/caderno/VisibilidadeBadge";
@@ -57,6 +59,7 @@ import {
   useCreateChapter,
   useCreatePage,
   useDeleteBook,
+  useDuplicateBook,
   useProfile,
   useUpdateBook,
 } from "@/data";
@@ -89,12 +92,14 @@ function BookPage() {
 
   const updateBook = useUpdateBook();
   const deleteBook = useDeleteBook();
+  const duplicateBook = useDuplicateBook();
 
   const [editar, setEditar] = useState(false);
   const [permissoes, setPermissoes] = useState(false);
   const [excluir, setExcluir] = useState(false);
   const [novoCapitulo, setNovoCapitulo] = useState(false);
   const [novaPagina, setNovaPagina] = useState(false);
+  const [ordenar, setOrdenar] = useState(false);
   const [busca, setBusca] = useState("");
 
   // Registra a visualização do livro ao abrir.
@@ -159,7 +164,15 @@ function BookPage() {
     }
   };
 
-  const emBreve = () => toast.info("Em breve.");
+  const handleCopiar = async () => {
+    try {
+      const novo = await duplicateBook.mutateAsync(bookId);
+      toast.success("Livro duplicado!");
+      navigate({ to: "/livros/$bookId", params: { bookId: novo.id } });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Não foi possível duplicar o livro.");
+    }
+  };
 
   // ----- estados de carregamento / erro -----
   if (isLoading) {
@@ -191,8 +204,8 @@ function BookPage() {
     { icon: FolderPlus, label: "Novo capítulo", onClick: () => setNovoCapitulo(true) },
     { icon: Pencil, label: "Editar", onClick: () => setEditar(true) },
     { icon: Shield, label: "Permissões", onClick: () => setPermissoes(true) },
-    { icon: Copy, label: "Copiar", onClick: emBreve },
-    { icon: ArrowDownUp, label: "Ordenar", onClick: emBreve },
+    { icon: Copy, label: "Copiar", onClick: handleCopiar },
+    { icon: ArrowDownUp, label: "Ordenar", onClick: () => setOrdenar(true) },
     { icon: Trash2, label: "Excluir", onClick: () => setExcluir(true), danger: true },
   ];
 
@@ -290,6 +303,14 @@ function BookPage() {
         onOpenChange={setNovaPagina}
         bookId={bookId}
         capitulos={capitulos}
+      />
+
+      {/* Ordenar capítulos/páginas */}
+      <OrdenarLivroDialog
+        open={ordenar}
+        onOpenChange={setOrdenar}
+        bookId={bookId}
+        arvore={book.arvore}
       />
     </AppLayout>
   );

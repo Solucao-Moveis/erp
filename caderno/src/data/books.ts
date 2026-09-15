@@ -211,6 +211,93 @@ export function useDeleteBook() {
   });
 }
 
+/**
+ * Duplica um livro inteiro: capítulos e páginas (com conteúdo), mantendo a
+ * mesma estrutura e a ordem original. Anexos das páginas NÃO são copiados
+ * (ficam só na página original) — evita duplicar arquivos no Storage.
+ */
+export function useDuplicateBook() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (bookId: string): Promise<Book> => {
+      const original = await fetchBookConteudo(bookId);
+      const created_by = await getUserId();
+
+      const { data: novoBookData, error: bookErr } = await supabase
+        .from("books")
+        .insert({
+          nome: `${original.nome} (cópia)`,
+          slug: slugUnico(`${original.nome} cópia`),
+          descricao: original.descricao,
+          capa_url: original.capa_url,
+          ordem: original.ordem,
+          visibilidade: original.visibilidade,
+          team_id: original.team_id,
+          created_by,
+        })
+        .select()
+        .single();
+      if (bookErr) throw bookErr;
+      const novoBook = novoBookData as Book;
+
+      for (const item of original.arvore) {
+        if (item.tipo === "chapter" && item.chapter) {
+          const cap = item.chapter;
+          const { data: novoCapData, error: capErr } = await supabase
+            .from("chapters")
+            .insert({
+              book_id: novoBook.id,
+              nome: cap.nome,
+              slug: slugUnico(cap.nome),
+              descricao: cap.descricao,
+              ordem: cap.ordem,
+              created_by,
+            })
+            .select()
+            .single();
+          if (capErr) throw capErr;
+          const novoCap = novoCapData as Chapter;
+
+          for (const p of item.paginas ?? []) {
+            const { error: pageErr } = await supabase.from("pages").insert({
+              book_id: novoBook.id,
+              chapter_id: novoCap.id,
+              nome: p.nome,
+              slug: slugUnico(p.nome),
+              html: p.html,
+              texto: p.texto,
+              ordem: p.ordem,
+              rascunho: p.rascunho,
+              created_by,
+            });
+            if (pageErr) throw pageErr;
+          }
+        } else if (item.tipo === "page" && item.page) {
+          const p = item.page;
+          const { error: pageErr } = await supabase.from("pages").insert({
+            book_id: novoBook.id,
+            chapter_id: null,
+            nome: p.nome,
+            slug: slugUnico(p.nome),
+            html: p.html,
+            texto: p.texto,
+            ordem: p.ordem,
+            rascunho: p.rascunho,
+            created_by,
+          });
+          if (pageErr) throw pageErr;
+        }
+      }
+
+      return novoBook;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: qk.books });
+      qc.invalidateQueries({ queryKey: qk.todosLivros });
+    },
+  });
+}
+
 /** Vincula um livro existente a uma estante. */
 export function useAddBookToShelf() {
   const qc = useQueryClient();
