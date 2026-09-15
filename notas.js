@@ -10,6 +10,29 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.85',
+    data: '15/09/2026',
+    titulo: 'Cronoanálise/PCP: cadastro de Operadores e máquinas atualizado direto no sistema',
+    resumo: 'A lista de operadores e a de máquinas da Folha de Apontamentos estavam congeladas desde a migração do sistema — quem saía da empresa continuava aparecendo, quem entrava não aparecia, e cadastrar máquina nova não refletia no apontamento. Agora tudo isso é mantido dentro do próprio sistema.',
+    mudancas: [
+      {
+        app: 'Cronoanálise/PCP — Operadores (tela nova)',
+        o_que: 'Nova tela "Operadores" pra manter a lista de quem trabalha na fábrica sempre em dia.',
+        como: 'Em Operadores, clique em "Importar PDF do SMERP" e suba o relatório de funcionários ativos — o sistema mostra quem vai entrar e quem vai sair antes de aplicar. Quem sai é só marcado como inativo (nunca apagado, pra não perder histórico). Também dá pra cadastrar/editar operador manualmente.',
+      },
+      {
+        app: 'Cronoanálise/PCP — Folha de Apontamentos',
+        o_que: 'Os campos "Equipamento" e "Operador" agora vêm direto do cadastro (Máquinas e Operadores), em vez de uma lista fixa.',
+        como: 'Cadastrar uma máquina nova em "Máquinas" já faz ela aparecer no apontamento na hora — antes não aparecia.',
+      },
+      {
+        app: 'Cronoanálise/PCP — Inspeção',
+        o_que: 'O setor "Inspeção", que existia cadastrado duas vezes, foi unificado; e ganhou os 6 boxes físicos como opção de máquina no apontamento.',
+        como: 'Ao apontar um item da Inspeção, agora dá pra escolher "INSPEÇÃO BOX 1" até "BOX 6" no lugar de um setor genérico.',
+      },
+    ],
+  },
+  {
     versao: '6.84',
     data: '15/09/2026',
     titulo: 'Primeira rodada de pedidos do quadro de Desenvolvimento (Inovação)',
