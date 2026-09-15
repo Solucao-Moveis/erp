@@ -10,6 +10,39 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.84',
+    data: '15/09/2026',
+    titulo: 'Primeira rodada de pedidos do quadro de Desenvolvimento (Inovação)',
+    resumo: 'Atendemos 5 pedidos abertos por vocês no quadro de Desenvolvimento: melhorias em Manutenção, Hora a Hora, Compras e Caderno.',
+    mudancas: [
+      {
+        app: 'Manutenção — Estoque',
+        o_que: 'A tela de estoque ganhou busca e sugestão automática de código pra item novo.',
+        como: 'Digite qualquer parte do código, descrição, local ou máquina no campo de busca pra filtrar a lista. Ao clicar em "Novo item", o código já vem preenchido com o próximo número da sequência (ainda dá pra editar).',
+      },
+      {
+        app: 'Hora a Hora — Apontamento',
+        o_que: 'Agora dá pra apagar um lançamento de hora feito sem querer.',
+        como: 'Em cada campo já preenchido aparece um "×" no canto — clique pra limpar o lançamento e o campo volta pro "—" (sem apontamento), em vez de ficar travado com o número errado.',
+      },
+      {
+        app: 'Compras — Solicitações',
+        o_que: 'A busca de solicitações agora também encontra pelo código do item.',
+        como: 'Digite o código do produto na busca da tela de Solicitações e os pedidos que contêm aquele item aparecem na lista.',
+      },
+      {
+        app: 'Caderno — Livro',
+        o_que: '"Copiar" e "Ordenar", na tela do livro, que antes só mostravam "Em breve", agora funcionam.',
+        como: '"Copiar" duplica o livro inteiro (capítulos e páginas) pra você editar a cópia sem mexer no original. "Ordenar" abre uma janela pra arrastar e reordenar capítulos e páginas do jeito que quiser.',
+      },
+      {
+        app: 'Caderno — Anexos',
+        o_que: 'Arquivos de Word, Excel e PowerPoint anexados numa página agora abrem pra visualizar, sem precisar baixar.',
+        como: 'Clique no anexo e ele abre numa janela de visualização (só leitura); se precisar do arquivo de verdade, tem um link "Baixar original" ali dentro.',
+      },
+    ],
+  },
+  {
     versao: '6.83',
     data: '21/08/2026',
     titulo: 'Compras: filtros, ações e anexos ajustados para o celular',
