@@ -10,6 +10,29 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.86',
+    data: '17/09/2026',
+    titulo: 'RH: acesso de líder por setor; Cronoanálise: setor Solda/Dobra corrigido',
+    resumo: 'RH ganhou um jeito de dar acesso restrito aos líderes de cada setor, sem abrir o sistema inteiro. E corrigimos um cadastro invertido na Cronoanálise que jogava dado de Dobra e Solda no setor errado.',
+    mudancas: [
+      {
+        app: 'RH — Ajustes (novo)',
+        o_que: 'Novo papel "Líder": só consulta os colaboradores e ocorrências do próprio setor, sem editar nada.',
+        como: 'Em Ajustes → Líderes, quem já tem acesso completo escolhe "Líder (só consulta)" pra uma pessoa e marca o(s) setor(es) que ela acompanha. Essa pessoa passa a ver só a aba Colaboradores, filtrada pro setor dela.',
+      },
+      {
+        app: 'RH — Colaboradores',
+        o_que: 'Novo filtro por setor na aba Ranking.',
+        como: 'Escolha um setor no campo acima da tabela pra ver só os colaboradores daquele setor.',
+      },
+      {
+        app: 'Cronoanálise/PCP',
+        o_que: 'Corrigido um cadastro que jogava lançamentos de Dobra e Solda no setor errado.',
+        como: 'Novos lançamentos sem código de item reconhecido agora caem no setor certo automaticamente (Dobra em Metalurgia, Solda em Solda).',
+      },
+    ],
+  },
+  {
     versao: '6.85',
     data: '15/09/2026',
     titulo: 'Cronoanálise/PCP: cadastro de Operadores e máquinas atualizado direto no sistema',
