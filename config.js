@@ -53,7 +53,7 @@ window.SMERP_CONFIG = {
     utilitarios: 'https://solucaomoveis-caderno.h5xdag.easypanel.host/',
     // Segurança do Trabalho — Programa de Gestão e Desempenho em SST
     seguranca: 'https://solucaomoveis-seguranca-solucao.h5xdag.easypanel.host/',
-    // TESTE - Acidentes e Afastamentos (módulo novo, nome provisório; acesso só master).
+    // Acidentes e Afastamentos (system 'teste' / schema 'teste' ficaram com o nome antigo; acesso por papel).
     teste: 'https://solucaomoveis-testeseguranca.h5xdag.easypanel.host/',
     // RH — Indicadores de Absenteísmo & Turnover (acesso restrito a 3 pessoas)
     rh: 'https://solucaomoveis-rh-solucao.h5xdag.easypanel.host/',
@@ -98,7 +98,7 @@ window.SMERP_CONFIG = {
       ] },
     { id: 'seguranca',      nome: 'Segurança do Trabalho', icon: 'shield', cor: '#DC2626', modulos: [
         { system: 'seguranca', nome: 'SST — Gestão de Segurança', desc: 'Programa de Gestão e Desempenho em Segurança: placar mensal por setor, pódio, mural e evolução trimestral' },
-        { system: 'teste', nome: 'TESTE - Acidentes e Afastamentos', desc: 'Módulo em teste (nome provisório, acesso só master): lançamento, dashboard e registros de acidentes/afastamentos' }
+        { system: 'teste', nome: 'Acidentes e Afastamentos', desc: 'Lançamento, dashboard e registros de acidentes/afastamentos com ações corretivas' }
       ] },
     { id: 'rh',            nome: 'RH / Pessoas',           icon: 'users', cor: '#7C3AED', modulos: [
         { system: 'rh', nome: 'Indicadores de RH', desc: 'Absenteísmo & turnover: painel, diário de ausentes e lançamentos mensais' }
@@ -192,6 +192,12 @@ window.SMERP_CONFIG = {
           { value: 'sesmt',  label: 'SESMT',         desc: 'Lança e edita avaliações mensais de todos os setores' },
           { value: 'lider',  label: 'Líder',         desc: 'Consulta painel, registros e detalhe do setor (somente leitura)' },
           { value: 'leitor', label: 'Leitor',        desc: 'Visualiza o painel e a evolução dos setores (somente leitura)' }
+        ] },
+      { system: 'teste', nome: 'Acidentes e Afastamentos', cor: '#DC2626', icon: 'shield',
+        papeis: [
+          { value: 'admin',  label: 'Administrador', desc: 'Acesso total: lança, edita e exclui acidentes e ações corretivas' },
+          { value: 'sesmt',  label: 'SESMT',         desc: 'Lança e edita acidentes/afastamentos e ações corretivas' },
+          { value: 'leitor', label: 'Leitor',        desc: 'Consulta o dashboard e os registros (somente leitura)' }
         ] },
       { system: 'rh', nome: 'RH — Indicadores', cor: '#7C3AED', icon: 'users',
         papeis: [
