@@ -10,6 +10,24 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.87',
+    data: '07/10/2026',
+    titulo: 'Cronoanálise/PCP: cenários salvos no Simulador e caderno virtual de páginas',
+    resumo: 'O Simulador de Carga só guardava um estado no navegador (sumia ao trocar de aba ou de computador). Agora dá pra salvar vários cenários nomeados. E cada apontamento salvo na Folha vira uma página permanente, consultável depois — tipo um caderno.',
+    mudancas: [
+      {
+        app: 'Cronoanálise/PCP — Simulador de Carga',
+        o_que: 'Novos botões "Salvar cenário" e "Cenários salvos".',
+        como: 'Monte a simulação normalmente e clique em "Salvar cenário" pra dar um nome e guardar no banco. Em "Cenários salvos" você abre qualquer um deles de volta (substitui a tela atual) ou exclui os que não precisa mais.',
+      },
+      {
+        app: 'Cronoanálise/PCP — Folha de Apontamentos',
+        o_que: 'Nova aba "Salvos" — um caderno com todas as folhas já lançadas.',
+        como: 'Toda vez que você clica em "Salvar no banco" na Folha de Apontamentos, aquele lançamento aparece na aba "Salvos", organizado por mês, com o resumo e o gráfico de volta igual na hora que foi salvo — sem precisar guardar PDF por fora.',
+      },
+    ],
+  },
+  {
     versao: '6.86',
     data: '17/09/2026',
     titulo: 'RH: acesso de líder por setor; Cronoanálise: setor Solda/Dobra corrigido',
