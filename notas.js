@@ -16,12 +16,12 @@ window.SMERP_NOTAS = [
     resumo: 'O módulo de Acidentes e Afastamentos (em Segurança do Trabalho) perdeu o "TESTE" do nome e deixou de ser só do master. Agora o acesso é liberado pessoa a pessoa, como nos outros sistemas.',
     mudancas: [
       {
-        app: 'Segurança do Trabalho — Acidentes e Afastamentos',
+        app: 'Segurança do Trabalho: Acidentes e Afastamentos',
         o_que: 'Nome novo no Hub e dentro do sistema: "Acidentes e Afastamentos", sem o "TESTE" na frente.',
         como: 'O card continua no mesmo lugar, dentro de Segurança do Trabalho. O endereço do sistema não mudou.',
       },
       {
-        app: 'Hub — Usuários',
+        app: 'Hub: Usuários',
         o_que: 'Acidentes e Afastamentos aparece na aba Usuários com 3 tipos de acesso: Administrador, SESMT e Leitor.',
         como: 'Na aba Usuários, abra a pessoa e marque o tipo de acesso. Administrador e SESMT lançam, editam e excluem acidentes e ações corretivas. Leitor só consulta o Dashboard e os Registros: para ele o menu Lançamento some e a ficha do acidente abre só para leitura.',
       },
