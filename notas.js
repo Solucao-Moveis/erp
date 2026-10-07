@@ -10,6 +10,24 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.88',
+    data: '07/10/2026',
+    titulo: 'Manutenção: Relatório de PCM agora pode ser visto por setor',
+    resumo: 'O Relatório de PCM (aba Indicadores) só mostrava os números somados de toda a fábrica. Agora dá pra olhar separado, setor por setor, com metas próprias pra cada um.',
+    mudancas: [
+      {
+        app: 'Manutenção — Indicadores',
+        o_que: 'Nova aba "Por Setor", ao lado da aba "Geral", no topo do Relatório de PCM.',
+        como: 'Clique em "Por Setor" e escolha o setor no campo que aparece ao lado. Todos os gráficos, o Top 5 de equipamentos, o Pareto de falhas e a tabela comparativa recalculam só com as máquinas daquele setor. O PDF exportado também sai só com o que está na tela.',
+      },
+      {
+        app: 'Manutenção — Indicadores',
+        o_que: 'Metas (Disponibilidade, MTTR, MTBF) podem ter um valor diferente por setor.',
+        como: 'Com a aba "Por Setor" selecionada, o botão "Metas" edita a meta só daquele setor. Setor que não tiver meta própria cadastrada continua usando a meta geral.',
+      },
+    ],
+  },
+  {
     versao: '6.87',
     data: '07/10/2026',
     titulo: 'Cronoanálise/PCP: cenários salvos no Simulador e caderno virtual de páginas',
