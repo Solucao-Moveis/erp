@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.89',
+    data: '07/10/2026',
+    titulo: 'Manutenção: nova tela "Indicadores por Máquina"',
+    resumo: 'Até agora só dava pra ver os indicadores (Disponibilidade, MTTR, MTBF) somados por fábrica ou por setor. Agora dá pra abrir o histórico de UMA máquina só.',
+    mudancas: [
+      {
+        app: 'Manutenção — Indicadores por Máquina (novo)',
+        o_que: 'Novo item no menu "Indicadores por Máquina": lista todas as máquinas, agrupadas por setor (igual ao Dashboard), com busca por nome ou código.',
+        como: 'Clique numa máquina pra abrir o raio-x dela: Disponibilidade, MTTR, MTTR Total, MTBF e OS no Período calculados só com o histórico daquela máquina, mais o Pareto de falhas e os gráficos de evolução mensal. O período padrão é o mês atual; dá pra trocar pra "Personalizado" e escolher qualquer intervalo de datas, igual já existe no Relatório de PCM. Botão "Voltar à lista" retorna pra lista de máquinas.',
+      },
+    ],
+  },
+  {
     versao: '6.88',
     data: '07/10/2026',
     titulo: 'Manutenção: Relatório de PCM agora pode ser visto por setor',
