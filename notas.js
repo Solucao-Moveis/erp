@@ -10,6 +10,34 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.92',
+    data: '09/10/2026',
+    titulo: 'Gerencial: novo Painel do Diretor (computador, TV e celular)',
+    resumo: 'O Gerencial virou o Painel do Diretor: os números mais importantes da fábrica, mês a mês, com os mesmos valores que aparecem em cada sistema (BIP, Hora a Hora, Pro-Care, Compras, RH e Segurança).',
+    mudancas: [
+      {
+        app: 'Gerencial: Painel do Diretor',
+        o_que: 'Menu novo por assunto: Abertura, Entrega, Produção, Setores, Manutenção, Compras, RH e Segurança. Cada tela mostra o mês atual, como ele está contra o mês anterior e contra a meta, e a evolução dos últimos 12 meses. Os números são buscados direto dos sistemas e se atualizam sozinhos.',
+        como: 'Entre no Gerencial pelo Hub. A Abertura mostra os 6 números principais; clique num card ou no menu para abrir o assunto. Clique em um mês no gráfico para ver aquele mês. Cada card diz de onde vem o número e até quando o dado foi lançado. O botão "Fórmulas" mostra como cada número é calculado.',
+      },
+      {
+        app: 'Gerencial: Setores (ao vivo)',
+        o_que: 'Tela nova com cada setor da fábrica no dia: quanto já produziu, a meta do dia e um velocímetro dizendo se, até a última hora lançada, o setor está batendo a meta. Avisa quais máquinas ainda não lançaram e quais estão produzindo sem meta.',
+        como: 'No menu, clique em "Setores". Use "Hoje" ou "Dia anterior". Clique num setor para ver as máquinas dele. As contas são as mesmas do Hora a Hora.',
+      },
+      {
+        app: 'Gerencial: Modo TV e celular',
+        o_que: 'Modo TV para deixar o painel passando na televisão, e uma versão para celular em formato de stories.',
+        como: 'No computador, clique em "Modo TV": a tela fica cheia e passa sozinha por todos os assuntos, com relógio. No celular, as telas passam sozinhas: toque à direita para avançar, à esquerda para voltar, ou segure 3 segundos para pausar e navegar; "Continuar" volta a rodar.',
+      },
+      {
+        app: 'Gerencial: Metas',
+        o_que: 'Tela de Metas com histórico: cada meta vale a partir de um mês, e mudar a meta não muda como os meses anteriores foram julgados.',
+        como: 'Em Ferramentas, clique em "Metas" (só diretoria). Escolha a partir de qual mês e o valor novo e clique em "Salvar meta".',
+      },
+    ],
+  },
+  {
     versao: '6.91',
     data: '09/10/2026',
     titulo: 'Gestor de Projeto: nova aba "Agenda de Implantação" (FOCCO e Promob)',
