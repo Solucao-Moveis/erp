@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.91',
+    data: '09/10/2026',
+    titulo: 'Gestor de Projeto: nova aba "Agenda de Implantação" (FOCCO e Promob)',
+    resumo: 'A agenda da implantação do FOCCO ERP e do Promob agora mora dentro do Gestor de Projeto: reuniões, entregas e pendências com dono e prazo, num lugar só.',
+    mudancas: [
+      {
+        app: 'Gestor de Projeto: Agenda de Implantação (nova)',
+        o_que: 'Novo item no menu "Agenda de Implantação" (no celular, fica em "Mais"). Traz a faixa vermelha "Atenção agora" com os atrasos, choques de agenda e datas a confirmar; os números-chave (atrasadas, em risco, vencem em 7 dias, sem dono ou prazo, % entregue) e 5 abas: Agenda 2 semanas, Mês, Pendências e entregas, Quem está devendo e Cronogramas. Já vem com os 69 itens da agenda atual.',
+        como: 'Use os botões Todos / FOCCO / PROMOB e a busca para filtrar. Clique em qualquer item para editar, ou em "+ Novo item" para criar uma reunião, entrega ou pendência. O quadradinho da linha marca como feito (e grava a data de conclusão). Os números do topo são clicáveis e levam direto para a lista filtrada. Em "Quem está devendo", o botão "Copiar cobrança" monta a mensagem pronta para mandar no WhatsApp e registra a data da cobrança em cada item. O que uma pessoa muda aparece para todo mundo.',
+      },
+    ],
+  },
+  {
     versao: '6.90',
     data: '07/10/2026',
     titulo: 'Acidentes e Afastamentos saiu de teste e já pode ser liberado pra equipe',
