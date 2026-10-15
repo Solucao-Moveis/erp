@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.93',
+    data: '15/10/2026',
+    titulo: 'BIP: achar carregamentos antigos nos Finalizados',
+    resumo: 'Antes, a lista de Finalizados do BIP mostrava só os 12 carregamentos mais recentes, e os mais antigos não tinham como ser abertos pela tela. Agora dá para buscar, filtrar por data e ver todos.',
+    mudancas: [
+      {
+        app: 'BIP: Finalizados',
+        o_que: 'A seção Finalizados ganhou um campo de busca, um filtro de data e um botão "Mostrar mais". Todos os carregamentos finalizados podem ser encontrados e abertos, com o relatório de cada um.',
+        como: 'Na tela Carregamentos do BIP, desça até "Finalizados". Digite no campo de busca o número do pedido, da carga, o nome do motorista, a placa ou a cidade. Ou escolha uma data para ver só os carregamentos daquele dia. Clique em "Limpar" para voltar à lista normal. Sem filtro, a lista mostra os 12 mais recentes e o botão "Mostrar mais" carrega os próximos.',
+      },
+    ],
+  },
+  {
     versao: '6.92',
     data: '09/10/2026',
     titulo: 'Gerencial: novo Painel do Diretor (computador, TV e celular)',
