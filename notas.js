@@ -33,7 +33,7 @@ window.SMERP_NOTAS = [
       {
         app: 'Marcenaria: Velocímetros de ritmo',
         o_que: 'No topo do Dashboard, um velocímetro para cada máquina e um para a marcenaria toda, igual ao da aba Setores do Gerencial. O ponteiro sobe conforme as peças são lançadas e mostra se a máquina está no ritmo da meta.',
-        como: 'Abra o Dashboard da Marcenaria. O ponteiro compara as peças feitas com as que já deveriam ter saído até agora: vermelho abaixo de 90%, amarelo de 90 a 99%, verde de 100% em diante. Embaixo aparece quantas peças estão acima (▲) ou abaixo (▼) do esperado, e se a máquina está rodando ou parada. A tela se atualiza sozinha.',
+        como: 'Abra o Dashboard da Marcenaria. O ponteiro compara as peças feitas com as que já deveriam ter saído até agora: vermelho abaixo de 90%, amarelo de 90 a 99%, verde de 100% em diante. Embaixo aparece quantas peças estão acima (▲) ou abaixo (▼) do esperado, e se a máquina está rodando ou parada. Com uma máquina só (ou escolhendo uma no filtro), o velocímetro fica grande e mostra também o ritmo real, quantas peças por hora faltam para bater a meta e a previsão para o fim do turno. A tela se atualiza sozinha.',
       },
       {
         app: 'Marcenaria: Histórico, máquinas e metas',
