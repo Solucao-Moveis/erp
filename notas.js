@@ -31,6 +31,11 @@ window.SMERP_NOTAS = [
         como: 'No menu, clique em "Dashboard". Escolha a data e, se quiser, uma máquina. Passe o mouse (ou toque) nas barras da linha do tempo para ver o horário e o motivo. O selo "Conferido com o banco" confirma que a conta da tela bate com a do banco. O botão "PDF" baixa o relatório do dia.',
       },
       {
+        app: 'Marcenaria: Velocímetros de ritmo',
+        o_que: 'No topo do Dashboard, um velocímetro para cada máquina e um para a marcenaria toda, igual ao da aba Setores do Gerencial. O ponteiro sobe conforme as peças são lançadas e mostra se a máquina está no ritmo da meta.',
+        como: 'Abra o Dashboard da Marcenaria. O ponteiro compara as peças feitas com as que já deveriam ter saído até agora: vermelho abaixo de 90%, amarelo de 90 a 99%, verde de 100% em diante. Embaixo aparece quantas peças estão acima (▲) ou abaixo (▼) do esperado, e se a máquina está rodando ou parada. A tela se atualiza sozinha.',
+      },
+      {
         app: 'Marcenaria: Histórico, máquinas e metas',
         o_que: 'O líder pode corrigir horários e quantidades lançados errado, e cadastrar as máquinas com a meta diária. Máquina esquecida rodando fecha sozinha no fim do expediente e aparece como "fechado automático".',
         como: 'Em "Histórico", escolha o dia e toque no lápis ao lado do horário ou da quantidade para corrigir (quantidade 0 exclui). Toda correção fica registrada. Em "Máquinas e metas", adicione a máquina com a meta padrão por dia; para um dia diferente, use "Meta de um dia específico". Máquina que não é mais usada pode ser arquivada.',
