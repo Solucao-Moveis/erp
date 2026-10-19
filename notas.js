@@ -10,6 +10,39 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.94',
+    data: '19/10/2026',
+    titulo: 'Novo módulo: Marcenaria (cronômetro de máquina e hora a hora)',
+    resumo: 'A marcenaria ganhou um sistema próprio. O líder controla cada máquina com START, PAUSA e FIM, lança as peças com o tempo correndo, e o sistema monta sozinho o hora a hora, o tempo rodando, o tempo parado e os motivos de parada.',
+    mudancas: [
+      {
+        app: 'Marcenaria: Controle',
+        o_que: 'Tela com um cartão por máquina: cronômetro ao vivo do tempo rodando no dia, peças feitas, peças por hora, tempo parado e a barra da meta do dia, com a marca de quanto já deveria ter sido feito até agora.',
+        como: 'No Hub, abra Fábrica / Produção e clique em "Marcenaria". Quando a máquina começar, toque em START. Durante o trabalho, toque em +1, +5, +10 ou +N para lançar as peças (a seta desfaz o último lançamento). Se a máquina parar, toque em PAUSA e escreva o motivo, ou escolha um dos botões prontos (Almoço, Manutenção, Falta de material...). Para voltar, toque em RETOMAR. No fim, toque em FIM. "Encerrar tudo" fecha todas as máquinas de uma vez. A tela se atualiza sozinha em todos os aparelhos.',
+      },
+      {
+        app: 'Marcenaria: Pausa planejada',
+        o_que: 'Almoço e café podem ser marcados como pausa planejada, e aí não contam como máquina parada no indicador.',
+        como: 'Ao pausar, escolha "Almoço" ou "Café / intervalo", ou marque a caixa "Pausa planejada". As outras paradas contam como tempo parado.',
+      },
+      {
+        app: 'Marcenaria: Dashboard',
+        o_que: 'Números do dia (peças, meta, tempo rodando, tempo parado, disponibilidade e peças por hora), meta × realizado por máquina, hora a hora colorido igual ao Hora a Hora, linha do tempo de cada máquina, ranking dos motivos de parada e relatório em PDF.',
+        como: 'No menu, clique em "Dashboard". Escolha a data e, se quiser, uma máquina. Passe o mouse (ou toque) nas barras da linha do tempo para ver o horário e o motivo. O selo "Conferido com o banco" confirma que a conta da tela bate com a do banco. O botão "PDF" baixa o relatório do dia.',
+      },
+      {
+        app: 'Marcenaria: Histórico, máquinas e metas',
+        o_que: 'O líder pode corrigir horários e quantidades lançados errado, e cadastrar as máquinas com a meta diária. Máquina esquecida rodando fecha sozinha no fim do expediente e aparece como "fechado automático".',
+        como: 'Em "Histórico", escolha o dia e toque no lápis ao lado do horário ou da quantidade para corrigir (quantidade 0 exclui). Toda correção fica registrada. Em "Máquinas e metas", adicione a máquina com a meta padrão por dia; para um dia diferente, use "Meta de um dia específico". Máquina que não é mais usada pode ser arquivada.',
+      },
+      {
+        app: 'Hub: Usuários',
+        o_que: 'A Marcenaria aparece na aba Usuários para liberar o acesso, com três tipos: Administrador, Líder e Visualizador.',
+        como: 'Na aba Usuários do Hub, marque "Marcenaria" e escolha o papel. Líder e Administrador operam o cronômetro; Visualizador só acompanha.',
+      },
+    ],
+  },
+  {
     versao: '6.93',
     data: '15/10/2026',
     titulo: 'BIP: achar carregamentos antigos nos Finalizados',

@@ -160,6 +160,20 @@ as $$
             )
               then '["master"]'::jsonb
           end
+        ),
+        'marcenaria', (
+          -- Marcenaria: cronômetro por máquina + hora a hora. Papéis: admin | lider | visualizador.
+          -- Master sempre enxerga o módulo.
+          select case
+            when exists (select 1 from marcenaria.profiles where id = auth.uid())
+              then coalesce(
+                (select jsonb_agg(role) from marcenaria.user_roles where user_id = auth.uid()),
+                '[]'::jsonb)
+            when exists (
+              select 1 from auth.users where id = auth.uid() and lower(email) = 'master@solucaomoveis.ind.br'
+            )
+              then '["master"]'::jsonb
+          end
         )
       )
     ),

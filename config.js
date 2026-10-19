@@ -61,6 +61,9 @@ window.SMERP_CONFIG = {
     pcp: 'https://solucaomoveis-timestamp.h5xdag.easypanel.host/',
     // Painel de Produção ao vivo — OFs + carga de máquina + gargalos (CODI)
     codi: 'https://solucaomoveis-producao-solucao.h5xdag.easypanel.host/',
+    // Marcenaria: cronômetro por máquina + hora a hora (repo marcenaria-solucao).
+    // CONFIRME a URL após publicar no EasyPanel.
+    marcenaria: 'https://solucaomoveis-marcenaria.h5xdag.easypanel.host/',
     // Inovação/Desenvolvimento: página própria (fora do Hub), servida do
     // mesmo deploy estático em /desenvolvimento/ (igual /institucional/).
     inovacao: 'https://solucaomoveis-erp.h5xdag.easypanel.host/desenvolvimento/'
@@ -80,7 +83,8 @@ window.SMERP_CONFIG = {
         { system: 'manutencao', nome: 'Manutenção', desc: 'Ordens de serviço, preventivas e estoque de peças' },
         { system: 'planejamento', nome: 'Planejamento de Carga', desc: 'Pedido (PDF) → cargas/embarque: fatiamento por cubagem e indicadores' },
         { system: 'pcp',  nome: 'Cronoanálise / PCP', desc: 'Estudos de tempo, roteiros, sequenciamento, kanban de OPs e OEE' },
-        { system: 'codi', nome: 'Painel de Produção', desc: 'OFs abertas, carga por máquina e gargalos direto do CODI — ao vivo' }
+        { system: 'codi', nome: 'Painel de Produção', desc: 'OFs abertas, carga por máquina e gargalos direto do CODI — ao vivo' },
+        { system: 'marcenaria', nome: 'Marcenaria', desc: 'Cronômetro por máquina (início, pausa e fim), peças e hora a hora da marcenaria' }
       ] },
     { id: 'logistica',      nome: 'Expedição / Logística', icon: 'bars',  cor: '#1F9D55', modulos: [
         { system: 'bip', nome: 'Gestor de Expedição — Apontamento (Celular)', desc: 'Modo enxuto: criar e bipar carregamentos no celular', path: 'apontar' },
@@ -214,6 +218,12 @@ window.SMERP_CONFIG = {
         papeis: [
           { value: 'gestor', label: 'Gestor', desc: 'Vê tudo, incluindo a tela de sincronização e status do coletor' },
           { value: 'leitor', label: 'Leitor', desc: 'Consulta OFs, carga de máquina e dashboard (somente leitura)' }
+        ] },
+      { system: 'marcenaria', nome: 'Marcenaria', cor: '#2E78D2', icon: 'clock',
+        papeis: [
+          { value: 'admin',        label: 'Administrador', desc: 'Acesso total: opera o cronômetro, cadastra máquinas e metas, corrige lançamentos' },
+          { value: 'lider',        label: 'Líder',         desc: 'Opera o cronômetro das máquinas, lança peças, cadastra máquinas e metas' },
+          { value: 'visualizador', label: 'Visualizador',  desc: 'Só acompanha o controle e o dashboard, sem lançar' }
         ] }
     ]
   }
