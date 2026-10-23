@@ -10,6 +10,24 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.97',
+    data: '23/10/2026',
+    titulo: 'Manutenção: editar OS e ajuste nos filtros',
+    resumo: 'O administrador da manutenção agora pode editar uma OS já aberta, por exemplo para mudar a prioridade. O botão Excel saiu da barra de filtros.',
+    mudancas: [
+      {
+        app: 'Manutenção: Editar OS',
+        o_que: 'Novo botão "Editar" em cada OS, só para administradores. Permite corrigir título, setor, máquina, responsável, descrição, condição da máquina e prioridade.',
+        como: 'Em Ordens de Serviço, clique em "Editar" na linha da OS. A janela abre com os dados atuais. Mude o que precisar (por exemplo, a prioridade de P3 para P1) e clique em "Salvar alterações". O que já foi registrado no atendimento e os tempos da OS não mudam. OS canceladas não podem ser editadas.',
+      },
+      {
+        app: 'Manutenção: Filtros',
+        o_que: 'O botão Excel foi retirado da barra de filtros.',
+        como: 'Os filtros continuam iguais. Para salvar uma OS, use "Exportar PDF" dentro de "Ver detalhes".',
+      },
+    ],
+  },
+  {
     versao: '6.95',
     data: '23/10/2026',
     titulo: 'Manutenção: tela de Ordens de Serviço renovada',
