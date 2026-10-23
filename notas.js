@@ -54,6 +54,11 @@ window.SMERP_NOTAS = [
         como: 'Nada muda no uso. Com o modo escuro ligado, as janelas de abrir, editar e ver a OS agora ficam legíveis.',
       },
       {
+        app: 'Manutenção: Classificação da OS',
+        o_que: 'Condição da máquina, prioridade e responsável agora só podem ser escolhidos pelo PCM da manutenção (administrador). Para os outros usuários esses campos aparecem travados.',
+        como: 'Quem não é administrador abre a OS normalmente com título, máquina e descrição; ela entra como Amarela, P3 média e sem técnico. Depois o PCM clica em "Editar" na OS e ajusta a condição, a prioridade e o responsável.',
+      },
+      {
         app: 'Manutenção: Filtros',
         o_que: 'O botão Excel foi retirado da barra de filtros.',
         como: 'Os filtros continuam iguais. Para salvar uma OS, use "Exportar PDF" dentro de "Ver detalhes".',
