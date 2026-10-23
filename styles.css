@@ -309,7 +309,7 @@ body.simple .sys__desc { display: none; }
 
   /* Fundo escuro que aparece com a gaveta */
   .backdrop {
-    display: block; position: fixed; inset: 0; z-index: 40;
+    display: block; position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 40;
     background: rgba(20,22,30,0.45);
     opacity: 0; pointer-events: none; transition: opacity .28s ease;
   }
@@ -338,7 +338,7 @@ body.smerp-booting .main,
 body.smerp-booting .side { visibility: hidden; }
 
 .smerp-overlay {
-  position: fixed; inset: 0; z-index: 1000;
+  position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 1000;
   display: flex; align-items: center; justify-content: center;
   padding: 24px;
 }
@@ -380,7 +380,7 @@ body.smerp-booting .side { visibility: hidden; }
   background: rgba(232,114,42,0.14);
 }
 .smerp-loading__bar span {
-  position: absolute; inset: 0; display: block; width: 42%;
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: block; width: 42%;
   border-radius: 99px;
   background: linear-gradient(90deg, transparent, var(--orange), var(--orange-dark));
   animation: smerp-bar 1.25s cubic-bezier(.5,0,.2,1) infinite;
@@ -511,7 +511,7 @@ body.smerp-booting .side { visibility: hidden; }
 .smerp-updates { z-index: 1100; opacity: 0; transition: opacity .2s ease; }
 .smerp-updates.is-open { opacity: 1; }
 .smerp-modal__backdrop {
-  position: absolute; inset: 0; background: rgba(26,26,46,0.45);
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(26,26,46,0.45);
   opacity: 0; transition: opacity .2s ease;
 }
 .smerp-updates.is-open .smerp-modal__backdrop { opacity: 1; }
@@ -594,7 +594,7 @@ body.smerp-booting .side { visibility: hidden; }
   position: relative; height: 260px; overflow: hidden;
   border: 1px dashed var(--border); border-radius: 10px; background: var(--surface);
 }
-.upd__shot-ph { position: absolute; inset: 0; display: grid; place-items: center; font-size: 12px; font-weight: 600; color: var(--ink-soft); }
+.upd__shot-ph { position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: grid; place-items: center; font-size: 12px; font-weight: 600; color: var(--ink-soft); }
 .upd__shot-frame img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
 
 @media (max-width: 680px) {
@@ -937,7 +937,7 @@ html.dark .theme-toggle .ico-moon { display: none; }
 .eng-row__link { font-size: 11.5px; color: #0D9488; margin-top: 5px; font-weight: 700; }
 
 /* seletor de desvio (modal por cima da tela cheia) */
-.eng-picker { position: fixed; inset: 0; z-index: 1200; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(15,23,42,.45); }
+.eng-picker { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 1200; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(15,23,42,.45); }
 .eng-picker[hidden] { display: none; }
 .eng-picker__card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow-panel); width: 100%; max-width: 760px; max-height: 84vh; display: flex; flex-direction: column; overflow: hidden; }
 .eng-picker__hd { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 15px; }

@@ -10,6 +10,29 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.98',
+    data: '23/10/2026',
+    titulo: 'Gestor de Frota abre em celular Android antigo',
+    resumo: 'O Gestor de Frota e a tela de login do SMERP agora funcionam em celulares Android com o Chrome desatualizado (a partir da versão 85), mesmo sem conseguir atualizar pela Play Store.',
+    mudancas: [
+      {
+        app: 'Frota: Celular antigo',
+        o_que: 'Em celulares com Chrome antigo o Gestor de Frota abria sem visual ou não aparecia. Agora ele abre normal, com as telas, botões e janelas no lugar certo.',
+        como: 'Nada muda no uso: entre no SMERP pelo celular, toque em "Gestor de Frota" e use como sempre. Se o celular ainda mostrar a tela em branco, feche o navegador e abra de novo para carregar a versão nova.',
+      },
+      {
+        app: 'Frota: Janelas no celular',
+        o_que: 'As janelas (abrir lançamento, solicitação, iniciar rota e outras) agora sempre cabem na tela do celular, com uma pequena margem, e ficaram mais compactas.',
+        como: 'Toque no botão que abre a janela (ex.: "Novo lançamento"). Se o formulário for maior que a tela, arraste para cima dentro da janela para ver o resto e chegar no botão de salvar.',
+      },
+      {
+        app: 'SMERP: Login no celular',
+        o_que: 'Nos celulares com Chrome antigo, a caixa de login do SMERP ficava encostada no canto da tela. Agora ela aparece centralizada.',
+        como: 'Abra o SMERP no celular, digite e-mail e senha e toque em "Entrar".',
+      },
+    ],
+  },
+  {
     versao: '6.97',
     data: '23/10/2026',
     titulo: 'Manutenção: editar OS e ajuste nos filtros',
