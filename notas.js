@@ -46,7 +46,7 @@ window.SMERP_NOTAS = [
       {
         app: 'Manutenção: Lista de OS',
         o_que: 'Cada informação da linha da OS agora tem o nome na frente: Máquina, Setor, Solicitante, Técnico, Aberta em e Fechada em.',
-        como: 'Basta abrir Ordens de Serviço. Embaixo do título de cada OS aparece o número e os dados com o nome de cada um, para saber na hora o que é o quê.',
+        como: 'Basta abrir Ordens de Serviço. Embaixo do título de cada OS aparece o número e os dados com o nome de cada um, para saber na hora o que é o quê. Nas OS em aberto o botão é "Atender" (ou "Continuar"); o "Ver detalhes" aparece só nas OS fechadas e canceladas.',
       },
       {
         app: 'Manutenção: Modo escuro',
