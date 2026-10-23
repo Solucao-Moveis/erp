@@ -59,6 +59,11 @@ window.SMERP_NOTAS = [
         como: 'Quem não é administrador abre a OS normalmente com título, máquina e descrição; ela entra como Amarela, P3 média e sem técnico. Depois o PCM clica em "Editar" na OS e ajusta a condição, a prioridade e o responsável.',
       },
       {
+        app: 'Manutenção: Finalizar OS',
+        o_que: 'Só o PCM da manutenção (administrador) pode finalizar uma OS. Os técnicos continuam atendendo e registrando o serviço.',
+        como: 'O técnico abre a OS em "Atender", preenche defeito, categoria, serviço, materiais e fotos, e clica em "Salvar progresso". A OS fica "Em andamento". O PCM abre em "Continuar", revisa e clica em "Finalizar OS".',
+      },
+      {
         app: 'Manutenção: Filtros',
         o_que: 'O botão Excel foi retirado da barra de filtros.',
         como: 'Os filtros continuam iguais. Para salvar uma OS, use "Exportar PDF" dentro de "Ver detalhes".',
