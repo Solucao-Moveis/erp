@@ -21,6 +21,11 @@ window.SMERP_NOTAS = [
         como: 'Em Ordens de Serviço, clique em "Editar" na linha da OS. A janela abre com os dados atuais. Mude o que precisar (por exemplo, a prioridade de P3 para P1) e clique em "Salvar alterações". O que já foi registrado no atendimento e os tempos da OS não mudam. OS canceladas não podem ser editadas.',
       },
       {
+        app: 'Manutenção: Lista de OS',
+        o_que: 'Cada informação da linha da OS agora tem o nome na frente: Máquina, Setor, Solicitante, Técnico, Aberta em e Fechada em.',
+        como: 'Basta abrir Ordens de Serviço. Embaixo do título de cada OS aparece o número e os dados com o nome de cada um, para saber na hora o que é o quê.',
+      },
+      {
         app: 'Manutenção: Filtros',
         o_que: 'O botão Excel foi retirado da barra de filtros.',
         como: 'Os filtros continuam iguais. Para salvar uma OS, use "Exportar PDF" dentro de "Ver detalhes".',
