@@ -10,6 +10,34 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.95',
+    data: '23/10/2026',
+    titulo: 'Manutenção: tela de Ordens de Serviço renovada',
+    resumo: 'A tela de Ordens de Serviço do Pro-Care ficou mais organizada e fácil de ler. A OS agora tem título e prioridade, o histórico mostra os pedidos de compra com o tempo descontado, e dá para filtrar por data, exportar para Excel e salvar a OS em PDF.',
+    mudancas: [
+      {
+        app: 'Manutenção: Abrir OS',
+        o_que: 'A janela de abrir OS foi redesenhada e ganhou três campos: título da ordem, responsável (técnico) e prioridade de P1 a P4.',
+        como: 'Em Ordens de Serviço, clique em "Abrir OS". Escreva um título curto (ex.: "Vibração no motor"), escolha a máquina e, se já souber, o técnico responsável ("Definir depois" deixa em branco). Descreva o problema. No bloco amarelo, marque a condição (amarela: operando com pendência, vermelha: máquina parada) e a prioridade: P1 crítica, P2 alta, P3 média ou P4 evolutiva. Clique em "Criar ordem de serviço". As OS antigas ficam como P3.',
+      },
+      {
+        app: 'Manutenção: Lista de OS',
+        o_que: 'As OS aparecem como linhas com uma bolinha de cor (vermelha se a máquina está parada), o título, a máquina, o setor e selos de prioridade, condição e status.',
+        como: 'Na lista "OS em aberto", use "Atender" ou "Continuar" para registrar o serviço e "Ver detalhes" para consultar. Nas fechadas, clique na linha para abrir o histórico.',
+      },
+      {
+        app: 'Manutenção: Filtros e Excel',
+        o_que: 'O painel de filtros ganhou o período de abertura (de/até) e o botão Excel.',
+        como: 'Escolha as datas em "Período de abertura" e os outros filtros que quiser. O botão "Excel" baixa uma planilha só com as OS que estão aparecendo na tela. "Limpar" volta tudo ao normal.',
+      },
+      {
+        app: 'Manutenção: Histórico da OS',
+        o_que: 'A visualização da OS mostra resumo, execução, causa, fotos em miniatura, linha do tempo e os pedidos de compra ligados à OS, com o tempo trabalhado, o tempo pausado esperando compra e o tempo total. Também dá para salvar em PDF.',
+        como: 'Clique em "Ver detalhes" em qualquer OS. No bloco "Pedidos de compra" aparece cada solicitação com número, situação e quanto tempo a OS ficou pausada esperando por ela. Embaixo, o tempo trabalhado já vem descontando essas pausas, com a mesma conta da tela de atender. O botão "Exportar PDF", no topo, baixa a OS em PDF.',
+      },
+    ],
+  },
+  {
     versao: '6.94',
     data: '19/10/2026',
     titulo: 'Novo módulo: Marcenaria (cronômetro de máquina e hora a hora)',
