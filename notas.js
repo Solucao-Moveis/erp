@@ -55,8 +55,8 @@ window.SMERP_NOTAS = [
       },
       {
         app: 'Manutenção: Classificação da OS',
-        o_que: 'Condição da máquina, prioridade e responsável agora só podem ser escolhidos pelo PCM da manutenção (administrador). Para os outros usuários esses campos aparecem travados.',
-        como: 'Quem não é administrador abre a OS normalmente com título, máquina e descrição; ela entra como Amarela, P3 média e sem técnico. Depois o PCM clica em "Editar" na OS e ajusta a condição, a prioridade e o responsável.',
+        o_que: 'Prioridade e responsável só podem ser escolhidos pelo PCM da manutenção (administrador). A condição da máquina (amarela ou vermelha) continua sendo escolhida por quem abre a OS.',
+        como: 'Ao abrir a OS, marque se a máquina está Amarela (operando com pendência) ou Vermelha (parada). Para quem não é administrador, a OS entra como P3 média e sem técnico; depois o PCM clica em "Editar" e ajusta a prioridade e o responsável.',
       },
       {
         app: 'Manutenção: Finalizar OS',
