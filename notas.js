@@ -64,6 +64,11 @@ window.SMERP_NOTAS = [
         como: 'O técnico abre a OS em "Atender", preenche defeito, categoria, serviço, materiais e fotos, e clica em "Salvar progresso". A OS fica "Em andamento". O PCM abre em "Continuar", revisa e clica em "Finalizar OS".',
       },
       {
+        app: 'Manutenção: Quem atende a OS',
+        o_que: 'O botão "Atender" só aparece para a equipe de manutenção (técnicos e PCM). Quem é da produção abre a OS e acompanha a lista, mas não atende.',
+        como: 'Usuários da produção continuam abrindo OS pelo botão "Abrir OS" e vendo a situação de cada uma na lista. O atendimento é feito pelos técnicos da manutenção.',
+      },
+      {
         app: 'Manutenção: Filtros',
         o_que: 'O botão Excel foi retirado da barra de filtros.',
         como: 'Os filtros continuam iguais. Para salvar uma OS, use "Exportar PDF" dentro de "Ver detalhes".',
