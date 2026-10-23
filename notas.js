@@ -26,6 +26,11 @@ window.SMERP_NOTAS = [
         como: 'Basta abrir Ordens de Serviço. Embaixo do título de cada OS aparece o número e os dados com o nome de cada um, para saber na hora o que é o quê.',
       },
       {
+        app: 'Manutenção: Modo escuro',
+        o_que: 'Corrigido o fundo dos blocos amarelos (Classificação, Causa e rastreabilidade) e dos selos, que ficavam cinza e sem leitura no modo escuro.',
+        como: 'Nada muda no uso. Com o modo escuro ligado, as janelas de abrir, editar e ver a OS agora ficam legíveis.',
+      },
+      {
         app: 'Manutenção: Filtros',
         o_que: 'O botão Excel foi retirado da barra de filtros.',
         como: 'Os filtros continuam iguais. Para salvar uma OS, use "Exportar PDF" dentro de "Ver detalhes".',
