@@ -10,6 +10,19 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '6.99',
+    data: '26/10/2026',
+    titulo: 'Gerencial: botões Hoje e Dia anterior voltaram a funcionar',
+    resumo: 'No painel do Gerencial, clicar em "Hoje" ou "Dia anterior" na parte da fábrica deixava a tela com erro. Agora troca o dia normalmente.',
+    mudancas: [
+      {
+        app: 'Gerencial: Hoje / Dia anterior',
+        o_que: 'Os botões que trocam entre o dia de hoje e o dia anterior na produção da fábrica davam erro na tela ao serem clicados. O problema foi corrigido.',
+        como: 'No painel do Gerencial, vá até a parte da produção da fábrica e clique em "Hoje" para ver o dia ao vivo ou em "Dia anterior" para ver o último dia fechado. Os números e setores mudam para o dia escolhido.',
+      },
+    ],
+  },
+  {
     versao: '6.98',
     data: '23/10/2026',
     titulo: 'Gestor de Frota abre em celular Android antigo',
