@@ -10,6 +10,44 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '7.00',
+    data: '03/11/2026',
+    titulo: 'Acidentes e Afastamentos: nova área de Ocorrências Internas',
+    resumo: 'O app de Acidentes e Afastamentos ganhou a área "Interno", que substitui a planilha de controle de ocorrências: lançamento com fotos pelo celular, lista de registros, gráficos e comparativo com 2025.',
+    mudancas: [
+      {
+        app: 'Acidentes: Menu Interno',
+        o_que: 'No menu da esquerda apareceu o item "Interno". Ele abre e fecha mostrando as telas das ocorrências internas: Lançamento, Registros e fotos, Gráficos e Comparativo 2025 x 2026.',
+        como: 'Clique em "Interno" no menu para abrir a lista e escolha a tela. Clique de novo na setinha para fechar.',
+      },
+      {
+        app: 'Acidentes: Lançar ocorrência',
+        o_que: 'As ocorrências internas (CPT, SPT, incidente e atendimento ambulatorial) agora são lançadas direto no sistema, com fotos, em vez da planilha. Só a equipe autorizada lança; os demais só consultam.',
+        como: 'Em Interno > Lançamento, preencha data, líder, empregado (digite o nome para buscar), tipo de evento, descrição e se houve lesão ou hospital. Toque em "Adicionar fotos" para tirar foto ou escolher da galeria e depois em "Salvar ocorrência". Se alguma foto não subir, toque em "Tentar de novo".',
+      },
+      {
+        app: 'Acidentes: Registros e fotos',
+        o_que: 'Lista de todas as ocorrências internas com as fotos em miniatura, já com os registros de 2026 trazidos da planilha.',
+        como: 'Em Interno > Registros e fotos, escolha o ano no filtro "Ano:" e, se quiser, o mês no filtro "Mês:" (ou Todos). Toque numa miniatura para ver a foto grande. Se aparecer "Foto não carregou", toque em "Tentar de novo". Lembre: são dados de saúde dos colaboradores, não compartilhe prints fora da equipe de segurança.',
+      },
+      {
+        app: 'Acidentes: Editar e excluir',
+        o_que: 'Quem lança as ocorrências internas agora pode corrigir ou excluir um registro. Os registros trazidos da planilha aparecem como "A revisar" até alguém conferir e salvar.',
+        como: 'Em Interno > Registros e fotos, toque no lápis ao lado da ocorrência, corrija o que precisar (pode incluir ou remover fotos) e toque em "Salvar alterações": o aviso "A revisar" some. Para apagar, toque na lixeira e confirme em "Excluir". A exclusão não tem volta.',
+      },
+      {
+        app: 'Acidentes: Gráficos e comparativo',
+        o_que: 'Gráficos das ocorrências internas, com cor fixa por tipo: CPT vermelho, SPT dourado, Incidente cinza escuro e Atendimento ambulatorial azul. Incidentes e atendimentos ambulatoriais têm gráfico próprio, separados dos acidentes (CPT e SPT). Também há um comparativo mês a mês entre 2025 e 2026.',
+        como: 'Em Interno > Gráficos veja "Ocorrências por mês e tipo" (CPT e SPT lado a lado), "Incidentes por mês" e "Atendimentos ambulatoriais por mês". Em Interno > Comparativo 2025 x 2026 veja lado a lado quantas ocorrências teve em cada mês nos dois anos.',
+      },
+      {
+        app: 'Acidentes: Setores',
+        o_que: 'Na lista de setores, "Segurança" passou a se chamar "SESMT", e Desempeno e Inspeção viraram um setor só: "Desempeno / Inspeção".',
+        como: 'Ao lançar um acidente ou uma ocorrência interna, escolha "SESMT" para o setor de segurança do trabalho e "Desempeno / Inspeção" para quem é do desempeno ou da inspeção. Os registros antigos desses setores passam a aparecer com o nome novo.',
+      },
+    ],
+  },
+  {
     versao: '6.99',
     data: '26/10/2026',
     titulo: 'Gerencial: botões Hoje e Dia anterior voltaram a funcionar',
