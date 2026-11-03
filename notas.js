@@ -38,7 +38,7 @@ window.SMERP_NOTAS = [
       {
         app: 'Acidentes: Gráficos e comparativo',
         o_que: 'Gráficos das ocorrências internas, com cor fixa por tipo: CPT vermelho, SPT dourado, Incidente cinza escuro e Atendimento ambulatorial azul. Incidentes e atendimentos ambulatoriais têm gráfico próprio, separados dos acidentes (CPT e SPT). Também há um comparativo mês a mês entre 2025 e 2026.',
-        como: 'Em Interno > Gráficos escolha o ano e, se quiser, o mês nos filtros "Ano:" e "Mês:". No topo aparecem os totais, incluindo quantos CPT teve. Veja "Ocorrências por mês e tipo" (CPT e SPT lado a lado), "Incidentes por mês" e "Atendimentos ambulatoriais por mês". Em Interno > Comparativo 2025 x 2026 veja lado a lado quantas ocorrências teve em cada mês nos dois anos.',
+        como: 'Em Interno > Gráficos escolha o ano e, se quiser, o mês nos filtros "Ano:" e "Mês:". No topo aparecem os cartões: Total de eventos (cada registro conta uma vez, mesmo marcado com mais de um tipo), CPT (com perda de tempo), SPT (sem perda de tempo), Incidentes, Atendimentos ambulatoriais e Setores envolvidos. Veja "Ocorrências por mês e tipo" (CPT e SPT lado a lado), "Incidentes por mês" e "Atendimentos ambulatoriais por mês". Em Interno > Comparativo 2025 x 2026 veja lado a lado quantas ocorrências teve em cada mês nos dois anos.',
       },
       {
         app: 'Acidentes: Setores',
