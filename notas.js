@@ -23,7 +23,7 @@ window.SMERP_NOTAS = [
       {
         app: 'Acidentes: Lançar ocorrência',
         o_que: 'As ocorrências internas (CPT, SPT, incidente e atendimento ambulatorial) agora são lançadas direto no sistema, com fotos, em vez da planilha. Só a equipe autorizada lança; os demais só consultam.',
-        como: 'Em Interno > Lançamento, preencha data, líder, empregado (digite o nome para buscar), tipo de evento, descrição e se houve lesão ou hospital. Toque em "Adicionar fotos" para tirar foto ou escolher da galeria e depois em "Salvar ocorrência". Se alguma foto não subir, toque em "Tentar de novo".',
+        como: 'Em Interno > Lançamento, preencha data, líder, empregado (digite o nome para buscar), tipo de evento, descrição e se houve lesão ou hospital. Se marcar SIM em "Houve lesão?", escreva na linha "Parte do corpo atingida" (ex.: mão esquerda). Toque em "Adicionar fotos" para tirar foto ou escolher da galeria e depois em "Salvar ocorrência". Se alguma foto não subir, toque em "Tentar de novo".',
       },
       {
         app: 'Acidentes: Registros e fotos',
@@ -38,7 +38,7 @@ window.SMERP_NOTAS = [
       {
         app: 'Acidentes: Gráficos e comparativo',
         o_que: 'Gráficos das ocorrências internas, com cor fixa por tipo: CPT vermelho, SPT dourado, Incidente cinza escuro e Atendimento ambulatorial azul. Incidentes e atendimentos ambulatoriais têm gráfico próprio, separados dos acidentes (CPT e SPT). Também há um comparativo mês a mês entre 2025 e 2026.',
-        como: 'Em Interno > Gráficos veja "Ocorrências por mês e tipo" (CPT e SPT lado a lado), "Incidentes por mês" e "Atendimentos ambulatoriais por mês". Em Interno > Comparativo 2025 x 2026 veja lado a lado quantas ocorrências teve em cada mês nos dois anos.',
+        como: 'Em Interno > Gráficos escolha o ano e, se quiser, o mês nos filtros "Ano:" e "Mês:". No topo aparecem os totais, incluindo quantos CPT teve. Veja "Ocorrências por mês e tipo" (CPT e SPT lado a lado), "Incidentes por mês" e "Atendimentos ambulatoriais por mês". Em Interno > Comparativo 2025 x 2026 veja lado a lado quantas ocorrências teve em cada mês nos dois anos.',
       },
       {
         app: 'Acidentes: Setores',
