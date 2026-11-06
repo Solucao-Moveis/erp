@@ -10,6 +10,24 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '7.01',
+    data: '06/11/2026',
+    titulo: 'Hora a Hora: tela de TV por setor',
+    resumo: 'O Hora a Hora ganhou uma tela própria para TV: o mapa de calor de um setor fica aberto o dia todo e atualiza sozinho quando o líder lança a produção.',
+    mudancas: [
+      {
+        app: 'Hora a Hora: Aba TV',
+        o_que: 'O PCP agora cria um link de TV para cada setor (ex.: Solda). O link abre sem login, então a TV não cai na tela de senha.',
+        como: 'No menu do Hora a Hora, clique em "TV", escolha o setor, dê um nome se quiser e clique em "Gerar TV". Depois clique em "Copiar link" e abra esse link no navegador da TV. Para tirar a TV do ar, clique em "Desativar".',
+      },
+      {
+        app: 'Hora a Hora: Tela da TV',
+        o_que: 'A TV mostra o placar do dia (realizado contra a meta), se o setor está adiantado ou atrasado, a hora atual e o mapa de calor de cada máquina hora a hora. A hora atual fica destacada em laranja, e a hora que passou sem lançamento aparece com um "!" vermelho.',
+        como: 'Não precisa mexer em nada: a tela se atualiza sozinha a cada 5 segundos, e quando entra um lançamento novo a célula pisca e aparece o aviso no topo. À meia-noite ela já passa para o dia novo. Dê dois cliques na tela para deixar em tela cheia.',
+      },
+    ],
+  },
+  {
     versao: '7.00',
     data: '03/11/2026',
     titulo: 'Acidentes e Afastamentos: nova área de Ocorrências Internas',
