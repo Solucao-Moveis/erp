@@ -35,6 +35,11 @@ window.SMERP_NOTAS = [
         o_que: 'Na TV, cada hora que ainda não foi lançada mostra quanto a máquina precisa fazer naquela hora para fechar a meta do dia, já contando o que foi feito até agora. O placar de cima mostra o mesmo para o setor inteiro.',
         como: 'Olhe o número escrito "precisa" na hora atual: em verde, dá para bater a meta mesmo abaixo da meta normal da hora; em vermelho, é preciso produzir acima da meta normal para recuperar. Quando a máquina já bateu a meta do dia, aparece um "✓". Na coluna Total, "precisa X/h" é a média por hora que falta.',
       },
+      {
+        app: 'Hora a Hora: Status da máquina na TV',
+        o_que: 'Na TV, o nome de cada máquina ganhou a cor do status que vem do CODI: verde produzindo, e a cor do tipo de parada quando está parada (ex.: vermelho para falta de peças, amarelo para fora de operação). Quando a máquina para, aparece um cronômetro na frente do nome contando há quanto tempo está parada, com o motivo logo abaixo.',
+        como: 'Não precisa fazer nada: a cor e o cronômetro seguem o CODI sozinhos. Cinza quer dizer que o CODI não está mandando sinal daquela máquina. O total de peças feitas na coluna Total também ficou maior e em negrito.',
+      },
     ],
   },
   {
