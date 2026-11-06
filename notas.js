@@ -25,6 +25,11 @@ window.SMERP_NOTAS = [
         o_que: 'A TV mostra o placar do dia (realizado contra a meta), se o setor está adiantado ou atrasado, a hora atual e o mapa de calor de cada máquina hora a hora. A hora atual fica destacada em laranja, e a hora que passou sem lançamento aparece com um "!" vermelho.',
         como: 'Não precisa mexer em nada: a tela se atualiza sozinha a cada 5 segundos, e quando entra um lançamento novo a célula pisca e aparece o aviso no topo. À meia-noite ela já passa para o dia novo. Dê dois cliques na tela para deixar em tela cheia.',
       },
+      {
+        app: 'Hora a Hora: TV sempre na versão nova',
+        o_que: 'Na TV o nome da máquina aparece curto (ex.: "Box 1", "Robô 2") para o número não ficar escondido. E quando sai uma melhoria, a TV se atualiza sozinha, sem trocar o link.',
+        como: 'Não precisa fazer nada: o link que já está na TV continua valendo e a tela recarrega sozinha quando houver novidade.',
+      },
     ],
   },
   {
