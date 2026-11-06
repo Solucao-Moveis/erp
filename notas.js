@@ -30,6 +30,11 @@ window.SMERP_NOTAS = [
         o_que: 'Na TV o nome da máquina aparece curto (ex.: "Box 1", "Robô 2") para o número não ficar escondido. E quando sai uma melhoria, a TV se atualiza sozinha, sem trocar o link.',
         como: 'Não precisa fazer nada: o link que já está na TV continua valendo e a tela recarrega sozinha quando houver novidade.',
       },
+      {
+        app: 'Hora a Hora: Quanto falta por hora',
+        o_que: 'Na TV, cada hora que ainda não foi lançada mostra quanto a máquina precisa fazer naquela hora para fechar a meta do dia, já contando o que foi feito até agora. O placar de cima mostra o mesmo para o setor inteiro.',
+        como: 'Olhe o número escrito "precisa" na hora atual: em verde, dá para bater a meta mesmo abaixo da meta normal da hora; em vermelho, é preciso produzir acima da meta normal para recuperar. Quando a máquina já bateu a meta do dia, aparece um "✓". Na coluna Total, "precisa X/h" é a média por hora que falta.',
+      },
     ],
   },
   {
