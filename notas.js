@@ -38,7 +38,7 @@ window.SMERP_NOTAS = [
       {
         app: 'Hora a Hora: Status da máquina na TV',
         o_que: 'Na TV, o nome de cada máquina ganhou a cor do status que vem do CODI: verde produzindo, e a cor do tipo de parada quando está parada (ex.: vermelho para falta de peças, amarelo para fora de operação). Quando a máquina para, aparece um cronômetro na frente do nome contando há quanto tempo está parada, com o motivo logo abaixo.',
-        como: 'Não precisa fazer nada: a cor e o cronômetro seguem o CODI sozinhos. Cinza quer dizer que o CODI não está mandando sinal daquela máquina. O total de peças feitas na coluna Total também ficou maior e em negrito. Funciona na TV da Solda e da Metalurgia; na Metalurgia o nome das máquinas também ficou mais curto (ex.: "Laser K6 151"). A EMT furo fica sem cor porque não está no CODI.',
+        como: 'Não precisa fazer nada: a cor e o cronômetro seguem o CODI sozinhos. Cinza quer dizer que o CODI não está mandando sinal daquela máquina. O total de peças feitas na coluna Total também ficou maior e em negrito. Funciona na TV da Solda e da Metalurgia; na Metalurgia o nome das máquinas também ficou mais curto (ex.: "K6 151", "Viterbo"). A EMT furo fica sem cor porque não está no CODI.',
       },
     ],
   },
