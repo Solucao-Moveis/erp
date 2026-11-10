@@ -179,9 +179,15 @@ async function lerPeriodos(codiId, seteDias) {
   });
   const item = resp?.data?.[0];
   if (!item || !Array.isArray(item.oeeByPeriod)) throw new Error('resposta sem oeeByPeriod');
+  const periodos = item.oeeByPeriod.filter(p => p?.date);
+  // 7 dias: a hora mais antiga vem cortada ("7 dias a partir de agora"), descarta.
+  // Ao vivo: só hora atual e a anterior; hora fechada vale a consolidada.
+  const inicioHoraAtual = Math.floor(Date.now() / 3600e3) * 3600e3;
+  const maisAntiga = Math.min(...periodos.map(p => Date.parse(p.date.slice(0, 19) + 'Z')));
   const horas = new Map(); // "dia|hora" → qtd
-  for (const p of item.oeeByPeriod) {
-    if (!p?.date) continue;
+  for (const p of periodos) {
+    const t = Date.parse(p.date.slice(0, 19) + 'Z');
+    if (seteDias ? t === maisAntiga : t < inicioHoraAtual - 3600e3) continue;
     const { dia, hora } = paraLocal(p.date);
     // Pode vir negativo (estorno no CODI): guarda igual, pro total do dia bater
     const qtd = Math.round(Number(p.qty) || 0);
@@ -198,7 +204,7 @@ function atualizarTipico(codiId, horas) {
 }
 
 async function lerMaquina(codiId, seteDias) {
-  // Hora em andamento vem da leitura ao vivo (a consolidada atrasa um pouco)
+  // Hora atual e anterior vêm da leitura ao vivo (a consolidada atrasa um pouco)
   const vivo = await lerPeriodos(codiId, false);
   let horas = vivo;
   if (seteDias) {
