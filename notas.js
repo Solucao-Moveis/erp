@@ -12,9 +12,14 @@ window.SMERP_NOTAS = [
   {
     versao: '7.02',
     data: '10/11/2026',
-    titulo: 'Hora a Hora: Metalurgia lançada sozinha pela contagem do CODI',
-    resumo: 'Na Metalurgia, as peças de cada hora agora entram sozinhas no Hora a Hora, direto da contagem do CODI. O líder só lança à mão quando quiser corrigir ou quando a contagem parar.',
+    titulo: 'Hora a Hora: Metalurgia e Solda lançadas sozinhas pela contagem do CODI',
+    resumo: 'Na Metalurgia e na Solda, as peças de cada hora agora entram sozinhas no Hora a Hora, direto da contagem do CODI. O líder só lança à mão quando quiser corrigir ou quando a contagem parar.',
     mudancas: [
+      {
+        app: 'Hora a Hora: Lançamento automático (Solda)',
+        o_que: 'Na Solda, os Box 1 a 7 e o Robô 3 também recebem as peças de cada hora sozinhas, igual ao que o CODI contou. Os Robôs 1 e 2 continuam com lançamento manual.',
+        como: 'Funciona igual à Metalurgia: a hora que veio do CODI aparece com borda azul e a etiqueta "CODI" no Apontamento; para corrigir, digite o número físico na hora.',
+      },
       {
         app: 'Hora a Hora: Lançamento automático (Metalurgia)',
         o_que: 'As máquinas da Metalurgia ligadas ao CODI (K6 151, K6 152, Viterbo, OMP, BLM, Robótica e EMT dobra) recebem as peças de cada hora sozinhas, igual ao que o CODI contou. A TV atualiza junto. A EMT furo continua manual porque não está no CODI.',
