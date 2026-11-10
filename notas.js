@@ -10,6 +10,29 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '7.02',
+    data: '10/11/2026',
+    titulo: 'Hora a Hora: Metalurgia lançada sozinha pela contagem do CODI',
+    resumo: 'Na Metalurgia, as peças de cada hora agora entram sozinhas no Hora a Hora, direto da contagem do CODI. O líder só lança à mão quando quiser corrigir ou quando a contagem parar.',
+    mudancas: [
+      {
+        app: 'Hora a Hora: Lançamento automático (Metalurgia)',
+        o_que: 'As máquinas da Metalurgia ligadas ao CODI (K6 151, K6 152, Viterbo, OMP, BLM, Robótica e EMT dobra) recebem as peças de cada hora sozinhas, igual ao que o CODI contou. A TV atualiza junto. A EMT furo continua manual porque não está no CODI.',
+        como: 'Não precisa digitar nada. Na tela de Apontamento, a hora que veio do CODI aparece com borda azul brilhante e a etiqueta "CODI". O que o CODI contar entre 12h e 13h entra na hora 14h. Se aparecer "estorno" com número negativo, é porque alguém corrigiu um apontamento no CODI naquela hora; o total do dia continua certo.',
+      },
+      {
+        app: 'Hora a Hora: Corrigir com a contagem física',
+        o_que: 'O líder pode trocar o número de qualquer hora pela contagem física. A partir daí o CODI não mexe mais naquela hora.',
+        como: 'Digite o número no campo da hora e clique fora. A hora perde a borda azul e mostra "físico", com o botão "CODI: (número) · usar" embaixo. Clique nesse botão se quiser voltar a usar o número do CODI.',
+      },
+      {
+        app: 'Hora a Hora: Aviso de contagem parada',
+        o_que: 'Se a contagem do CODI parar de chegar por mais de 3 minutos, aparece uma faixa vermelha na TV e na tela de Apontamento do líder. O PCP também vê o aviso se passar de 15 minutos.',
+        como: 'Quando aparecer a faixa, o líder lança as horas à mão no Apontamento. Quando o CODI voltar, a faixa some sozinha e as horas que ficaram vazias são completadas automaticamente; o que o líder lançou fica como está.',
+      },
+    ],
+  },
+  {
     versao: '7.00',
     data: '03/11/2026',
     titulo: 'Acidentes e Afastamentos: nova área de Ocorrências Internas',

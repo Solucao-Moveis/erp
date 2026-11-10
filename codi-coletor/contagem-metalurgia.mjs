@@ -9,6 +9,11 @@
  * Na partida, depois de qualquer falha e a cada hora, relê 7 dias
  * (histórico do CODI) e completa o que faltou.
  *
+ * Lançamento no Hora a Hora (a partir de CONTAGEM_LANCAR_DESDE): soma as horas
+ * do CODI nas horas do Hora a Hora (ver horaParaSlot) e grava pela função
+ * fabrill.codi_lancar_horas. Hora que o líder corrigiu ('manual') nunca é
+ * sobrescrita: o banco só atualiza o número do CODI ao lado (qtd_codi).
+ *
  * Proteções:
  *   - chave do CODI lida do próprio site (environment.json): se o CODI trocar,
  *     segue sozinho; refresh_token → password grant → relê a chave.
@@ -16,7 +21,9 @@
  *     o total do dia sempre bate com o CODI.
  *   - Supabase fora: guarda em .contagem-pendente.json e envia na volta.
  *   - batimento em codi.contagem_saude (o Hora a Hora avisa se ficar velho).
- *   - vigia: ciclo travado por 3 min → sai e o PM2 sobe de novo.
+ *   - vigia: ciclo travado por 10 min → sai e o PM2 sobe de novo.
+ *   - ultimo_ok do batimento só anda quando leitura, gravação E lançamento
+ *     deram certo: se qualquer um falhar, a TV e o líder veem o aviso.
  *
  * Uso:  pm2 start contagem-metalurgia.mjs --name codi-contagem
  */
@@ -54,6 +61,8 @@ const FETCH_TIMEOUT   = 20_000;
 const UTC_OFFSET_H    = -3;           // Brasília (sem horário de verão desde 2019)
 // Horas do expediente: gravadas mesmo com 0 (para uma correção do CODI zerar a hora)
 const HORA_INI = 6, HORA_FIM = 20;
+// Dias anteriores a esta data continuam como o líder lançou (não mexe no histórico)
+const LANCAR_DESDE = process.env.CONTAGEM_LANCAR_DESDE || '2026-11-10';
 
 if (!CODI_USER || !CODI_PASS || !SB_URL || !SB_KEY) {
   console.error('[contagem] Variáveis de ambiente faltando. Verifique o .env');
@@ -146,9 +155,9 @@ async function carregarMaquinas() {
     const { data: area, error: ea } = await sbFabrill.from('areas').select('id').eq('name', SETOR).maybeSingle();
     if (ea || !area) throw new Error(ea?.message ?? `setor ${SETOR} não encontrado`);
     const { data, error } = await sbFabrill.from('machines')
-      .select('name, codi_maquina_id').eq('area_id', area.id).not('codi_maquina_id', 'is', null);
+      .select('id, name, codi_maquina_id').eq('area_id', area.id).not('codi_maquina_id', 'is', null);
     if (error) throw error;
-    maquinas = data.map(m => ({ codi_id: m.codi_maquina_id, nome: m.name }));
+    maquinas = data.map(m => ({ id: m.id, codi_id: m.codi_maquina_id, nome: m.name }));
     writeFileSync(MAQUINAS_FILE, JSON.stringify(maquinas), 'utf8');
   } catch (e) {
     // Supabase fora: segue com a última lista conhecida
@@ -217,6 +226,7 @@ async function lerMaquina(codiId, seteDias) {
   for (const [k, quantidade] of horas) {
     const [dia, h] = k.split('|');
     const hora = Number(h);
+    horasMem.set(`${codiId}|${k}`, quantidade);
     if (quantidade === 0 && (hora < HORA_INI || hora > HORA_FIM)) continue;
     linhas.push({
       maquina_id: codiId, dia, hora, quantidade,
@@ -268,6 +278,63 @@ async function gravar(linhas) {
   return lote.length;
 }
 
+// ─── Lançamento no Hora a Hora ────────────────────────────────
+
+const horasMem = new Map();  // "codiId|dia|hora" → qtd (tudo o que já foi lido)
+const lancado  = new Map();  // "machineId|dia|slot" → qtd já enviada
+
+/**
+ * Hora local do CODI → hora do Hora a Hora (src/lib/time-slots.ts):
+ * 7h-8h = slot 0 ... 11h-12h = slot 4; almoço (12h) entra no slot 5 (13h-14h);
+ * 13h = 5 ... 17h = 9. O que vier antes das 7h cai no primeiro slot e depois do
+ * último (16h na sexta e fim de semana; 17h nos outros dias, limite do banco)
+ * cai no último: nenhuma peça fica de fora do total.
+ */
+function horaParaSlot(dia, hora) {
+  const semana = new Date(`${dia}T12:00:00Z`).getUTCDay();
+  const ultimo = semana === 5 || semana === 0 || semana === 6 ? 7 : 9;
+  if (hora < 7) return 0;
+  if (hora <= 11) return hora - 7;
+  if (hora === 12) return 5;
+  return Math.min(hora - 8, ultimo);
+}
+
+function diaLocal(deslocDias = 0) {
+  return new Date(Date.now() + UTC_OFFSET_H * 3600e3 - deslocDias * 86400e3).toISOString().slice(0, 10);
+}
+
+async function lancar() {
+  // Hoje e ontem (o consolidado do CODI pode mudar a última hora de ontem)
+  const dias = [diaLocal(1), diaLocal(0)].filter(d => d >= LANCAR_DESDE);
+  const linhas = [];
+  for (const m of maquinas) {
+    if (!m.id) continue;
+    for (const dia of dias) {
+      const slots = new Map();
+      for (const [k, q] of horasMem) {
+        const [c, d, h] = k.split('|');
+        if (Number(c) !== m.codi_id || d !== dia) continue;
+        // Zero fora do expediente normal não cria hora (não suja a hora extra)
+        if (q === 0 && (Number(h) < 7 || Number(h) > 16)) continue;
+        const s = horaParaSlot(dia, Number(h));
+        slots.set(s, (slots.get(s) ?? 0) + q);
+      }
+      for (const [slot, quantidade] of slots) {
+        const k = `${m.id}|${dia}|${slot}`;
+        if (lancado.get(k) === quantidade) continue;
+        linhas.push({ k, machine_id: m.id, entry_date: dia, hour_slot: slot, quantity: quantidade });
+      }
+    }
+  }
+  if (!linhas.length) return 0;
+  const { error } = await sbFabrill.rpc('codi_lancar_horas', {
+    p_linhas: linhas.map(({ k, ...l }) => l),
+  });
+  if (error) throw new Error(`lançamento no Hora a Hora: ${error.message}`);
+  for (const l of linhas) lancado.set(l.k, l.quantity);
+  return linhas.length;
+}
+
 // ─── Batimento ────────────────────────────────────────────────
 
 const estado = {}; // codi_id → { nome, ok, erro, ultimo_ok }
@@ -312,15 +379,17 @@ async function ciclo() {
       }
     }
     if (!erros.length) {
-      ultimoOkGeral = new Date().toISOString();
       if (seteDias) { ultimaReleitura = Date.now(); precisaReler = false; }
     } else {
       precisaReler = true;  // na volta, completa o que faltou
     }
     // Falha no Supabase não pede releitura: o que foi lido já está na fila
-    let n = 0;
+    // (contagem) ou em horasMem (lançamento, reenviado no próximo ciclo)
+    let n = 0, nl = 0;
     try { n = await gravar(linhas); } catch (e) { erros.push(e.message); }
-    if (n || seteDias || erros.length) log(`[ciclo] ${seteDias ? '7 dias' : 'ao vivo'} · ${n} horas gravadas${erros.length ? ` · ${erros.length} erro(s)` : ''}`);
+    try { nl = await lancar(); } catch (e) { erros.push(e.message); }
+    if (!erros.length) ultimoOkGeral = new Date().toISOString();
+    if (n || nl || seteDias || erros.length) log(`[ciclo] ${seteDias ? '7 dias' : 'ao vivo'} · ${n} horas gravadas · ${nl} lançadas${erros.length ? ` · ${erros.length} erro(s)` : ''}`);
     if (erros.length) warn('[ciclo]', erros.join(' | '));
     await bater(erros.length ? erros.join(' | ').slice(0, 1000) : 'ok', erros.length > 0);
   } catch (e) {
