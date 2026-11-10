@@ -10,6 +10,9 @@ apis codi/
 codi-coletor/.env
 codi-coletor/.token
 codi-coletor/.access_token
+codi-coletor/.token-contagem
+codi-coletor/.contagem-*.json
+codi-coletor/.contagem-*.json.tmp
 
 # ===== Migração (migracao/) — NÃO versionar segredos nem dumps =====
 # service_role key hardcoded (acesso total ao banco, ignora RLS)
