@@ -19,11 +19,15 @@ create table if not exists codi.contagem_hora (
   maquina_id   integer     not null,
   dia          date        not null,
   hora         smallint    not null check (hora between 0 and 23),
-  quantidade   integer     not null default 0 check (quantidade >= 0),
+  quantidade   integer     not null default 0,
   suspeito     boolean     not null default false,
   lido_em      timestamptz not null default now(),
   primary key (maquina_id, dia, hora)
 );
+
+-- O CODI manda hora negativa quando há estorno; guardamos igual (o total
+-- do dia tem que bater com o CODI). A trava >= 0 da 1ª versão sai.
+alter table codi.contagem_hora drop constraint if exists contagem_hora_quantidade_check;
 
 create index if not exists idx_codi_contagem_hora_dia
   on codi.contagem_hora (dia desc);

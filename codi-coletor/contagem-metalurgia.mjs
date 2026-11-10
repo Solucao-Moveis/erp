@@ -12,6 +12,8 @@
  * Proteções:
  *   - chave do CODI lida do próprio site (environment.json): se o CODI trocar,
  *     segue sozinho; refresh_token → password grant → relê a chave.
+ *   - hora negativa (estorno no CODI) é gravada igual e marcada como suspeita:
+ *     o total do dia sempre bate com o CODI.
  *   - Supabase fora: guarda em .contagem-pendente.json e envia na volta.
  *   - batimento em codi.contagem_saude (o Hora a Hora avisa se ficar velho).
  *   - vigia: ciclo travado por 3 min → sai e o PM2 sobe de novo.
@@ -181,7 +183,8 @@ async function lerPeriodos(codiId, seteDias) {
   for (const p of item.oeeByPeriod) {
     if (!p?.date) continue;
     const { dia, hora } = paraLocal(p.date);
-    const qtd = Math.max(0, Math.round(Number(p.qty) || 0));
+    // Pode vir negativo (estorno no CODI): guarda igual, pro total do dia bater
+    const qtd = Math.round(Number(p.qty) || 0);
     horas.set(`${dia}|${hora}`, qtd);
   }
   return horas;
@@ -211,7 +214,7 @@ async function lerMaquina(codiId, seteDias) {
     if (quantidade === 0 && (hora < HORA_INI || hora > HORA_FIM)) continue;
     linhas.push({
       maquina_id: codiId, dia, hora, quantidade,
-      suspeito: !!tipico && quantidade > tipico * 3,
+      suspeito: quantidade < 0 || (!!tipico && quantidade > tipico * 3),
     });
   }
   return linhas;
