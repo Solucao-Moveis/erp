@@ -304,8 +304,11 @@ function diaLocal(deslocDias = 0) {
 }
 
 async function lancar() {
-  // Hoje e ontem (o consolidado do CODI pode mudar a última hora de ontem)
-  const dias = [diaLocal(1), diaLocal(0)].filter(d => d >= LANCAR_DESDE);
+  // Todos os dias lidos do CODI (até 7 pra trás): se a contagem ficou fora do
+  // ar (PC desligado no fim de semana, CODI fora), na volta completa tudo.
+  // Hora que o líder lançou ('manual') o banco não mexe.
+  const dias = [...new Set([...horasMem.keys()].map(k => k.split('|')[1]))]
+    .filter(d => d >= LANCAR_DESDE && d <= diaLocal(0));
   const linhas = [];
   for (const m of maquinas) {
     if (!m.id) continue;
