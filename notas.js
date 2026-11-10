@@ -10,6 +10,39 @@
    ============================================================ */
 window.SMERP_NOTAS = [
   {
+    versao: '7.01',
+    data: '06/11/2026',
+    titulo: 'Hora a Hora: tela de TV por setor',
+    resumo: 'O Hora a Hora ganhou uma tela própria para TV: o mapa de calor de um setor fica aberto o dia todo e atualiza sozinho quando o líder lança a produção.',
+    mudancas: [
+      {
+        app: 'Hora a Hora: Aba TV',
+        o_que: 'O PCP agora cria um link de TV para cada setor (ex.: Solda). O link abre sem login, então a TV não cai na tela de senha.',
+        como: 'No menu do Hora a Hora, clique em "TV", escolha o setor, dê um nome se quiser e clique em "Gerar TV". Depois clique em "Copiar link" e abra esse link no navegador da TV. Para tirar a TV do ar, clique em "Desativar".',
+      },
+      {
+        app: 'Hora a Hora: Tela da TV',
+        o_que: 'A TV mostra o placar do dia (realizado contra a meta), se o setor está adiantado ou atrasado, a hora atual e o mapa de calor de cada máquina hora a hora. A hora atual fica destacada em laranja, e a hora que passou sem lançamento aparece com um "!" vermelho.',
+        como: 'Não precisa mexer em nada: a tela se atualiza sozinha a cada 5 segundos, e quando entra um lançamento novo a célula pisca e aparece o aviso no topo. À meia-noite ela já passa para o dia novo. Dê dois cliques na tela para deixar em tela cheia.',
+      },
+      {
+        app: 'Hora a Hora: TV sempre na versão nova',
+        o_que: 'Na TV o nome da máquina aparece curto (ex.: "Box 1", "Robô 2") para o número não ficar escondido. E quando sai uma melhoria, a TV se atualiza sozinha, sem trocar o link.',
+        como: 'Não precisa fazer nada: o link que já está na TV continua valendo e a tela recarrega sozinha quando houver novidade.',
+      },
+      {
+        app: 'Hora a Hora: Quanto falta por hora',
+        o_que: 'Na TV, cada hora que ainda não foi lançada mostra quanto a máquina precisa fazer naquela hora para fechar a meta do dia, já contando o que foi feito até agora. O placar de cima mostra o mesmo para o setor inteiro.',
+        como: 'Olhe o número escrito "precisa" na hora atual: em verde, dá para bater a meta mesmo abaixo da meta normal da hora; em vermelho, é preciso produzir acima da meta normal para recuperar. Quando a máquina já bateu a meta do dia, aparece um "✓". Na coluna Total, "precisa X/h" é a média por hora que falta.',
+      },
+      {
+        app: 'Hora a Hora: Status da máquina na TV',
+        o_que: 'Na TV, o nome de cada máquina ganhou a cor do status que vem do CODI: verde produzindo, e a cor do tipo de parada quando está parada (ex.: vermelho para falta de peças, amarelo para fora de operação). Quando a máquina para, aparece um cronômetro na frente do nome contando há quanto tempo está parada, com o motivo logo abaixo.',
+        como: 'Não precisa fazer nada: a cor e o cronômetro seguem o CODI sozinhos. Cinza quer dizer que o CODI não está mandando sinal daquela máquina. O total de peças feitas na coluna Total também ficou maior e em negrito.',
+      },
+    ],
+  },
+  {
     versao: '7.00',
     data: '03/11/2026',
     titulo: 'Acidentes e Afastamentos: nova área de Ocorrências Internas',
