@@ -28,7 +28,7 @@ window.SMERP_NOTAS = [
       {
         app: 'Hora a Hora: Corrigir com a contagem física',
         o_que: 'O líder pode trocar o número de qualquer hora pela contagem física. A partir daí o CODI não mexe mais naquela hora.',
-        como: 'Digite o número no campo da hora e clique fora. A hora perde a borda azul e mostra "físico", com o botão "CODI: (número) · usar" embaixo. Clique nesse botão se quiser voltar a usar o número do CODI.',
+        como: 'Digite o número no campo da hora e clique fora. A hora troca a borda azul por um contorno laranja com a etiqueta "MANUAL", mostrando que foi alterada à mão, com o botão "CODI: (número) · usar" embaixo. Clique nesse botão se quiser voltar a usar o número do CODI.',
       },
       {
         app: 'Hora a Hora: Aviso de contagem parada',
