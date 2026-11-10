@@ -4,13 +4,16 @@
  * Separado do coletor principal (index.js): login, token e arquivos próprios.
  * Se um cair, o outro segue.
  *
- * A cada 1 min lê, das máquinas do setor (fabrill.machines.codi_maquina_id),
- * as peças por hora das últimas 24h e grava em codi.contagem_hora.
- * Na partida, depois de qualquer falha e a cada hora, relê 7 dias
- * (histórico do CODI) e completa o que faltou.
+ * Máquinas: todas com fabrill.machines.codi_contagem_desde preenchido (liga
+ * por máquina, de qualquer setor: hoje Metalurgia e Solda). O nome do arquivo
+ * é da primeira versão, só Metalurgia.
  *
- * Lançamento no Hora a Hora (a partir de CONTAGEM_LANCAR_DESDE): soma as horas
- * do CODI nas horas do Hora a Hora (ver horaParaSlot) e grava pela função
+ * A cada 1 min lê do CODI as peças por hora das últimas 24h e grava em
+ * codi.contagem_hora. Na partida, depois de qualquer falha e a cada hora,
+ * relê 7 dias (histórico do CODI) e completa o que faltou.
+ *
+ * Lançamento no Hora a Hora (a partir de codi_contagem_desde de cada máquina):
+ * soma as horas do CODI nas horas do Hora a Hora (ver horaParaSlot) e grava pela função
  * fabrill.codi_lancar_horas. Hora que o líder corrigiu ('manual') nunca é
  * sobrescrita: o banco só atualiza o número do CODI ao lado (qtd_codi).
  *
@@ -41,8 +44,8 @@ const MAQUINAS_FILE = join(__dir, '.contagem-maquinas.json');
 
 // ─── Config ───────────────────────────────────────────────────
 
-const SETOR    = process.env.CONTAGEM_SETOR || 'Metalurgia';
-const PROCESSO = `contagem-${SETOR.toLowerCase()}`;
+const PROCESSO = 'contagem';
+const PROCESSO_ANTIGO = 'contagem-metalurgia'; // batimento da 1ª versão (apagado na partida)
 const CODI_ORIGIN = new URL(process.env.CODI_BASE_URL || 'http://192.168.2.210:8080').origin;
 const CODI_GLUE   = `${CODI_ORIGIN}/apis/codi-glue`;
 const CODI_TOKEN  = `${CODI_ORIGIN}/auth/token`;
@@ -144,20 +147,35 @@ async function codiGet(endpoint, params) {
   }
 }
 
-// ─── Máquinas do setor ────────────────────────────────────────
+// ─── Máquinas no automático ───────────────────────────────────
 
-let maquinas = [];        // [{ codi_id, nome }]
+let maquinas = [];        // [{ id, codi_id, nome, desde }]
 let maquinasLidasEm = 0;
+
+async function buscarMaquinas() {
+  const { data, error } = await sbFabrill.from('machines')
+    .select('id, name, codi_maquina_id, codi_contagem_desde')
+    .not('codi_maquina_id', 'is', null).not('codi_contagem_desde', 'is', null);
+  if (!error) return data.map(m => ({ id: m.id, codi_id: m.codi_maquina_id, nome: m.name, desde: m.codi_contagem_desde }));
+  if (!/codi_contagem_desde/.test(error.message)) throw error;
+  // Banco ainda sem a coluna (fabrill_contagem_codi_solda.sql): só Metalurgia, como antes
+  const { data: area } = await sbFabrill.from('areas').select('id').eq('name', 'Metalurgia').maybeSingle();
+  if (!area) throw new Error('setor Metalurgia não encontrado');
+  const r = await sbFabrill.from('machines').select('id, name, codi_maquina_id')
+    .eq('area_id', area.id).not('codi_maquina_id', 'is', null);
+  if (r.error) throw r.error;
+  return r.data.map(m => ({ id: m.id, codi_id: m.codi_maquina_id, nome: m.name, desde: LANCAR_DESDE }));
+}
 
 async function carregarMaquinas() {
   if (maquinas.length && Date.now() - maquinasLidasEm < 10 * 60_000) return;
   try {
-    const { data: area, error: ea } = await sbFabrill.from('areas').select('id').eq('name', SETOR).maybeSingle();
-    if (ea || !area) throw new Error(ea?.message ?? `setor ${SETOR} não encontrado`);
-    const { data, error } = await sbFabrill.from('machines')
-      .select('id, name, codi_maquina_id').eq('area_id', area.id).not('codi_maquina_id', 'is', null);
-    if (error) throw error;
-    maquinas = data.map(m => ({ id: m.id, codi_id: m.codi_maquina_id, nome: m.name }));
+    const novas = await buscarMaquinas();
+    // Máquina nova no automático: relê 7 dias pra preencher desde o início dela
+    if (novas.some(n => !maquinas.some(m => m.codi_id === n.codi_id))) precisaReler = true;
+    maquinas = novas;
+    // Máquina que saiu do automático não pode ficar "parada" no batimento
+    for (const id of Object.keys(estado)) if (!maquinas.some(m => String(m.codi_id) === id)) delete estado[id];
     writeFileSync(MAQUINAS_FILE, JSON.stringify(maquinas), 'utf8');
   } catch (e) {
     // Supabase fora: segue com a última lista conhecida
@@ -308,11 +326,12 @@ async function lancar() {
   // ar (PC desligado no fim de semana, CODI fora), na volta completa tudo.
   // Hora que o líder lançou ('manual') o banco não mexe.
   const dias = [...new Set([...horasMem.keys()].map(k => k.split('|')[1]))]
-    .filter(d => d >= LANCAR_DESDE && d <= diaLocal(0));
+    .filter(d => d <= diaLocal(0));
   const linhas = [];
   for (const m of maquinas) {
     if (!m.id) continue;
     for (const dia of dias) {
+      if (dia < (m.desde ?? LANCAR_DESDE)) continue;
       const slots = new Map();
       for (const [k, q] of horasMem) {
         const [c, d, h] = k.split('|');
@@ -414,6 +433,9 @@ setInterval(() => {
 
 process.on('unhandledRejection', e => { console.error('[contagem] erro não tratado:', e); process.exit(1); });
 
-log(`[contagem] iniciando · setor ${SETOR} · ciclo ${CICLO_MS / 1000}s`);
+log(`[contagem] iniciando · ciclo ${CICLO_MS / 1000}s`);
+// Batimento da 1ª versão (só Metalurgia) ficaria velho e acenderia o aviso
+sbCodi.from('contagem_saude').delete().eq('processo', PROCESSO_ANTIGO)
+  .then(({ error }) => error && warn('[saude] limpar antigo:', error.message));
 ciclo();
 setInterval(ciclo, CICLO_MS);
